@@ -534,12 +534,11 @@ function descargarPDF() {
             allowTaint: true
         },
         jsPDF: { 
-            unit: 'mm', 
-            format: 'a4', 
-            orientation: 'portrait'
-        },
-        pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
-    };
+    unit: 'mm', 
+    format: [215.9, 355.6], // Formato legal en milímetros (8.5 x 14 pulgadas)
+    orientation: 'portrait',
+    compress: true
+},
     
     // Cargar html2pdf.js desde CDN si no está ya cargado
     if (typeof html2pdf === 'undefined') {
