@@ -424,10 +424,9 @@ function generarPDFCorregido() {
                 unit: 'mm',
                 format: 'legal', // Formato oficio/legal
                 orientation: 'portrait',
-                compress: false, // Desactivar compresión para mejor calidad
+                compress: true, // Volvemos a la compresión original
                 precision: 16,
-                putOnlyUsedFonts: true,
-                floatPrecision: "smart" // Precisión de punto flotante inteligente
+                putOnlyUsedFonts: true
             },
             
             // Configuración de saltos de página
@@ -439,23 +438,19 @@ function generarPDFCorregido() {
             
             // Usar el nuevo modo para división de contenido
             enableLinks: false,
-            image: { type: 'jpeg', quality: 0.99 }, // Calidad máxima de imagen
+            image: { type: 'jpeg', quality: 0.95 }, // Volvemos a la calidad original
             margin: [15, 10, 15, 10], // top, right, bottom, left
             
             // Importante: Esta opción optimiza el proceso y evita páginas en blanco
             html2canvas: { 
-                scale: 2.0, // Mayor escala para mejor calidad
+                scale: 1.5, // Volvemos al valor original
                 scrollY: 0, 
                 scrollX: 0,
                 backgroundColor: '#FFFFFF',
                 removeContainer: true,
                 allowTaint: true,
                 useCORS: true,
-                letterRendering: true,
-                dpi: 300, // DPI más alto para mejor calidad
-                imageTimeout: 30000, // Más tiempo para procesar imágenes de alta calidad
-                imageSmoothingEnabled: false, // Evita el suavizado que puede hacer que el texto se vea borroso
-                imageSmoothingQuality: "high" // Alta calidad para imágenes
+                letterRendering: true
             }
         };
         
