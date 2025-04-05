@@ -121,7 +121,6 @@ function generarPDFCorregido() {
             body {
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
-                color-adjust: exact !important;
             }
             .container {
                 font-size: 12pt !important;
@@ -154,37 +153,7 @@ function generarPDFCorregido() {
                 height: 1px !important;
                 visibility: hidden !important;
             }
-            /* Forzar los colores de fondo */
-            * {
-                -webkit-print-color-adjust: exact !important;
-                color-adjust: exact !important;
-                print-color-adjust: exact !important;
-            }
-            .header-row, th {
-                background-color: #003366 !important;
-                color: white !important;
-            }
-            tr:nth-child(even) {
-                background-color: #f9f9f9 !important;
-            }
-            .info-section, .summary {
-                background-color: #f9f9f9 !important;
-            }
-            .result.seguro {
-                background-color: #dff0d8 !important;
-                color: #3c763d !important;
-                border: 1px solid #d6e9c6 !important;
-            }
-            .result.riesgo {
-                background-color: #fcf8e3 !important;
-                color: #8a6d3b !important;
-                border: 1px solid #faebcc !important;
-            }
-            .result.inseguro {
-                background-color: #f2dede !important;
-                color: #a94442 !important;
-                border: 1px solid #ebccd1 !important;
-            }
+            /* Añadir más reglas específicas según sea necesario */
         `;
         document.head.appendChild(estilosTemporales);
         
@@ -205,7 +174,7 @@ function generarPDFCorregido() {
             
             // Modo de optimización: 1 = velocidad, 2 = precisión
             html2canvas: {
-                scale: 2.0, // Mayor escala para mejorar la calidad
+                scale: 1.5,
                 useCORS: true,
                 allowTaint: true,
                 scrollX: 0,
@@ -216,215 +185,14 @@ function generarPDFCorregido() {
                 backgroundColor: '#FFFFFF',
                 imageTimeout: 15000,
                 removeContainer: true,
-                foreignObjectRendering: false, // Deshabilitar para mayor compatibilidad
-                // Estas opciones mejoran la calidad del texto y gráficos
-                letterRendering: true,
-                dpi: 300, // DPI más alto para mejor calidad
-                useCORS: true,
-                taintTest: false, // Deshabilitar prueba de contaminación para mejor rendimiento
-                imageSmoothingEnabled: false, // Evita el suavizado que puede hacer que el texto se vea borroso
-                imageSmoothingQuality: "high", // Alta calidad para imágenes
-                onclone: function(clonedDoc) {
-                    // Eliminar cualquier elemento que pueda estar causando la mancha vertical
-                    const posiblesElementosProblematicos = clonedDoc.querySelectorAll(
-                        '.container::before, .container::after, body::before, body::after, ' + 
-                        'div::before, div::after, td::before, td::after, ' +
-                        '[style*="position: absolute"], [style*="position:absolute"]'
-                    );
-                    
-                    posiblesElementosProblematicos.forEach(el => {
-                        if (el && el.parentNode) {
-                            el.parentNode.removeChild(el);
-                        }
-                    });
-                    
-                    // Eliminar elementos específicos que puedan estar causando la mancha
-                    const removeSelectors = [
-                        '.datos-guardados-info', '#indicador-guardado', 
-                        '.no-print', '[class*="indicador"]', '[id*="indicador"]'
-                    ];
-                    
-                    removeSelectors.forEach(selector => {
-                        clonedDoc.querySelectorAll(selector).forEach(el => {
-                            if (el && el.parentNode) {
-                                el.parentNode.removeChild(el);
-                            }
-                        });
-                    });
-                    
-                    // Forzar la visibilidad de los fondos y mejorar la calidad del texto
-                    const style = clonedDoc.createElement('style');
-                    style.innerHTML = `
-                        * {
-                            -webkit-print-color-adjust: exact !important;
-                            print-color-adjust: exact !important;
-                            color-adjust: exact !important;
-                            text-rendering: geometricPrecision !important;
-                            -webkit-font-smoothing: antialiased !important;
-                        }
-                        
-                        /* Eliminar cualquier posible mancha o fondo no deseado */
-                        body, html {
-                            background: white !important;
-                            background-image: none !important;
-                            font-smooth: always !important;
-                        }
-                        
-                        .container {
-                            background: white !important;
-                            background-image: none !important;
-                            box-shadow: none !important;
-                        }
-                        
-                        /* Estilos específicos para asegurar fondos correctos */
-                        .header-row, th {
-                            background-color: #003366 !important;
-                            color: white !important;
-                        }
-                        
-                        tr:nth-child(even) {
-                            background-color: #f9f9f9 !important;
-                        }
-                        
-                        .info-section, .summary {
-                            background-color: #f9f9f9 !important;
-                        }
-                        
-                        .result.seguro {
-                            background-color: #dff0d8 !important;
-                            color: #3c763d !important;
-                        }
-                        
-                        .result.riesgo {
-                            background-color: #fcf8e3 !important;
-                            color: #8a6d3b !important;
-                        }
-                        
-                        .result.inseguro {
-                            background-color: #f2dede !important;
-                            color: #a94442 !important;
-                        }
-                        
-                        /* Eliminar pseudoelementos que puedan causar manchas */
-                        *::before, *::after {
-                            display: none !important;
-                            content: none !important;
-                        }
-                        
-                        /* Mejorar la nitidez del texto */
-                        p, h1, h2, h3, h4, h5, h6, li, td, th, a, span, div {
-                            text-rendering: geometricPrecision !important;
-                            -webkit-font-smoothing: antialiased !important;
-                        }
-                    `;
-                    clonedDoc.head.appendChild(style);
-                    
-                    // Asegurar que las imágenes se muestran correctamente
-                    Array.from(clonedDoc.querySelectorAll('img')).forEach(img => {
-                        img.style.display = 'block';
-                        img.style.maxWidth = '100%';
-                    });
-                }
-            },
-                onclone: function(clonedDoc) {
-                    // Eliminar cualquier elemento que pueda estar causando la mancha vertical
-                    const posiblesElementosProblematicos = clonedDoc.querySelectorAll(
-                        '.container::before, .container::after, body::before, body::after, ' + 
-                        'div::before, div::after, td::before, td::after, ' +
-                        '[style*="position: absolute"], [style*="position:absolute"]'
-                    );
-                    
-                    posiblesElementosProblematicos.forEach(el => {
-                        if (el && el.parentNode) {
-                            el.parentNode.removeChild(el);
-                        }
-                    });
-                    
-                    // Eliminar elementos específicos que puedan estar causando la mancha
-                    const removeSelectors = [
-                        '.datos-guardados-info', '#indicador-guardado', 
-                        '.no-print', '[class*="indicador"]', '[id*="indicador"]'
-                    ];
-                    
-                    removeSelectors.forEach(selector => {
-                        clonedDoc.querySelectorAll(selector).forEach(el => {
-                            if (el && el.parentNode) {
-                                el.parentNode.removeChild(el);
-                            }
-                        });
-                    });
-                    
-                    // Forzar la visibilidad de los fondos
-                    const style = clonedDoc.createElement('style');
-                    style.innerHTML = `
-                        * {
-                            -webkit-print-color-adjust: exact !important;
-                            print-color-adjust: exact !important;
-                            color-adjust: exact !important;
-                        }
-                        
-                        /* Eliminar cualquier posible mancha o fondo no deseado */
-                        body, html {
-                            background: white !important;
-                            background-image: none !important;
-                        }
-                        
-                        .container {
-                            background: white !important;
-                            background-image: none !important;
-                            box-shadow: none !important;
-                        }
-                        
-                        /* Estilos específicos para asegurar fondos correctos */
-                        .header-row, th {
-                            background-color: #003366 !important;
-                            color: white !important;
-                        }
-                        
-                        tr:nth-child(even) {
-                            background-color: #f9f9f9 !important;
-                        }
-                        
-                        .info-section, .summary {
-                            background-color: #f9f9f9 !important;
-                        }
-                        
-                        .result.seguro {
-                            background-color: #dff0d8 !important;
-                            color: #3c763d !important;
-                        }
-                        
-                        .result.riesgo {
-                            background-color: #fcf8e3 !important;
-                            color: #8a6d3b !important;
-                        }
-                        
-                        .result.inseguro {
-                            background-color: #f2dede !important;
-                            color: #a94442 !important;
-                        }
-                        
-                        /* Eliminar pseudoelementos que puedan causar manchas */
-                        *::before, *::after {
-                            display: none !important;
-                            content: none !important;
-                        }
-                    `;
-                    clonedDoc.head.appendChild(style);
-                    
-                    // Asegurar que las imágenes se muestran correctamente
-                    Array.from(clonedDoc.querySelectorAll('img')).forEach(img => {
-                        img.style.display = 'block';
-                        img.style.maxWidth = '100%';
-                    });
-                }
+                foreignObjectRendering: false // Deshabilitar para mayor compatibilidad
             },
             
             jsPDF: {
                 unit: 'mm',
                 format: 'legal', // Formato oficio/legal
                 orientation: 'portrait',
-                compress: true, // Volvemos a la compresión original
+                compress: true,
                 precision: 16,
                 putOnlyUsedFonts: true
             },
@@ -438,20 +206,11 @@ function generarPDFCorregido() {
             
             // Usar el nuevo modo para división de contenido
             enableLinks: false,
-            image: { type: 'jpeg', quality: 0.95 }, // Volvemos a la calidad original
+            image: { type: 'jpeg', quality: 0.95 },
             margin: [15, 10, 15, 10], // top, right, bottom, left
             
             // Importante: Esta opción optimiza el proceso y evita páginas en blanco
-            html2canvas: { 
-                scale: 1.5, // Volvemos al valor original
-                scrollY: 0, 
-                scrollX: 0,
-                backgroundColor: '#FFFFFF',
-                removeContainer: true,
-                allowTaint: true,
-                useCORS: true,
-                letterRendering: true
-            }
+            html2canvas: { scale: 1.5, scrollY: 0, scrollX: 0 }
         };
         
         // Generar el PDF con el manejo optimizado
@@ -533,15 +292,7 @@ function generarPDFCorregido() {
         // 1. Restaurar elementos ocultos
         if (estadoOriginal.ocultos) {
             estadoOriginal.ocultos.forEach(item => {
-                // Si el elemento fue completamente eliminado, restaurarlo
-                if (item.parent && item.nextSibling) {
-                    item.parent.insertBefore(item.element, item.nextSibling);
-                } else if (item.parent) {
-                    item.parent.appendChild(item.element);
-                } else if (item.display !== undefined) {
-                    // Si solo se cambió el display
-                    item.element.style.display = item.display || '';
-                }
+                item.element.style.display = item.display || '';
             });
         }
         
