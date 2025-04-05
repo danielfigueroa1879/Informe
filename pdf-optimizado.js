@@ -1,6 +1,6 @@
 /**
  * Solución definitiva para la generación de PDF sin páginas en blanco
- * y con saltos de página correctos - ESCALA DOBLE
+ * con saltos de página correctos y todos los gráficos visibles
  */
 
 // Función principal que configura y genera el PDF
@@ -219,7 +219,7 @@ function generarPDFCorregido() {
             
             // Modo de optimización: 1 = velocidad, 2 = precisión
             html2canvas: {
-                scale: 3.0, // ESCALA DOBLE (original era 1.5)
+                scale: 1.5, // ESCALA ORIGINAL
                 useCORS: true,
                 allowTaint: true,
                 scrollX: 0,
@@ -306,7 +306,7 @@ function generarPDFCorregido() {
             
             // Importante: Esta opción optimiza el proceso y evita páginas en blanco
             html2canvas: { 
-                scale: 3.0, // ESCALA DOBLE
+                scale: 1.5, // ESCALA ORIGINAL
                 scrollY: 0, 
                 scrollX: 0,
                 backgroundColor: '#FFFFFF',
@@ -609,7 +609,7 @@ function instalarBotonPDFCorregido() {
         
         // Actualizar texto y estilos para distinguirlo
         if (btn.textContent.includes('PDF')) {
-            btn.textContent = 'Descargar PDF (Escala Doble)';
+            btn.textContent = 'Descargar PDF Optimizado';
         }
         
         // Estilos destacados
@@ -645,7 +645,7 @@ function instalarBotonPDFCorregido() {
         botonesDivs.forEach(div => {
             const nuevoBoton = document.createElement('button');
             nuevoBoton.type = 'button';
-            nuevoBoton.textContent = 'Descargar PDF (Escala Doble)';
+            nuevoBoton.textContent = 'Descargar PDF Optimizado';
             nuevoBoton.onclick = generarPDFCorregido;
             nuevoBoton.className = 'no-print';
             
