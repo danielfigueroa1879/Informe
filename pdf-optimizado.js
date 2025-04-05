@@ -163,113 +163,207 @@ function generarPDFCorregido() {
         
         // 5. Añadir una hoja de estilos temporal con reglas específicas para PDF
         const estilosTemporales = document.createElement('style');
-        estilosTemporales.id = 'estilos-temporales-pdf';
-        estilosTemporales.textContent = `
-            @page {
-                size: legal portrait;
-                margin: 15mm 10mm;
-            }
-            body {
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-                color-adjust: exact !important;
-            }
-            .container {
-                font-size: 12pt !important;
-                width: 100% !important;
-                max-width: 100% !important;
-                padding: 0 !important;
-                margin: 0 !important;
-            }
-            h2 {
-                page-break-before: always !important;
-                break-before: page !important;
-                page-break-after: avoid !important;
-                break-after: avoid !important;
-            }
-            h3 {
-                page-break-after: avoid !important;
-                break-after: avoid !important;
-            }
-            table {
-                page-break-inside: auto !important;
-                break-inside: auto !important;
-            }
-            tr {
-                page-break-inside: avoid !important;
-                break-inside: avoid !important;
-            }
-            .forced-page-break {
-                page-break-before: always !important;
-                break-before: page !important;
-                height: 1px !important;
-                visibility: hidden !important;
-            }
-            
-            /* Eliminar saltos de página no deseados */
-            div:empty {
-                display: none !important;
-            }
-            
-            /* Mejorar visualización de observaciones */
-            .textarea-contenido-pdf {
-                min-height: 50px;
-                padding: 5px !important;
-                font-family: inherit !important;
-                font-size: inherit !important;
-                line-height: 1.4 !important;
-                white-space: pre-wrap !important;
-                word-break: break-word !important;
-                margin-bottom: 5px !important;
-            }
-            
-            /* Estilos para asegurar que los fondos se muestren correctamente */
-            * {
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-                color-adjust: exact !important;
-            }
-            
-            /* Estilos específicos para que los gráficos y colores se muestren correctamente */
-            .header-row, th {
-                background-color: #003366 !important;
-                color: white !important;
-            }
-            
-            tr:nth-child(even) {
-                background-color: #f9f9f9 !important;
-            }
-            
-            .info-section, .summary {
-                background-color: #f9f9f9 !important;
-            }
-            
-            .result.seguro {
-                background-color: #dff0d8 !important;
-                color: #3c763d !important;
-                border: 1px solid #d6e9c6 !important;
-            }
-            
-            .result.riesgo {
-                background-color: #fcf8e3 !important;
-                color: #8a6d3b !important;
-                border: 1px solid #faebcc !important;
-            }
-            
-            .result.inseguro {
-                background-color: #f2dede !important;
-                color: #a94442 !important;
-                border: 1px solid #ebccd1 !important;
-            }
-            
-            /* Asegurar que las imágenes sean visibles */
-            img {
-                display: inline-block !important;
-                max-width: 100% !important;
-            }
-        `;
-        document.head.appendChild(estilosTemporales);
-        estadoOriginal.elementosCreados.push(estilosTemporales);
+// Busca esta sección en el archivo pdf-optimizado.js y reemplázala
+
+// 5. Añadir una hoja de estilos temporal con reglas específicas para PDF
+const estilosTemporales = document.createElement('style');
+estilosTemporales.id = 'estilos-temporales-pdf';
+estilosTemporales.textContent = `
+    @page {
+        size: legal portrait;
+        margin: 5mm 3mm;
+    }
+    body {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        color-adjust: exact !important;
+    }
+    .container {
+        font-size: 0.5pt !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        transform: scale(0.9);
+        transform-origin: top left;
+    }
+    h1 {
+        font-size: 2pt !important;
+        margin-bottom: 2pt !important;
+        margin-top: 2pt !important;
+    }
+    h2 {
+        font-size: 1.5pt !important;
+        page-break-before: always !important;
+        break-before: page !important;
+        page-break-after: avoid !important;
+        break-after: avoid !important;
+        margin-top: 5pt !important;
+        margin-bottom: 2pt !important;
+    }
+    h3 {
+        font-size: 1pt !important;
+        page-break-after: avoid !important;
+        break-after: avoid !important;
+        margin-top: 3pt !important;
+        margin-bottom: 1pt !important;
+    }
+    
+    /* Texto normal extremadamente pequeño */
+    body, p, td, th, li, span, div, input, textarea, label {
+        font-size: 0.5pt !important;
+        line-height: 0.6 !important;
+    }
+    
+    table {
+        page-break-inside: auto !important;
+        break-inside: auto !important;
+        font-size: 0.5pt !important;
+        margin-bottom: 2pt !important;
+    }
+    
+    th, td {
+        padding: 0.5pt !important;
+        font-size: 0.5pt !important;
+        border-width: 0.1pt !important;
+    }
+    
+    tr {
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+        height: auto !important;
+        line-height: 0.6 !important;
+    }
+    
+    .forced-page-break {
+        page-break-before: always !important;
+        break-before: page !important;
+        height: 1px !important;
+        visibility: hidden !important;
+    }
+    
+    /* Eliminar saltos de página no deseados */
+    div:empty {
+        display: none !important;
+    }
+    
+    /* Mejorar visualización de observaciones */
+    .textarea-contenido-pdf {
+        min-height: 15pt !important;
+        padding: 0.5pt !important;
+        font-family: inherit !important;
+        font-size: 0.5pt !important;
+        line-height: 0.6 !important;
+        white-space: pre-wrap !important;
+        word-break: break-word !important;
+        margin-bottom: 1pt !important;
+    }
+    
+    /* Estilos para asegurar que los fondos se muestren correctamente */
+    * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        color-adjust: exact !important;
+    }
+    
+    /* Estilos específicos para que los gráficos y colores se muestren correctamente */
+    .header-row, th {
+        background-color: #003366 !important;
+        color: white !important;
+        font-size: 0.5pt !important;
+    }
+    
+    tr:nth-child(even) {
+        background-color: #f9f9f9 !important;
+    }
+    
+    .info-section, .summary {
+        background-color: #f9f9f9 !important;
+        padding: 1pt !important;
+        margin-bottom: 2pt !important;
+    }
+    
+    .info-section p {
+        font-size: 0.5pt !important;
+        margin: 0.5pt 0 !important;
+    }
+    
+    .info-section p strong {
+        font-size: 0.5pt !important;
+    }
+    
+    .result.seguro {
+        background-color: #dff0d8 !important;
+        color: #3c763d !important;
+        border: 1px solid #d6e9c6 !important;
+        font-size: 1pt !important;
+        padding: 1pt !important;
+    }
+    
+    .result.riesgo {
+        background-color: #fcf8e3 !important;
+        color: #8a6d3b !important;
+        border: 1px solid #faebcc !important;
+        font-size: 1pt !important;
+        padding: 1pt !important;
+    }
+    
+    .result.inseguro {
+        background-color: #f2dede !important;
+        color: #a94442 !important;
+        border: 1px solid #ebccd1 !important;
+        font-size: 1pt !important;
+        padding: 1pt !important;
+    }
+    
+    /* Resumen automático extremadamente pequeño */
+    #resumen-automatico, .resumen-seccion {
+        font-size: 0.5pt !important;
+        padding: 1pt !important;
+    }
+    
+    #resumen-automatico strong {
+        font-size: 0.5pt !important;
+    }
+    
+    #resumen-automatico ul, 
+    #resumen-automatico ul li, 
+    #resumen-automatico ul ul li {
+        font-size: 0.5pt !important;
+        margin: 0.3pt 0 !important;
+        line-height: 0.6 !important;
+    }
+    
+    .no-cumple-tag {
+        font-size: 0.5pt !important;
+    }
+    
+    /* Plan de acción microscópico */
+    #plan-accion-editor, .rich-text-editor {
+        font-size: 0.5pt !important;
+        line-height: 0.6 !important;
+    }
+    
+    /* Resultados en tamaño micro */
+    .resultados-compacto h3 {
+        font-size: 1pt !important;
+        margin: 1pt 0 0.5pt 0 !important;
+    }
+    
+    .resultados-compacto p, .resultados-info p {
+        font-size: 0.5pt !important;
+        margin: 0.3pt 0 !important;
+    }
+    
+    /* Asegurar que las imágenes sean visibles */
+    img {
+        display: inline-block !important;
+        max-width: 100% !important;
+        max-height: 80px !important;
+    }
+`;
+document.head.appendChild(estilosTemporales);
+estadoOriginal.elementosCreados.push(estilosTemporales);
         
         // 6. Eliminar elementos vacíos que puedan causar páginas en blanco
         const elementosVacios = Array.from(container.querySelectorAll('div, p, span'))
