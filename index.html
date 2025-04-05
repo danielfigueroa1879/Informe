@@ -838,350 +838,427 @@
     </style>
 </head>
 <script>
-    function contarCumplimiento() {
-        var totalItems = document.querySelectorAll('input[type="radio"][name^="item_"]').length / 2;
-        var itemsCumplen = document.querySelectorAll('input[type="radio"][value="cumple"]:checked').length;
-        var itemsNoCumplen = document.querySelectorAll('input[type="radio"][value="no-cumple"]:checked').length;
-        
-        document.getElementById('total-items').textContent = totalItems;
-        document.getElementById('items-cumplen').textContent = itemsCumplen;
-        document.getElementById('items-no-cumplen').textContent = itemsNoCumplen;
-        
-        var porcentaje = 0;
-        if (itemsCumplen + itemsNoCumplen > 0) {
-            porcentaje = Math.round((itemsCumplen / (itemsCumplen + itemsNoCumplen)) * 100);
-        }
-        
-        document.getElementById('porcentaje-cumplimiento').textContent = porcentaje;
-        
-        var resultElement = document.getElementById('resultado-evaluacion');
-        resultElement.classList.remove('seguro', 'riesgo', 'inseguro');
-        
-        // Determinar el resultado de la evaluación
-        var estadoSeguridad = "PENDIENTE DE EVALUACIÓN";
-        var recomendacionTexto = "Complete la evaluación para generar un análisis de vulnerabilidades.";
-        
-        if (itemsCumplen + itemsNoCumplen > 0) {
-            if (porcentaje >= 80) {
-                estadoSeguridad = "ESTABLECIMIENTO SEGURO";
-                resultElement.classList.add('seguro');
-                recomendacionTexto = "El establecimiento cumple con la mayoría de los requisitos de seguridad. Se recomienda mantener las medidas actuales y mejorar los aspectos no conformes.";
-            } else if (porcentaje >= 60) {
-                estadoSeguridad = "ESTABLECIMIENTO EN RIESGO";
-                resultElement.classList.add('riesgo');
-                recomendacionTexto = "El establecimiento presenta vulnerabilidades significativas que deben ser subsanadas a corto plazo. Se requiere un plan de acción inmediato.";
-            } else {
-                estadoSeguridad = "ESTABLECIMIENTO INSEGURO";
-                resultElement.classList.add('inseguro');
-                recomendacionTexto = "El establecimiento presenta graves deficiencias de seguridad que lo hacen vulnerable. Se requiere intervención urgente y un plan integral de mejora.";
-            }
-        }
-        
-        resultElement.textContent = estadoSeguridad;
-        document.getElementById('recomendacion').textContent = recomendacionTexto;
-        
-        // Generar resumen automático
-        generarResumenAutomatico(itemsCumplen, itemsNoCumplen, porcentaje, estadoSeguridad);
-    }
-    
-    function generarResumenAutomatico(itemsCumplen, itemsNoCumplen, porcentaje, estadoSeguridad) {
-        var resumenElement = document.getElementById('resumen-automatico');
-        
-        // Obtener la entidad y fecha
-        var nombreEntidad = document.querySelector('input[name="nombre_entidad"]').value || "[Nombre no especificado]";
-        var fechaDia = document.querySelector('input[name="dia"]').value || "XX";
-        var fechaMes = document.querySelector('input[name="mes"]').value || "XX";
-        var fechaAno = document.querySelector('input[name="ano"]').value || "XX";
-        
-        // Recopilar información sobre items no cumplidos
-        var itemsNoCumplidosElements = document.querySelectorAll('input[type="radio"][value="no-cumple"]:checked');
-        var areasProblematicas = [];
-        
-        itemsNoCumplidosElements.forEach(function(radioButton) {
-            var fila = radioButton.closest('tr');
-            var itemDescripcion = fila.querySelector('td:first-child').textContent;
-            // Excluir cualquier ítem relacionado con armamento si hubiera
-            if (!itemDescripcion.toLowerCase().includes("arma") && 
-                !itemDescripcion.toLowerCase().includes("armamento") &&
-                                                                   !itemDescripcion.toLowerCase().includes("munición") &&
-                !itemDescripcion.toLowerCase().includes("pistola") &&
-                !itemDescripcion.toLowerCase().includes("revólver")) {
-                var seccion = fila.closest('table').previousElementSibling.textContent;
-                areasProblematicas.push({ seccion: seccion, item: itemDescripcion });
-            }
-        });
-        
-        // Construir el resumen en formato compacto
-        var resumenHTML = `
-            <div class="resumen-info-compacto">
-                <p><strong>Fecha de Evaluación:</strong> ${fechaDia}/${fechaMes}/${fechaAno}</p>
-                <p><strong>Entidad Evaluada:</strong> ${nombreEntidad}</p>
-                <p><strong>Resultado:</strong> ${estadoSeguridad}</p>
-                <p><strong>Cumplimiento General:</strong> ${porcentaje}% (${itemsCumplen} de ${itemsCumplen + itemsNoCumplen} ítems)</p>
-            </div>
-        `;
-        
-        // Añadir áreas problemáticas si existen
-        if (areasProblematicas.length > 0) {
-            resumenHTML += `<div class="areas-atencion">
-                <h4>Áreas que requieren atención:</h4><ul>`;
-            
-            // Agrupar por sección
-            var seccionesAgrupadas = {};
-            areasProblematicas.forEach(function(area) {
-                if (!seccionesAgrupadas[area.seccion]) {
-                    seccionesAgrupadas[area.seccion] = [];
-                }
-                seccionesAgrupadas[area.seccion].push(area.item);
-            });
-            
-            // Añadir cada sección con sus items
-            for (var seccion in seccionesAgrupadas) {
-                resumenHTML += `<li><strong>${seccion}</strong><ul>`;
-                seccionesAgrupadas[seccion].forEach(function(item) {
-                    resumenHTML += `<li>${item} <span class="no-cumple-tag">NO CUMPLE</span></li>`;
-                });
-                resumenHTML += `</ul></li>`;
-            }
-            
-            resumenHTML += `</ul></div>`;
-        } else if (itemsCumplen + itemsNoCumplen > 0) {
-            resumenHTML += `<p><strong>¡Felicitaciones!</strong> Todos los ítems evaluados cumplen con los requisitos de seguridad.</p>`;
-        } else {
-            resumenHTML += `<p>No se han evaluado ítems todavía. Complete la evaluación para generar un análisis detallado.</p>`;
-        }
-        
-        resumenElement.innerHTML = resumenHTML;
-    }
-    
-    function imprimirFormulario() {
-        window.print();
-    }
-    
-    function limpiarFormulario() {
-        if (confirm("¿Está seguro que desea limpiar todo el formulario?")) {
-            document.getElementById("formulario-fiscalizacion").reset();
-            contarCumplimiento();
-            
-            // Limpiar campos de observaciones
-            var observaciones = document.querySelectorAll('td.observaciones textarea');
-            for (var i = 0; i < observaciones.length; i++) {
-                observaciones[i].value = '';
-            }
-            
-            // Limpiar resumen automático
-            document.getElementById('resumen-automatico').innerHTML = '<p>El resumen detallado se generará automáticamente al completar la evaluación.</p>';
-            
-            // Limpiar plan de acción
-            var planEditor = document.getElementById('plan-accion-editor');
-            if (planEditor) {
-                planEditor.innerHTML = '';
-            }
-            var planHidden = document.getElementById('plan-accion');
-            if (planHidden) {
-                planHidden.value = '';
-            }
-            
-            // Limpiar previsualizaciones de fotos
-            document.getElementById('preview-foto1').innerHTML = '';
-            document.getElementById('preview-foto2').innerHTML = '';
-            
-            // Restaurar etiquetas y textos de fotografías
-            var fotoPlaceholders = document.querySelectorAll('.foto-placeholder');
-            for (var i = 0; i < fotoPlaceholders.length; i++) {
-                fotoPlaceholders[i].querySelector('p').style.display = 'block';
-                fotoPlaceholders[i].querySelector('label').style.display = 'inline-block';
-            }
-            
-            // Limpiar descripciones de fotos
-            var fotoDescripciones = document.querySelectorAll('.foto-descripcion');
-            for (var i = 0; i < fotoDescripciones.length; i++) {
-                fotoDescripciones[i].value = '';
-            }
-        }
-    }
-    
-    // Función para aplicar formato al texto en el editor de texto enriquecido
-    function formatText(command, value = null) {
-      document.execCommand(command, false, value);
-      document.getElementById('plan-accion-editor').focus();
-                                                              // Actualizar el campo oculto para enviar con el formulario
-      updateHiddenField();
+/**
+ * Ajustes de Texto y Mejora de Autoguardado
+ * Este script reduce el tamaño del texto en el resumen automático y asegura que el autoguardado funcione correctamente
+ */
+
+// Función para reducir el tamaño del texto en el resumen automático
+function reducirTextoResumenAutomatico() {
+  // Crear estilos CSS adicionales para el resumen automático
+  const estilo = document.createElement('style');
+  estilo.textContent = `
+    /* Ajustes para el resumen automático - reducción adicional de tamaño */
+    #resumen-automatico {
+      font-size: 0.9rem !important; /* Reducido significativamente */
+      line-height: 1.3 !important; /* Espaciado entre líneas más compacto */
     }
 
-    // Función para actualizar el campo oculto con el contenido HTML
-    function updateHiddenField() {
-      const editor = document.getElementById('plan-accion-editor');
-      const hiddenField = document.getElementById('plan-accion');
-      
-      if (editor && hiddenField) {
-        hiddenField.value = editor.innerHTML;
-      }
+    #resumen-automatico strong {
+      font-size: 0.95rem !important; /* Reducido */
+    }
+
+    /* Para los elementos de la lista principal */
+    #resumen-automatico ul {
+      margin: 4px 0 !important;
+      padding-left: 15px !important; 
+    }
+
+    #resumen-automatico ul li {
+      margin-bottom: 3px !important;
+      font-size: 0.9rem !important; /* Reducido */
+    }
+
+    /* Para las sublistas (los items que no cumplen) */
+    #resumen-automatico ul ul {
+      margin: 3px 0 !important;
+      padding-left: 12px !important;
+    }
+
+    #resumen-automatico ul ul li {
+      margin-bottom: 2px !important;
+      font-size: 0.85rem !important; /* Más pequeño aún */
+      line-height: 1.25 !important;
+    }
+
+    /* Para la etiqueta NO CUMPLE */
+    #resumen-automatico .no-cumple-tag {
+      font-weight: 700 !important;
+      color: #ff0000 !important;
+      margin-left: 3px !important;
+      font-size: 0.8rem !important; /* Muy reducido */
+    }
+
+    /* Ajustes para la información compacta al inicio */
+    #resumen-automatico .resumen-info-compacto {
+      margin-bottom: 6px !important;
+    }
+
+    #resumen-automatico .resumen-info-compacto p {
+      font-size: 0.9rem !important; /* Reducido */
+      margin: 2px 0 !important;
+    }
+
+    /* Hacer los títulos de sección más pequeños */
+    #resumen-automatico ul li strong {
+      font-size: 0.95rem !important; /* Reducido */
+    }
+
+    /* Ajustar el espacio entre secciones */
+    #resumen-automatico .areas-atencion h4 {
+      font-size: 0.95rem !important; /* Reducido */
+      margin-top: 6px !important;
+      margin-bottom: 3px !important;
     }
     
-    // NUEVA FUNCIÓN: Ajusta automáticamente la altura del editor
-    function autoResizeEditor() {
-      const editor = document.getElementById('plan-accion-editor');
-      if (!editor) return;
-      
-      // Función para ajustar la altura según el contenido
-      function adjustHeight() {
-        // Guardar la posición de scroll actual
-        const scrollPos = window.scrollY;
-        
-        // Resetear altura para calcular correctamente
-        editor.style.height = 'auto';
-        
-        // Añadir un poco de espacio extra al final
-        editor.style.height = (editor.scrollHeight + 20) + 'px';
-        
-        // Restaurar la posición de scroll para evitar saltos
-        window.scrollTo(0, scrollPos);
+    /* Ajustes adicionales para los párrafos */
+    #resumen-automatico p {
+      margin: 2px 0 !important;
+      font-size: 0.9rem !important;
+    }
+    
+    /* Ajustes para impresión */
+    @media print {
+      #resumen-automatico {
+        font-size: 8pt !important;
+        line-height: 1.2 !important;
       }
       
-      // Ajustar la altura cuando cambie el contenido
-      editor.addEventListener('input', adjustHeight);
+      #resumen-automatico strong {
+        font-size: 8pt !important;
+      }
       
-      // Ajustar también cuando se formatea el texto
-      const formatButtons = document.querySelectorAll('.rich-text-toolbar button');
-      formatButtons.forEach(button => {
-        button.addEventListener('click', function() {
-          // Pequeño retraso para permitir que el formato se aplique primero
-          setTimeout(adjustHeight, 10);
-        });
+      #resumen-automatico ul li {
+        font-size: 7.5pt !important;
+      }
+      
+      #resumen-automatico ul ul li {
+        font-size: 7pt !important;
+      }
+      
+      .no-cumple-tag {
+        font-size: 7pt !important;
+      }
+    }
+  `;
+  
+  document.head.appendChild(estilo);
+  console.log("Estilos de reducción de texto aplicados");
+}
+
+// Función para mejorar el autoguardado
+function mejorarAutoguardado() {
+  // Verificar si el autoguardado está funcionando
+  if (typeof localStorage === 'undefined') {
+    console.error("LocalStorage no disponible. El autoguardado no funcionará.");
+    return;
+  }
+  
+  // Función para guardar datos del formulario
+  function guardarFormulario() {
+    try {
+      // Guardar todos los campos de texto
+      document.querySelectorAll('input[type="text"]').forEach(input => {
+        if (input.name) {
+          localStorage.setItem('form_' + input.name, input.value);
+        }
       });
       
-      // Ajustar la altura inicial
-      adjustHeight();
+      // Guardar radios (checkboxes)
+      document.querySelectorAll('input[type="radio"]:checked').forEach(radio => {
+        if (radio.name) {
+          localStorage.setItem('form_radio_' + radio.name, radio.value);
+        }
+      });
+      
+      // Guardar observaciones (textareas)
+      document.querySelectorAll('textarea').forEach((textarea, index) => {
+        localStorage.setItem('form_textarea_' + index, textarea.value);
+      });
+      
+      // Guardar el editor de texto rico (plan de acción)
+      const planAccion = document.getElementById('plan-accion-editor');
+      if (planAccion) {
+        localStorage.setItem('form_plan_accion', planAccion.innerHTML);
+      }
+      
+      // Guardar el resumen automático
+      const resumen = document.getElementById('resumen-automatico');
+      if (resumen) {
+        localStorage.setItem('form_resumen', resumen.innerHTML);
+      }
+      
+      // Guardar fecha de última actualización
+      localStorage.setItem('form_last_saved', new Date().toISOString());
+      
+      console.log("Formulario guardado automáticamente: " + new Date().toLocaleTimeString());
+      mostrarNotificacionGuardado();
+    } catch (e) {
+      console.error("Error al guardar el formulario:", e);
+    }
+  }
+  
+  // Función para mostrar notificación de guardado
+  function mostrarNotificacionGuardado() {
+    // Comprobar si ya existe la notificación
+    let notificacion = document.getElementById('notificacion-guardado');
+    
+    if (!notificacion) {
+      // Crear el elemento de notificación
+      notificacion = document.createElement('div');
+      notificacion.id = 'notificacion-guardado';
+      Object.assign(notificacion.style, {
+        position: 'fixed',
+        bottom: '10px',
+        right: '10px',
+        backgroundColor: 'rgba(0, 51, 102, 0.85)',
+        color: 'white',
+        padding: '8px 15px',
+        borderRadius: '4px',
+        fontSize: '0.8rem',
+        boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
+        zIndex: '9999',
+        opacity: '0',
+        transition: 'opacity 0.3s ease'
+      });
+      document.body.appendChild(notificacion);
     }
     
-    window.onload = function() {
-        // Añadir textareas a las celdas de observaciones (excluyendo los encabezados)
-        var observaciones = document.querySelectorAll('td.observaciones');
-        for (var i = 0; i < observaciones.length; i++) {
-            var textarea = document.createElement('textarea');
-            textarea.rows = 3;
-            textarea.style.minHeight = "70px";
-            textarea.style.width = "100%";
-            textarea.style.boxSizing = "border-box";
-        //  textarea.placeholder = "Ingrese sus observaciones aquí...";
-            observaciones[i].appendChild(textarea);
+    // Actualizar el contenido y mostrar
+    notificacion.textContent = 'Guardado automático completado';
+    notificacion.style.opacity = '1';
+    
+    // Ocultar después de 2 segundos
+    setTimeout(() => {
+      notificacion.style.opacity = '0';
+    }, 2000);
+  }
+  
+  // Función para cargar los datos guardados
+  function cargarFormularioGuardado() {
+    try {
+      // Verificar si hay datos guardados
+      const lastSaved = localStorage.getItem('form_last_saved');
+      if (!lastSaved) return;
+      
+      console.log("Cargando datos guardados del: " + new Date(lastSaved).toLocaleString());
+      
+      // Cargar campos de texto
+      document.querySelectorAll('input[type="text"]').forEach(input => {
+        if (input.name) {
+          const valor = localStorage.getItem('form_' + input.name);
+          if (valor !== null) input.value = valor;
         }
-        
-        // Convertir divs a radio buttons
-        var checkboxes = document.querySelectorAll('td.check-column div.check-box');
-        for(var i = 0; i < checkboxes.length; i++) {
-            var div = checkboxes[i];
-            var td = div.parentNode;
-            var row = td.parentNode;
-            var itemNumber = Math.floor(i/2);
-            var isCumple = td.cellIndex === 1;
-            
-            var radio = document.createElement('input');
-            radio.type = 'radio';
-            radio.name = 'item_' + itemNumber;
-            radio.value = isCumple ? 'cumple' : 'no-cumple';
-            radio.onclick = function() { contarCumplimiento(); };
-            
-            div.parentNode.replaceChild(radio, div);
+      });
+      
+      // Cargar radios
+      document.querySelectorAll('input[type="radio"]').forEach(radio => {
+        if (radio.name) {
+          const valor = localStorage.getItem('form_radio_' + radio.name);
+          if (valor === radio.value) radio.checked = true;
         }
+      });
+      
+      // Cargar textareas
+      document.querySelectorAll('textarea').forEach((textarea, index) => {
+        const valor = localStorage.getItem('form_textarea_' + index);
+        if (valor !== null) textarea.value = valor;
+      });
+      
+      // Cargar editor de plan de acción
+      const planAccion = document.getElementById('plan-accion-editor');
+      if (planAccion) {
+        const valor = localStorage.getItem('form_plan_accion');
+        if (valor !== null) planAccion.innerHTML = valor;
+      }
+      
+      // Cargar el resumen (opcional, ya que normalmente se regenera)
+      const resumen = document.getElementById('resumen-automatico');
+      if (resumen) {
+        const valor = localStorage.getItem('form_resumen');
+        if (valor !== null) resumen.innerHTML = valor;
+      }
+      
+      // Actualizar conteo después de cargar datos
+      if (typeof window.contarCumplimiento === 'function') {
+        setTimeout(window.contarCumplimiento, 300);
+      }
+      
+      console.log("Datos cargados correctamente");
+    } catch (e) {
+      console.error("Error al cargar el formulario guardado:", e);
+    }
+  }
+  
+  // Configurar eventos para el guardado automático
+  function configurarEventosAutoguardado() {
+    // Guardar al cambiar cualquier input de texto
+    document.querySelectorAll('input[type="text"]').forEach(input => {
+      input.addEventListener('change', guardarFormulario);
+      input.addEventListener('blur', guardarFormulario);
+    });
+    
+    // Guardar al cambiar radios
+    document.querySelectorAll('input[type="radio"]').forEach(radio => {
+      radio.addEventListener('change', guardarFormulario);
+      // También guardar al contar el cumplimiento
+      radio.addEventListener('click', function() {
+        // Dar tiempo a que se ejecute contarCumplimiento primero
+        setTimeout(guardarFormulario, 500);
+      });
+    });
+    
+    // Guardar al escribir en textareas con retraso
+    document.querySelectorAll('textarea').forEach(textarea => {
+      textarea.addEventListener('change', guardarFormulario);
+      textarea.addEventListener('blur', guardarFormulario);
+      
+      // Debounce para no guardar con cada pulsación
+      let timeout = null;
+      textarea.addEventListener('input', function() {
+        clearTimeout(timeout);
+        timeout = setTimeout(guardarFormulario, 1000);
+      });
+    });
+    
+    // Guardar cuando se edita el plan de acción
+    const planAccion = document.getElementById('plan-accion-editor');
+    if (planAccion) {
+      planAccion.addEventListener('blur', guardarFormulario);
+      
+      let timeout = null;
+      planAccion.addEventListener('input', function() {
+        clearTimeout(timeout);
+        timeout = setTimeout(guardarFormulario, 1000);
+      });
+    }
+    
+    // Guardar también cuando se use la función de conteo
+    if (typeof window.contarCumplimiento === 'function') {
+      const originalFunction = window.contarCumplimiento;
+      window.contarCumplimiento = function() {
+        originalFunction.apply(this, arguments);
+        setTimeout(guardarFormulario, 500);
+      };
+    }
+    
+    // Guardar antes de abandonar la página
+    window.addEventListener('beforeunload', guardarFormulario);
+    
+    // Guardar periódicamente como respaldo
+    setInterval(guardarFormulario, 60000); // Cada minuto
+    
+    console.log("Eventos de autoguardado configurados");
+  }
+  
+  // Iniciar el proceso
+  cargarFormularioGuardado();
+  configurarEventosAutoguardado();
+  
+  // Guardar para asegurar que todo funcione
+  setTimeout(guardarFormulario, 2000);
+}
 
-        // Inicializar con ejemplo de datos predefinidos
-        document.querySelector('input[name="nombre_entidad"]').value = "CENTRO DE SALUD FAMILIAR (CESFAM) SAN JUAN";
-        document.querySelector('input[name="dia"]').value = "27";
-        document.querySelector('input[name="mes"]').value = "03";
-        document.querySelector('input[name="ano"]').value = "25";
+// Función para ajustar el tamaño general de los textos
+function ajustarTamañoGeneralTextos() {
+  const estilo = document.createElement('style');
+  estilo.textContent = `
+    /* Ajustes de texto general */
+    .observaciones textarea {
+      font-size: 0.9rem !important;
+    }
+    
+    .result {
+      font-size: 1.2rem !important;
+    }
+    
+    .info-section p {
+      font-size: 0.95rem !important;
+    }
+    
+    .count {
+      font-size: 0.95rem !important;
+    }
+    
+    /* Ajustar el editor de texto enriquecido */
+    .rich-text-editor {
+      font-size: 1rem !important;
+    }
+  `;
+  
+  document.head.appendChild(estilo);
+}
+
+// Función para comprobar y corregir el autoguardado existente
+function verificarAutoguardadoExistente() {
+  // Si el autoguardado ya está funcionando, no lo duplicamos
+  if (typeof window.guardarDatosFormulario === 'function') {
+    console.log("Sistema de autoguardado detectado. Mejorando funcionalidad...");
+    
+    // Sobrescribir la función existente para asegurar que funcione correctamente
+    const guardadoOriginal = window.guardarDatosFormulario;
+    window.guardarDatosFormulario = function() {
+      try {
+        // Ejecutar la función original
+        guardadoOriginal.apply(this, arguments);
         
-        // Marcar algunos items como ejemplo
-        // Esta parte es solo para simular los datos que se enviaron (12 cumplen, 18 no cumplen)
-        for(var i = 0; i < 30; i++) {
-            if(i < 12) {
-                if (document.getElementsByName('item_' + i)[0]) {
-                    document.getElementsByName('item_' + i)[0].checked = true; // Cumple
-                }
-            } else {
-                if (document.getElementsByName('item_' + (i-12))[1]) {
-                    document.getElementsByName('item_' + (i-12))[1].checked = true; // No cumple
-                }
-            }
+        // Verificar si se guardó la fecha de actualización
+        if (!localStorage.getItem('ultima_actualizacion')) {
+          // Si no se guardó, añadir la fecha actual
+          localStorage.setItem('ultima_actualizacion', new Date().toLocaleString());
         }
         
-        // Inicializar el editor de texto enriquecido
-        initRichEditor();
-        
-        // AÑADIDO: Inicializar la función de autoexpansión del editor
-        autoResizeEditor();
-        
-        // Actualizar conteo
-        contarCumplimiento();
+        console.log("Guardado mejorado aplicado");
+      } catch(e) {
+        console.error("Error en el guardado original:", e);
+        // Si hay error en el original, usar nuestra implementación
+        mejorarAutoguardado();
+      }
     };
     
-    // Inicializar el editor de texto enriquecido
-    function initRichEditor() {
-      const editor = document.getElementById('plan-accion-editor');
-      if (!editor) return;
-      
-      // Asegurarse de que el contenido se guarde cuando se modifique
-      editor.addEventListener('input', updateHiddenField);
-      editor.addEventListener('blur', updateHiddenField);
-      
-      // Si el formulario tiene un evento submit, asegúrate de actualizar el campo oculto
-      const form = editor.closest('form');
-      if (form) {
-        form.addEventListener('submit', function() {
-          updateHiddenField();
-        });
-      }
-      
-      // Para asegurar que el editor siempre tenga un párrafo
-      editor.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter') {
-          // Usar setTimeout para que se ejecute después de que el navegador haya procesado el Enter
-          setTimeout(function() {
-            const selection = window.getSelection();
-            const range = selection.getRangeAt(0);
-            const currentNode = range.startContainer;
-            
-            // Si no estamos dentro de un párrafo, crear uno
-            if (currentNode.nodeType === Node.TEXT_NODE && currentNode.parentNode === editor) {
-              document.execCommand('formatBlock', false, 'p');
-            }
-          }, 0);
-        }
-      });
-    }
-    
-    // Función para guardar como PDF
-    function guardarPDF() {
-        window.alert("Para guardar como PDF, utilice la opción de imprimir y seleccione 'Guardar como PDF' en las opciones de destino de su navegador.");
-        setTimeout(function() {
-            window.print();
-        }, 500);
-    }
-    
-    // Función para mostrar la imagen seleccionada
-    function mostrarImagen(input, previewId) {
-        var preview = document.getElementById(previewId);
-        preview.innerHTML = '';
-        
-        if (input.files && input.files[0]) {
-            var reader = new FileReader();
-            
-            reader.onload = function(e) {
-                var img = document.createElement('img');
-                img.src = e.target.result;
-                img.className = 'foto-preview';
-                preview.appendChild(img);
-                
-                // Ocultar el texto y el botón cuando hay una imagen
-                var placeholder = input.parentElement;
-                placeholder.querySelector('p').style.display = 'none';
-                placeholder.querySelector('label').style.display = 'none';
-            };
-            
-            reader.readAsDataURL(input.files[0]);
-        }
-    }
+    return true;
+  }
+  
+  return false;
+}
+
+// Función principal de inicialización
+function inicializarAjustes() {
+  console.log("Inicializando ajustes de texto y autoguardado...");
+  
+  // Aplicar estilos para reducir el texto del resumen
+  reducirTextoResumenAutomatico();
+  
+  // Ajustar tamaño general de textos
+  ajustarTamañoGeneralTextos();
+  
+  // Verificar si ya existe un sistema de autoguardado
+  const autoguardadoExistente = verificarAutoguardadoExistente();
+  
+  // Si no hay autoguardado existente, implementar el nuestro
+  if (!autoguardadoExistente) {
+    console.log("No se detectó sistema de autoguardado. Implementando nuevo sistema...");
+    mejorarAutoguardado();
+  }
+  
+  console.log("Ajustes completados");
+}
+
+// Esperar a que el DOM esté completamente cargado
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', inicializarAjustes);
+} else {
+  // Si el DOM ya está cargado, ejecutar inmediatamente
+  inicializarAjustes();
+}
+
+// También ejecutar cuando la ventana esté completamente cargada (incluidas imágenes)
+window.addEventListener('load', function() {
+  // Asegurarse de que el conteo se actualice después de cargar
+  if (typeof window.contarCumplimiento === 'function') {
+    setTimeout(window.contarCumplimiento, 1000);
+  }
+});
 </script>
 <script src="autoguardado.js"></script>
 <body>
