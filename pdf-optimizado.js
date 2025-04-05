@@ -861,3 +861,161 @@ window.instalarBotonPDFCorregido = instalarBotonPDFCorregido;
 
 // Ejecutar inmediatamente para instalar el botón sin esperar eventos
 instalarBotonPDFCorregido();
+
+// ---------- INICIO DE CÓDIGO AGREGADO ----------
+
+// Función para eliminar botones duplicados de PDF
+function eliminarBotonesDuplicados() {
+  // Obtener todos los botones que contengan "PDF" en su texto
+  const botonesPDF = Array.from(document.querySelectorAll('button'))
+    .filter(btn => btn.textContent.toLowerCase().includes('pdf'));
+  
+  // Si hay más de un botón de PDF, conservar solo el verde
+  if (botonesPDF.length > 1) {
+    console.log(`Se encontraron ${botonesPDF.length} botones de PDF. Eliminando duplicados...`);
+    
+    // Identificar el botón verde para mantenerlo
+    const botonVerde = botonesPDF.find(btn => 
+      btn.id === 'btn-descargar-pdf' || 
+      btn.style.backgroundColor.includes('28a745') ||
+      btn.classList.contains('btn-success') ||
+      window.getComputedStyle(btn).backgroundColor.includes('40, 167')
+    );
+    
+    // Si encontramos el botón verde, eliminar todos los demás botones de PDF
+    if (botonVerde) {
+      console.log('Botón verde encontrado. Manteniendo este botón y eliminando los demás.');
+      
+      botonesPDF.forEach(btn => {
+        if (btn !== botonVerde) {
+          // Ocultar el botón en lugar de eliminarlo para no romper funcionalidades existentes
+          btn.style.display = 'none';
+          console.log(`Botón oculto: ${btn.textContent}`);
+        } else {
+          // Asegurarse de que el botón verde sea más prominente
+          btn.style.backgroundColor = '#28a745';
+          btn.style.fontWeight = 'bold';
+        }
+      });
+    }
+  }
+}
+
+// Función para reducir el tamaño del texto en el PDF
+function ajustarTamañoTextoPDF() {
+  // Crear o actualizar la hoja de estilos específica para PDF
+  let estilosPDF = document.getElementById('estilos-pdf-optimizados');
+  
+  // Si no existe, crearla
+  if (!estilosPDF) {
+    estilosPDF = document.createElement('style');
+    estilosPDF.id = 'estilos-pdf-optimizados';
+    document.head.appendChild(estilosPDF);
+  }
+  
+  // Definir estilos específicos para impresión y PDF
+  estilosPDF.textContent = `
+    @media print {
+      /* Reducir tamaño de texto general */
+      body, p, td, th, li, span, div, textarea {
+        font-size: 10pt !important;
+        line-height: 1.3 !important;
+      }
+      
+      /* Reducir tamaño de encabezados */
+      h1 {
+        font-size: 16pt !important;
+        margin-bottom: 15pt !important;
+      }
+      
+      h2 {
+        font-size: 14pt !important;
+        margin-top: 20pt !important;
+        margin-bottom: 10pt !important;
+      }
+      
+      h3 {
+        font-size: 12pt !important;
+        margin-top: 15pt !important;
+        margin-bottom: 8pt !important;
+      }
+      
+      /* Reducir tamaño de los elementos en tablas */
+      table {
+        font-size: 9pt !important;
+      }
+      
+      th, td {
+        padding: 4pt !important;
+        font-size: 9pt !important;
+      }
+      
+      /* Reducir tamaño de texto en las áreas de observaciones */
+      textarea, .textarea-contenido-pdf {
+        font-size: 9pt !important;
+        line-height: 1.2 !important;
+      }
+      
+      /* Reducir tamaño de elementos en el resumen */
+      #resumen-automatico, .resumen-seccion {
+        font-size: 9pt !important;
+      }
+      
+      #resumen-automatico strong {
+        font-size: 9pt !important;
+      }
+      
+      #resumen-automatico ul, 
+      #resumen-automatico ul li, 
+      #resumen-automatico ul ul li {
+        font-size: 9pt !important;
+      }
+      
+      .no-cumple-tag {
+        font-size: 8pt !important;
+      }
+    }
+  `;
+  
+  console.log('Estilos para reducir tamaño de texto en PDF aplicados.');
+}
+
+// Modificar la función generarPDFCorregido existente si existe
+if (typeof window.generarPDFCorregido === 'function') {
+  const generarPDFOriginal = window.generarPDFCorregido;
+  
+  window.generarPDFCorregido = function() {
+    console.log('Ejecutando versión mejorada de generarPDFCorregido');
+    
+    // Eliminar botones duplicados
+    eliminarBotonesDuplicados();
+    
+    // Aplicar reducción de tamaño de texto
+    ajustarTamañoTextoPDF();
+    
+    // Llamar a la función original
+    return generarPDFOriginal.apply(this, arguments);
+  };
+}
+
+// Ejecutar la eliminación de botones duplicados cuando se cargue la página
+document.addEventListener('DOMContentLoaded', function() {
+  setTimeout(function() {
+    eliminarBotonesDuplicados();
+    
+    // Modificar el prepararContenidoParaPDF si existe
+    if (typeof window.prepararContenidoParaPDF === 'function') {
+      const prepararOriginal = window.prepararContenidoParaPDF;
+      
+      window.prepararContenidoParaPDF = function(container) {
+        // Primero aplicar los estilos de texto reducido
+        ajustarTamañoTextoPDF();
+        
+        // Luego llamar a la función original
+        return prepararOriginal.apply(this, arguments);
+      };
+    }
+  }, 1000);
+});
+
+// ---------- FIN DE CÓDIGO AGREGADO ----------
