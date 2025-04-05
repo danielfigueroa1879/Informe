@@ -901,8 +901,8 @@ function eliminarBotonesDuplicados() {
   }
 }
 /**
- * Función con tamaños de texto ultra-reducidos para PDF
- * Reemplaza la función ajustarTamañoTextoPDF() en tu archivo pdf-optimizado.js
+ * Función con texto microscópico (1pt para normal, 1.5-2pt para títulos) para PDF
+ * ADVERTENCIA: Estos tamaños están muy por debajo del límite de legibilidad
  */
 function ajustarTamañoTextoPDF() {
   // Crear o actualizar la hoja de estilos específica para PDF
@@ -915,182 +915,268 @@ function ajustarTamañoTextoPDF() {
     document.head.appendChild(estilosPDF);
   }
   
-  // Definir estilos específicos para impresión y PDF con tamaños ultra-reducidos
+  // Definir estilos específicos para impresión y PDF con tamaños microscópicos
   estilosPDF.textContent = `
     @media print {
-      /* Texto normal ultra-reducido */
-      body, p, td, th, li, span, div {
-        font-size: 4pt !important;
-        line-height: 1 !important;
+      /* Texto normal en tamaño microscópico de 1pt como solicitado */
+      body, p, td, th, li, span, div, input, textarea {
+        font-size: 1pt !important;
+        line-height: 0.8 !important;
       }
       
-      /* Títulos principales ultra-reducidos */
+      /* Títulos principales entre 1.5 y 2pt como solicitado */
       h1 {
-        font-size: 6pt !important;
-        margin-bottom: 4pt !important;
-        margin-top: 4pt !important;
+        font-size: 2pt !important;
+        margin-bottom: 1pt !important;
+        margin-top: 1pt !important;
       }
       
       h2 {
-        font-size: 5pt !important;
-        margin-top: 8pt !important;
-        margin-bottom: 3pt !important;
+        font-size: 1.8pt !important;
+        margin-top: 3pt !important;
+        margin-bottom: 0.5pt !important;
       }
       
       h3 {
-        font-size: 4.5pt !important;
-        margin-top: 6pt !important;
-        margin-bottom: 2pt !important;
+        font-size: 1.6pt !important;
+        margin-top: 2pt !important;
+        margin-bottom: 0.5pt !important;
       }
       
-      /* Títulos y elementos enumerados mínimos */
+      /* Títulos secundarios en tamaño micro */
       h4, h5, h6 {
-        font-size: 4pt !important;
-        margin-top: 4pt !important;
-        margin-bottom: 1pt !important;
+        font-size: 1.5pt !important;
+        margin-top: 1.5pt !important;
+        margin-bottom: 0.3pt !important;
       }
       
+      /* Texto en negrita también microscópico */
       strong, b {
-        font-size: 4pt !important;
+        font-size: 1pt !important;
       }
       
-      /* Encabezados de tabla ultra compactos */
+      /* Encabezados de tabla microscópicos */
       .header-row th, th {
-        font-size: 4pt !important;
-        padding: 1pt 2pt !important;
+        font-size: 1.5pt !important;
+        padding: 0.3pt !important;
         font-weight: bold !important;
       }
       
-      /* Tabla ultra compacta */
+      /* Tablas microscópicas */
       table {
-        font-size: 4pt !important;
-        margin-bottom: 6pt !important;
+        font-size: 1pt !important;
+        margin-bottom: 2pt !important;
+        border-collapse: collapse !important;
+        border-spacing: 0 !important;
       }
       
       th, td {
-        padding: 1pt 2pt !important;
-        font-size: 4pt !important;
+        padding: 0.3pt !important;
+        font-size: 1pt !important;
+        border-width: 0.2pt !important;
       }
       
-      /* Listas ultra comprimidas */
+      /* Listas microscópicas */
       ul, ol {
-        margin: 1pt 0 !important;
-        padding-left: 8pt !important;
+        margin: 0.2pt 0 !important;
+        padding-left: 3pt !important;
       }
       
       li {
-        font-size: 4pt !important;
-        margin: 0.5pt 0 !important;
-        line-height: 1 !important;
+        font-size: 1pt !important;
+        margin: 0.1pt 0 !important;
+        line-height: 0.8 !important;
       }
       
-      /* Áreas de texto mínimas */
+      /* Áreas de texto microscópicas */
       textarea, .textarea-contenido-pdf {
-        font-size: 4pt !important;
-        line-height: 1 !important;
-        padding: 1pt !important;
-        min-height: 20pt !important;
+        font-size: 1pt !important;
+        line-height: 0.8 !important;
+        padding: 0.3pt !important;
+        min-height: 8pt !important;
       }
       
-      /* Secciones ultra compactas */
+      /* Secciones con padding mínimo */
       .info-section, .summary {
-        padding: 3pt !important;
-        margin-bottom: 4pt !important;
+        padding: 0.5pt !important;
+        margin-bottom: 1pt !important;
       }
       
-      /* Resumen automático ultra pequeño */
+      /* Resumen automático microscópico */
       #resumen-automatico, .resumen-seccion {
-        font-size: 4pt !important;
+        font-size: 1pt !important;
       }
       
       #resumen-automatico strong {
-        font-size: 4pt !important;
+        font-size: 1pt !important;
       }
       
       #resumen-automatico ul, 
       #resumen-automatico ul li, 
       #resumen-automatico ul ul li {
-        font-size: 4pt !important;
-        margin: 0.5pt 0 !important;
-        line-height: 1 !important;
+        font-size: 1pt !important;
+        margin: 0.1pt 0 !important;
+        line-height: 0.8 !important;
       }
       
       .no-cumple-tag {
-        font-size: 3.5pt !important;
+        font-size: 1pt !important;
       }
       
-      /* Plan de acción ultra pequeño */
+      /* Plan de acción microscópico */
       #plan-accion-editor, .rich-text-editor {
-        font-size: 4pt !important;
-        line-height: 1 !important;
+        font-size: 1pt !important;
+        line-height: 0.8 !important;
       }
       
-      /* Información general ultra compacta */
+      /* Información general microscópica */
       .info-section p {
-        font-size: 4pt !important;
-        margin: 1pt 0 !important;
+        font-size: 1pt !important;
+        margin: 0.2pt 0 !important;
       }
       
       .info-section p strong {
-        font-size: 4pt !important;
+        font-size: 1pt !important;
       }
       
-      /* Resultados ultra compactos */
+      /* Resultados en tamaño micro */
       .resultados-compacto h3 {
-        font-size: 5pt !important;
-        margin: 3pt 0 1pt 0 !important;
+        font-size: 1.8pt !important;
+        margin: 0.8pt 0 0.3pt 0 !important;
       }
       
       .resultados-compacto p, .resultados-info p {
-        font-size: 4pt !important;
-        margin: 0.5pt 0 !important;
+        font-size: 1pt !important;
+        margin: 0.1pt 0 !important;
       }
       
       .result {
-        font-size: 6pt !important;
-        padding: 3pt !important;
-        margin: 4pt 0 !important;
+        font-size: 1.8pt !important;
+        padding: 0.8pt !important;
+        margin: 1pt 0 !important;
       }
       
-      /* Filas de tabla ultra compactas */
+      /* Reducir altura de filas */
       tr {
-        line-height: 1 !important;
+        line-height: 0.8 !important;
         height: auto !important;
       }
       
       /* Márgenes de página mínimos */
       @page {
-        margin: 6mm 4mm !important;
+        margin: 2mm 1mm !important;
       }
       
-      /* Asegurar que los colores y fondos se impriman correctamente */
+      /* Preservar colores */
       * {
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
         color-adjust: exact !important;
       }
       
-      /* Ajustar específicamente cualquier título que pudiera seguir grande */
-      .container h1, .container h2, .container h3,
-      #resultado-evaluacion, .resultados-compacto h3,
-      .resumen-seccion h3, .summary h3 {
-        font-size: 5pt !important;
-        line-height: 1.1 !important;
-      }
-      
-      /* Ajustar el título principal */
+      /* Título principal */
       .container h1 {
-        font-size: 6pt !important;
-        margin: 3pt 0 5pt 0 !important;
+        font-size: 2pt !important;
+        margin: 1pt 0 1pt 0 !important;
       }
       
-      /* Reducir a un mínimo absoluto cualquier espacio adicional */
+      /* Eliminar casi todos los espacios */
       .info-section, .resumen-seccion, .summary, .facility-characteristics {
-        padding: 3pt !important;
-        margin: 3pt 0 !important;
+        padding: 0.5pt !important;
+        margin: 0.5pt 0 !important;
+      }
+      
+      /* Bordes mínimos */
+      table, th, td {
+        border-width: 0.2pt !important;
+      }
+      
+      /* Reducir ancho de columnas de verificación */
+      .check-column {
+        width: 20px !important;
+      }
+      
+      /* Reducir altura de elementos visuales */
+      .foto-marco {
+        min-height: 120px !important;
+      }
+      
+      .foto-descripcion {
+        min-height: 20px !important;
+      }
+      
+      /* Radios y checkboxes más pequeños */
+      input[type="radio"], input[type="checkbox"] {
+        width: 6px !important;
+        height: 6px !important;
+      }
+      
+      /* Compactar todo el contenedor */
+      .container {
+        transform-origin: top left;
+        transform: scale(0.85);
+        max-width: 110% !important;
+        width: 110% !important;
+      }
+      
+      /* Todos los campos de entrada más pequeños */
+      input, select {
+        height: auto !important;
+        min-height: 0 !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        font-size: 1pt !important;
+      }
+      
+      /* Eliminar padding adicional de celdas */
+      td.observaciones {
+        padding: 0 !important;
+      }
+      
+      /* Reducir al mínimo el espacio entre elementos */
+      * {
+        margin-top: 0 !important;
+        margin-bottom: 0 !important;
+      }
+      
+      /* Asegurar separaciones mínimas pero suficientes para secciones */
+      h1, h2, h3 {
+        margin-top: 1pt !important;
       }
     }
   `;
   
-  console.log('Estilos con texto ultra-reducido para PDF aplicados.');
+  // Añadir script para intentar aplicar reducciones adicionales
+  const scriptAdicional = document.createElement('script');
+  scriptAdicional.innerHTML = `
+    function aplicarReduccionesAdicionales() {
+      // Reducir ancho de columnas específicas en tablas
+      document.querySelectorAll('th, td').forEach(celda => {
+        if (celda.offsetWidth > 100) {
+          celda.style.maxWidth = '100px';
+          celda.style.width = '100px';
+        }
+      });
+      
+      // Intentar eliminar espacios en blanco
+      document.querySelectorAll('br, div:empty, p:empty').forEach(el => {
+        if (el.innerHTML.trim() === '') {
+          el.style.display = 'none';
+          el.style.height = '0';
+          el.style.margin = '0';
+          el.style.padding = '0';
+        }
+      });
+      
+      // Comprimir más el documento
+      document.querySelector('.container').style.transform = 'scale(0.85)';
+      document.querySelector('.container').style.transformOrigin = 'top left';
+    }
+    
+    // Ejecutar antes de imprimir
+    window.addEventListener('beforeprint', aplicarReduccionesAdicionales);
+  `;
+  document.head.appendChild(scriptAdicional);
+  
+  console.log('Estilos con texto al límite microscópico (1pt normal, 1.5-2pt títulos) para PDF aplicados.');
 }
