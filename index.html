@@ -834,7 +834,142 @@
     margin-bottom: 12px;
     line-height: 1.5;
 }
-        
+ /* Estilos adicionales para reducir tamaño de texto */
+
+/* Ajustes para el resumen automático - reducción adicional */
+#resumen-automatico {
+    font-size: 0.9rem !important; /* Reducido */
+    line-height: 1.3 !important; /* Espaciado entre líneas más compacto */
+}
+
+#resumen-automatico strong {
+    font-size: 0.95rem !important; /* Reducido */
+}
+
+/* Para los elementos de la lista principal */
+#resumen-automatico ul {
+    margin: 4px 0 !important;
+    padding-left: 15px !important; 
+}
+
+#resumen-automatico ul li {
+    margin-bottom: 3px !important;
+    font-size: 0.9rem !important; /* Reducido */
+}
+
+/* Para las sublistas (los items que no cumplen) */
+#resumen-automatico ul ul {
+    margin: 3px 0 !important;
+    padding-left: 12px !important;
+}
+
+#resumen-automatico ul ul li {
+    margin-bottom: 2px !important;
+    font-size: 0.85rem !important; /* Más pequeño aún */
+    line-height: 1.25 !important;
+}
+
+/* Para la etiqueta NO CUMPLE */
+#resumen-automatico .no-cumple-tag {
+    font-weight: 700 !important;
+    color: #ff0000 !important;
+    margin-left: 3px !important;
+    font-size: 0.8rem !important; /* Muy reducido */
+}
+
+/* Ajustes para la información compacta al inicio */
+#resumen-automatico .resumen-info-compacto {
+    margin-bottom: 6px !important;
+}
+
+#resumen-automatico .resumen-info-compacto p {
+    font-size: 0.9rem !important; /* Reducido */
+    margin: 2px 0 !important;
+}
+
+/* Hacemos más compactas las tablas */
+table {
+    font-size: 0.95rem;
+}
+
+th, td {
+    padding: 10px 8px;
+}
+
+/* Estilos para la impresión */
+@media print {
+    body {
+        font-size: 10pt !important;
+    }
+    
+    h1 {
+        font-size: 18pt !important;
+    }
+    
+    h2 {
+        font-size: 14pt !important;
+    }
+    
+    h3 {
+        font-size: 12pt !important;
+    }
+    
+    table {
+        font-size: 9pt !important;
+    }
+    
+    #resumen-automatico {
+        font-size: 8pt !important;
+        line-height: 1.2 !important;
+    }
+    
+    #resumen-automatico strong {
+        font-size: 8pt !important;
+    }
+    
+    #resumen-automatico ul li {
+        font-size: 7.5pt !important;
+    }
+    
+    #resumen-automatico ul ul li {
+        font-size: 7pt !important;
+    }
+    
+    .no-cumple-tag {
+        font-size: 7pt !important;
+    }
+    
+    /* Evitar saltos de página en elementos importantes */
+    tr, .info-section, .summary {
+        page-break-inside: avoid !important;
+    }
+    
+    /* Forzar saltos en títulos de sección */
+    h2 {
+        page-break-before: always !important;
+    }
+    
+    /* Eliminar espacios innecesarios */
+    .container {
+        padding: 10px !important;
+    }
+}
+
+/* Notificación de autoguardado mejorada */
+#notificacion-guardado {
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+    background-color: rgba(0, 51, 102, 0.85);
+    color: white;
+    padding: 8px 15px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    z-index: 9999;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}       
     </style>
 </head>
 <script>
