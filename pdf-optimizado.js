@@ -1,6 +1,6 @@
 /**
- * Solución optimizada para la generación de PDF sin páginas en blanco intermedias
- * y con observaciones completas
+ * Solución optimizada para la generación de PDF sin páginas en blanco intermedias,
+ * con observaciones completas y letra reducida
  */
 
 // Función principal que configura y genera el PDF
@@ -96,11 +96,11 @@ function generarPDFCorregido() {
             contenidoTexto.textContent = textarea.value;
             contenidoTexto.className = 'textarea-contenido-pdf';
             Object.assign(contenidoTexto.style, {
-                minHeight: '50px',
+                minHeight: '40px', // Reducido de 50px
                 width: '100%',
                 fontFamily: textarea.style.fontFamily || 'inherit',
-                fontSize: textarea.style.fontSize || 'inherit',
-                lineHeight: '1.4',
+                fontSize: '9pt', // Reducido
+                lineHeight: '1.3', // Reducido de 1.4
                 paddingLeft: '5px',
                 whiteSpace: 'pre-wrap', // Preservar espacios y saltos de línea
                 wordBreak: 'break-word'
@@ -125,11 +125,16 @@ function generarPDFCorregido() {
             }},
             { selector: 'h2', estilos: {
                 pageBreakBefore: 'always',
-                marginTop: '20px',
-                paddingTop: '10px'
+                marginTop: '15px', // Reducido de 20px
+                paddingTop: '8px', // Reducido de 10px
+                fontSize: '1.5rem' // Tamaño reducido
+            }},
+            { selector: 'h3', estilos: {
+                fontSize: '1.2rem' // Tamaño reducido
             }},
             { selector: 'table', estilos: {
-                pageBreakInside: 'auto'
+                pageBreakInside: 'auto',
+                fontSize: '9pt' // Tamaño reducido
             }},
             { selector: 'tr', estilos: {
                 pageBreakInside: 'avoid'
@@ -137,7 +142,8 @@ function generarPDFCorregido() {
             { selector: '#plan-accion-editor', estilos: {
                 height: 'auto',
                 maxHeight: 'none',
-                overflow: 'visible'
+                overflow: 'visible',
+                fontSize: '9pt' // Tamaño reducido
             }}
         ];
         
@@ -173,9 +179,10 @@ function generarPDFCorregido() {
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
                 color-adjust: exact !important;
+                font-size: 10pt !important; /* Base font size reduced */
             }
             .container {
-                font-size: 12pt !important;
+                font-size: 10pt !important; /* Reduced from 12pt */
                 width: 100% !important;
                 max-width: 100% !important;
                 padding: 0 !important;
@@ -186,14 +193,25 @@ function generarPDFCorregido() {
                 break-before: page !important;
                 page-break-after: avoid !important;
                 break-after: avoid !important;
+                font-size: 1.5rem !important; /* Reduced */
+                margin-top: 15px !important; /* Reduced */
+                margin-bottom: 10px !important; /* Reduced */
             }
             h3 {
                 page-break-after: avoid !important;
                 break-after: avoid !important;
+                font-size: 1.2rem !important; /* Reduced */
+                margin-top: 12px !important; /* Reduced */
+                margin-bottom: 8px !important; /* Reduced */
             }
             table {
                 page-break-inside: auto !important;
                 break-inside: auto !important;
+                font-size: 9pt !important; /* Reduced */
+            }
+            th, td {
+                padding: 6px !important; /* Reduced from 8px or whatever the original was */
+                font-size: 9pt !important; /* Reduced */
             }
             tr {
                 page-break-inside: avoid !important;
@@ -213,14 +231,14 @@ function generarPDFCorregido() {
             
             /* Mejorar visualización de observaciones */
             .textarea-contenido-pdf {
-                min-height: 50px;
-                padding: 5px !important;
+                min-height: 40px; /* Reduced from 50px */
+                padding: 4px !important; /* Reduced from 5px */
                 font-family: inherit !important;
-                font-size: inherit !important;
-                line-height: 1.4 !important;
+                font-size: 9pt !important; /* Reduced */
+                line-height: 1.3 !important; /* Reduced from 1.4 */
                 white-space: pre-wrap !important;
                 word-break: break-word !important;
-                margin-bottom: 5px !important;
+                margin-bottom: 4px !important; /* Reduced from 5px */
             }
             
             /* Estilos para asegurar que los fondos se muestren correctamente */
@@ -234,6 +252,7 @@ function generarPDFCorregido() {
             .header-row, th {
                 background-color: #003366 !important;
                 color: white !important;
+                font-size: 9pt !important; /* Reduced */
             }
             
             tr:nth-child(even) {
@@ -242,6 +261,7 @@ function generarPDFCorregido() {
             
             .info-section, .summary {
                 background-color: #f9f9f9 !important;
+                font-size: 9.5pt !important; /* Reduced */
             }
             
             .result.seguro {
@@ -267,597 +287,21 @@ function generarPDFCorregido() {
                 display: inline-block !important;
                 max-width: 100% !important;
             }
-        `;
-        document.head.appendChild(estilosTemporales);
-        estadoOriginal.elementosCreados.push(estilosTemporales);
-        
-        // 6. Eliminar elementos vacíos que puedan causar páginas en blanco
-        const elementosVacios = Array.from(container.querySelectorAll('div, p, span'))
-            .filter(el => !el.textContent.trim() && !el.querySelector('img') && el.clientHeight < 20 && !el.id);
             
-        elementosVacios.forEach(el => {
-            // Solo eliminar si no tienen hijos o solo tienen espacios en blanco
-            if (el.children.length === 0 || (el.children.length === 1 && el.children[0].textContent.trim() === '')) {
-                estadoOriginal.ocultos.push({
-                    element: el,
-                    display: el.style.display,
-                    parent: el.parentNode,
-                    nextSibling: el.nextSibling
-                });
-                
-                if (el.parentNode) {
-                    el.parentNode.removeChild(el);
-                }
+            /* Reducir tamaños específicos */
+            p, li, div {
+                font-size: 10pt !important; /* Reduced */
+                margin-top: 3px !important; /* Reduced */
+                margin-bottom: 3px !important; /* Reduced */
             }
-        });
-        
-        // 7. Restringir el flujo del documento para evitar problemas de renderizado
-        document.body.style.overflow = 'visible';
-        document.body.style.height = 'auto';
-        
-        return estadoOriginal;
-    }
-    
-    // Función para generar el PDF con la configuración óptima
-    function generarPDFDesdeContenido(contenido, estadoOriginal) {
-        console.log("Generando PDF con configuración óptima...");
-        
-        // Configuración optimizada para tamaño legal/oficio
-        const opciones = {
-            filename: `Fiscalizacion_${new Date().toLocaleDateString().replace(/\//g, '-')}.pdf`,
             
-            // Modo de optimización: 1 = velocidad, 2 = precisión
-            html2canvas: {
-                scale: 1.5, // Escala original
-                useCORS: true,
-                allowTaint: true,
-                scrollX: 0,
-                scrollY: 0,
-                windowWidth: document.documentElement.offsetWidth,
-                windowHeight: document.documentElement.offsetHeight,
-                logging: false,
-                backgroundColor: '#FFFFFF',
-                imageTimeout: 30000, // Tiempo extendido para procesar gráficos
-                removeContainer: true,
-                foreignObjectRendering: false, // Deshabilitar para mayor compatibilidad
-                onclone: function(clonedDoc) {
-                    // Forzar la visibilidad de los fondos y gráficos
-                    const style = clonedDoc.createElement('style');
-                    style.innerHTML = `
-                        * {
-                            -webkit-print-color-adjust: exact !important;
-                            print-color-adjust: exact !important;
-                            color-adjust: exact !important;
-                        }
-                        
-                        /* Evitar páginas en blanco */
-                        div:empty, p:empty, span:empty {
-                            display: none !important;
-                        }
-                        
-                        /* Estilos específicos para asegurar fondos correctos */
-                        .header-row, th {
-                            background-color: #003366 !important;
-                            color: white !important;
-                        }
-                        
-                        tr:nth-child(even) {
-                            background-color: #f9f9f9 !important;
-                        }
-                        
-                        .info-section, .summary {
-                            background-color: #f9f9f9 !important;
-                        }
-                        
-                        .result.seguro {
-                            background-color: #dff0d8 !important;
-                            color: #3c763d !important;
-                            border: 1px solid #d6e9c6 !important;
-                        }
-                        
-                        .result.riesgo {
-                            background-color: #fcf8e3 !important;
-                            color: #8a6d3b !important;
-                            border: 1px solid #faebcc !important;
-                        }
-                        
-                        .result.inseguro {
-                            background-color: #f2dede !important;
-                            color: #a94442 !important;
-                            border: 1px solid #ebccd1 !important;
-                        }
-                        
-                        /* Asegurar que las textareas se muestran correctamente */
-                        .textarea-contenido-pdf {
-                            min-height: 50px;
-                            padding: 5px !important;
-                            font-family: inherit !important;
-                            font-size: inherit !important;
-                            line-height: 1.4 !important;
-                            white-space: pre-wrap !important;
-                            word-break: break-word !important;
-                        }
-                    `;
-                    clonedDoc.head.appendChild(style);
-                    
-                    // Asegurar que las imágenes se muestran correctamente
-                    Array.from(clonedDoc.querySelectorAll('img')).forEach(img => {
-                        img.style.display = 'block';
-                        img.style.maxWidth = '100%';
-                    });
-                    
-                    // Eliminar elementos vacíos en el clon que podrían causar páginas en blanco
-                    const divs = Array.from(clonedDoc.querySelectorAll('div, p, span'));
-                    divs.forEach(div => {
-                        if (!div.textContent.trim() && !div.querySelector('img') && div.clientHeight < 20 && !div.classList.contains('textarea-contenido-pdf')) {
-                            if (div.parentNode) {
-                                div.parentNode.removeChild(div);
-                            }
-                        }
-                    });
-                }
-            },
-            
-            jsPDF: {
-                unit: 'mm',
-                format: 'legal', // Formato oficio/legal
-                orientation: 'portrait',
-                compress: true,
-                precision: 16,
-                putOnlyUsedFonts: true
-            },
-            
-            // Configuración de saltos de página - Modificada para evitar páginas en blanco
-            pagebreak: {
-                mode: ['avoid-all'], // Simplificar el algoritmo
-                before: ['h2'], // Solo saltos explícitos en h2
-                avoid: ['table', 'img', '.textarea-contenido-pdf']
-            },
-            
-            // Usar el nuevo modo para división de contenido
-            enableLinks: false,
-            image: { type: 'jpeg', quality: 0.98 }, // Mayor calidad para gráficos
-            margin: [15, 10, 15, 10], // top, right, bottom, left
-            
-            // Importante: Esta opción optimiza el proceso y evita páginas en blanco
-            html2canvas: { 
-                scale: 1.5, // Escala original
-                scrollY: 0, 
-                scrollX: 0,
-                backgroundColor: '#FFFFFF',
-                removeContainer: true,
-                allowTaint: true,
-                useCORS: true,
-                letterRendering: true,
-                imageSmoothingEnabled: true,
-                imageTimeout: 30000
+            /* Optimizar el uso del espacio en la sección de resumen */
+            #resumen-automatico {
+                font-size: 9.5pt !important; /* Reduced */
             }
-        };
-        
-        // Generar el PDF con el manejo optimizado
-        html2pdf()
-            .from(contenido)
-            .set(opciones)
-            .toPdf()
-            .get('pdf')
-            .then(function(pdfObject) {
-                // Añadir metadatos y numeración
-                agregarMetadatosYNumeracion(pdfObject);
-                
-                // Guardar el PDF
-                pdfObject.save(opciones.filename);
-                
-                console.log("PDF generado exitosamente");
-                actualizarIndicadorExito();
-                
-                // Restaurar el documento original después de un momento
-                setTimeout(() => {
-                    restaurarDocumentoOriginal(estadoOriginal);
-                }, 1200);
-            })
-            .catch(function(error) {
-                console.error("Error al generar el PDF:", error);
-                ocultarIndicadorCarga();
-                alert("Ocurrió un error al generar el PDF. Por favor, intente nuevamente.");
-                restaurarDocumentoOriginal(estadoOriginal);
-            });
-    }
-    
-    // Función para agregar metadatos y numeración al PDF
-    function agregarMetadatosYNumeracion(pdf) {
-        try {
-            // Añadir metadatos
-            pdf.setProperties({
-                title: 'Cuadro de Fiscalización de Seguridad Privada',
-                subject: 'Informe de Fiscalización',
-                author: document.querySelector('input[name="fiscalizador"]')?.value || 'Sistema de Fiscalización',
-                keywords: 'seguridad, fiscalización, informe',
-                creator: 'Sistema PDF Optimizado'
-            });
             
-            // Añadir numeración de páginas
-            const totalPaginas = pdf.internal.getNumberOfPages();
-            
-            for (let i = 1; i <= totalPaginas; i++) {
-                pdf.setPage(i);
-                
-                // Configuración de texto para el pie de página
-                pdf.setFontSize(9);
-                pdf.setTextColor(100, 100, 100);
-                
-                // Obtener dimensiones de la página
-                const pageSize = pdf.internal.pageSize;
-                const pageWidth = pageSize.width ? pageSize.width : pageSize.getWidth();
-                const pageHeight = pageSize.height ? pageSize.height : pageSize.getHeight();
-                
-                // Texto de numeración
-                const texto = `Página ${i} de ${totalPaginas}`;
-                
-                // Posicionar en la esquina inferior derecha
-                const textWidth = pdf.getStringUnitWidth(texto) * 9 / pdf.internal.scaleFactor;
-                const x = pageWidth - textWidth - 15;
-                const y = pageHeight - 10;
-                
-                // Añadir el texto
-                pdf.text(texto, x, y);
+            #resumen-automatico p, #resumen-automatico li {
+                margin: 2px 0 !important; /* Reduced */
             }
-        } catch (error) {
-            console.warn("Error al añadir metadatos o numeración:", error);
-        }
-    }
-    
-    // Función para restaurar el documento a su estado original
-    function restaurarDocumentoOriginal(estadoOriginal) {
-        console.log("Restaurando documento a su estado original...");
-        
-        // 1. Remover elementos creados durante la preparación
-        if (estadoOriginal.elementosCreados) {
-            estadoOriginal.elementosCreados.forEach(el => {
-                if (el && el.parentNode) {
-                    el.parentNode.removeChild(el);
-                }
-            });
-        }
-        
-        // 2. Restaurar elementos ocultos
-        if (estadoOriginal.ocultos) {
-            estadoOriginal.ocultos.forEach(item => {
-                // Si el elemento fue removido completamente
-                if (item.parent && item.nextSibling) {
-                    item.parent.insertBefore(item.element, item.nextSibling);
-                } else if (item.parent) {
-                    item.parent.appendChild(item.element);
-                }
-                
-                // Restaurar visibilidad
-                if (item.display !== undefined) {
-                    item.element.style.display = item.display;
-                }
-            });
-        }
-        
-        // 3. Restaurar estilos originales
-        if (estadoOriginal.estilos) {
-            estadoOriginal.estilos.forEach((estilos, elemento) => {
-                Object.keys(estilos).forEach(prop => {
-                    // Manejar caso especial para textareas
-                    if (prop === 'value' && elemento.tagName === 'TEXTAREA') {
-                        elemento.value = estilos.value;
-                    } else {
-                        elemento.style[prop] = estilos[prop] || '';
-                    }
-                });
-            });
-        }
-        
-        // 4. Restaurar estilos del body
-        if (estadoOriginal.documentBody) {
-            document.body.style.overflow = estadoOriginal.documentBody.overflow || '';
-            document.body.style.height = estadoOriginal.documentBody.height || '';
-        }
-        
-        // 5. Eliminar hoja de estilos temporal si aún existe
-        const estilosTemporales = document.getElementById('estilos-temporales-pdf');
-        if (estilosTemporales && estilosTemporales.parentNode) {
-            estilosTemporales.parentNode.removeChild(estilosTemporales);
-        }
-        
-        // 6. Ocultar indicador de carga si aún está visible
-        ocultarIndicadorCarga();
-        
-        console.log("Documento restaurado correctamente");
-    }
-    
-    // Función para mostrar el indicador de carga con un diseño mejorado
-    function mostrarIndicadorCarga() {
-        // Eliminar indicador existente si lo hay
-        const indicadorExistente = document.getElementById('indicador-pdf-carga');
-        if (indicadorExistente) {
-            document.body.removeChild(indicadorExistente);
-        }
-        
-        // Crear nuevo indicador
-        const indicador = document.createElement('div');
-        indicador.id = 'indicador-pdf-carga';
-        
-        // Estilos para el contenedor principal
-        Object.assign(indicador.style, {
-            position: 'fixed',
-            top: '0',
-            left: '0',
-            width: '100%',
-            height: '100%',
-            backgroundColor: 'rgba(0, 0, 0, 0.7)',
-            zIndex: '9999',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            fontFamily: "'Poppins', sans-serif",
-            transition: 'opacity 0.3s ease'
-        });
-        
-        // Crear un contenedor para el mensaje
-        const mensajeContainer = document.createElement('div');
-        Object.assign(mensajeContainer.style, {
-            backgroundColor: '#003366',
-            padding: '25px 40px',
-            borderRadius: '12px',
-            boxShadow: '0 5px 25px rgba(0,0,0,0.5)',
-            textAlign: 'center',
-            maxWidth: '80%',
-            color: 'white'
-        });
-        
-        // Añadir título
-        const titulo = document.createElement('h3');
-        titulo.textContent = 'Generando PDF';
-        Object.assign(titulo.style, {
-            margin: '0 0 15px 0',
-            fontSize: '1.5rem',
-            fontWeight: '600',
-            color: 'white'
-        });
-        
-        // Añadir subtítulo con mensaje explicativo
-        const subtitulo = document.createElement('p');
-        subtitulo.textContent = 'Por favor espere mientras se procesa el documento...';
-        Object.assign(subtitulo.style, {
-            margin: '0 0 20px 0',
-            fontSize: '1rem',
-            color: 'rgba(255,255,255,0.9)'
-        });
-        
-        // Crear una barra de progreso animada
-        const barraContenedor = document.createElement('div');
-        Object.assign(barraContenedor.style, {
-            width: '100%',
-            height: '8px',
-            backgroundColor: 'rgba(255,255,255,0.2)',
-            borderRadius: '4px',
-            overflow: 'hidden',
-            margin: '10px 0'
-        });
-        
-        const barraProgreso = document.createElement('div');
-        barraProgreso.id = 'barra-progreso-pdf';
-        Object.assign(barraProgreso.style, {
-            width: '0%',
-            height: '100%',
-            backgroundColor: '#4CAF50',
-            borderRadius: '4px',
-            transition: 'width 0.5s ease'
-        });
-        
-        // Añadir texto de estado que cambiará durante el proceso
-        const textoEstado = document.createElement('p');
-        textoEstado.id = 'texto-estado-pdf';
-        textoEstado.textContent = 'Preparando documento...';
-        Object.assign(textoEstado.style, {
-            margin: '15px 0 0 0',
-            fontSize: '0.9rem',
-            color: 'rgba(255,255,255,0.8)',
-            fontStyle: 'italic'
-        });
-        
-        // Ensamblar todos los elementos
-        barraContenedor.appendChild(barraProgreso);
-        mensajeContainer.appendChild(titulo);
-        mensajeContainer.appendChild(subtitulo);
-        mensajeContainer.appendChild(barraContenedor);
-        mensajeContainer.appendChild(textoEstado);
-        indicador.appendChild(mensajeContainer);
-        
-        // Añadir al body
-        document.body.appendChild(indicador);
-        
-        // Animar la barra de progreso
-        setTimeout(() => {
-            barraProgreso.style.width = '30%';
-            textoEstado.textContent = 'Procesando contenido...';
-        }, 300);
-        
-        setTimeout(() => {
-            barraProgreso.style.width = '60%';
-            textoEstado.textContent = 'Generando PDF...';
-        }, 1500);
-        
-        setTimeout(() => {
-            barraProgreso.style.width = '80%';
-            textoEstado.textContent = 'Aplicando formato final...';
-        }, 3000);
-    }
-    
-    // Función para actualizar el indicador con mensaje de éxito
-    function actualizarIndicadorExito() {
-        const barraProgreso = document.getElementById('barra-progreso-pdf');
-        const textoEstado = document.getElementById('texto-estado-pdf');
-        
-        if (barraProgreso && textoEstado) {
-            barraProgreso.style.width = '100%';
-            barraProgreso.style.backgroundColor = '#4CAF50';
-            textoEstado.textContent = '¡PDF generado exitosamente!';
             
-            // Cambiar estilo para indicar éxito
-            const mensajeContainer = textoEstado.parentNode;
-            if (mensajeContainer) {
-                const titulo = mensajeContainer.querySelector('h3');
-                if (titulo) {
-                    titulo.textContent = '¡Proceso Completado!';
-                }
-            }
-        }
-        
-        // Ocultar después de un tiempo
-        setTimeout(ocultarIndicadorCarga, 1500);
-    }
-    
-    // Función para ocultar el indicador de carga
-    function ocultarIndicadorCarga() {
-        const indicador = document.getElementById('indicador-pdf-carga');
-        if (indicador) {
-            // Transición suave de salida
-            indicador.style.opacity = '0';
-            
-            // Remover después de la transición
-            setTimeout(() => {
-                if (indicador.parentNode) {
-                    indicador.parentNode.removeChild(indicador);
-                }
-            }, 300);
-        }
-    }
-}
-
-// Función para reemplazar los botones existentes con la nueva funcionalidad
-function instalarBotonPDFCorregido() {
-    console.log("Instalando botón de PDF corregido...");
-    
-    // Buscar todos los botones relacionados con PDF
-    const botonesExistentes = Array.from(document.querySelectorAll('button')).filter(btn => 
-        btn.textContent.includes('PDF') || 
-        btn.id?.includes('pdf') ||
-        btn.onclick?.toString().includes('PDF')
-    );
-    
-    // Modificar cada botón encontrado
-    botonesExistentes.forEach(btn => {
-        console.log(`Modificando botón de PDF existente: ${btn.textContent || btn.id}`);
-        
-        // Cambiar el evento onclick
-        btn.onclick = generarPDFCorregido;
-        
-        // Actualizar texto y estilos para distinguirlo
-        if (btn.textContent.includes('PDF')) {
-            btn.textContent = 'Descargar PDF Completo';
-        }
-        
-        // Estilos destacados
-        Object.assign(btn.style, {
-            backgroundColor: '#28a745',
-            color: 'white',
-            fontWeight: 'bold',
-            padding: '10px 20px',
-            borderRadius: '5px',
-            border: 'none',
-            cursor: 'pointer',
-            boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
-            transition: 'all 0.3s ease'
-        });
-        
-        // Añadir evento hover
-        btn.onmouseover = function() {
-            this.style.backgroundColor = '#218838';
-            this.style.transform = 'translateY(-2px)';
-            this.style.boxShadow = '0 6px 8px rgba(0,0,0,0.15)';
-        };
-        
-        btn.onmouseout = function() {
-            this.style.backgroundColor = '#28a745';
-            this.style.transform = 'translateY(0)';
-            this.style.boxShadow = '0 4px 6px rgba(0,0,0,0.1)';
-        };
-    });
-    
-    // Si no se encontró ningún botón, crear uno nuevo
-    if (botonesExistentes.length === 0) {
-        const botonesDivs = document.querySelectorAll('.botones');
-        botonesDivs.forEach(div => {
-            const nuevoBoton = document.createElement('button');
-            nuevoBoton.type = 'button';
-            nuevoBoton.textContent = 'Descargar PDF Completo';
-            nuevoBoton.onclick = generarPDFCorregido;
-            nuevoBoton.className = 'no-print';
-            
-            // Aplicar estilos
-            Object.assign(nuevoBoton.style, {
-                backgroundColor: '#28a745',
-                color: 'white',
-                fontWeight: 'bold',
-                padding: '10px 20px',
-                margin: '0 5px',
-                borderRadius: '5px',
-                border: 'none',
-                cursor: 'pointer',
-                boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
-                transition: 'all 0.3s ease'
-            });
-            
-            // Añadir eventos hover
-            nuevoBoton.onmouseover = function() {
-                this.style.backgroundColor = '#218838';
-                this.style.transform = 'translateY(-2px)';
-                this.style.boxShadow = '0 6px 8px rgba(0,0,0,0.15)';
-            };
-            
-            nuevoBoton.onmouseout = function() {
-                this.style.backgroundColor = '#28a745';
-                this.style.transform = 'translateY(0)';
-                this.style.boxShadow = '0 4px 6px rgba(0,0,0,0.1)';
-            };
-            
-            // Insertar al inicio
-            div.insertBefore(nuevoBoton, div.firstChild);
-        });
-    }
-    
-    // Sobrescribir funciones existentes para asegurar que siempre se use la nueva implementación
-    if (typeof window.guardarPDF === 'function') {
-        console.log("Sobrescribiendo función guardarPDF existente");
-        window.guardarPDF = generarPDFCorregido;
-    }
-    
-    if (typeof window.descargarPDF === 'function') {
-        console.log("Sobrescribiendo función descargarPDF existente");
-        window.descargarPDF = generarPDFCorregido;
-    }
-    
-    if (typeof window.generarPDFMejorado === 'function') {
-        console.log("Sobrescribiendo función generarPDFMejorado existente");
-        window.generarPDFMejorado = generarPDFCorregido;
-    }
-    
-    console.log("Instalación de botón PDF corregido completada");
-}
-
-// Iniciar cuando el DOM esté completamente cargado
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-        // Esperar un segundo para asegurar que todos los scripts se han cargado
-        setTimeout(instalarBotonPDFCorregido, 1000);
-    });
-} else {
-    // Si el DOM ya está cargado, ejecutar directamente con un pequeño retraso
-    setTimeout(instalarBotonPDFCorregido, 1000);
-}
-
-// También asegurar que se ejecute cuando la ventana esté completamente cargada
-window.addEventListener('load', () => {
-    setTimeout(instalarBotonPDFCorregido, 1500);
-});
-
-// Exponer funciones globalmente
-window.generarPDFCorregido = generarPDFCorregido;
-window.instalarBotonPDFCorregido = instalarBotonPDFCorregido;
-
-// Ejecutar inmediatamente para instalar el botón sin esperar eventos
-instalarBotonPDFCorregido();
+            /* Aj
