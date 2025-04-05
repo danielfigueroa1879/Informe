@@ -121,6 +121,7 @@ function generarPDFCorregido() {
             body {
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
+                color-adjust: exact !important;
             }
             .container {
                 font-size: 12pt !important;
@@ -153,7 +154,37 @@ function generarPDFCorregido() {
                 height: 1px !important;
                 visibility: hidden !important;
             }
-            /* Añadir más reglas específicas según sea necesario */
+            /* Forzar los colores de fondo */
+            * {
+                -webkit-print-color-adjust: exact !important;
+                color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            .header-row, th {
+                background-color: #003366 !important;
+                color: white !important;
+            }
+            tr:nth-child(even) {
+                background-color: #f9f9f9 !important;
+            }
+            .info-section, .summary {
+                background-color: #f9f9f9 !important;
+            }
+            .result.seguro {
+                background-color: #dff0d8 !important;
+                color: #3c763d !important;
+                border: 1px solid #d6e9c6 !important;
+            }
+            .result.riesgo {
+                background-color: #fcf8e3 !important;
+                color: #8a6d3b !important;
+                border: 1px solid #faebcc !important;
+            }
+            .result.inseguro {
+                background-color: #f2dede !important;
+                color: #a94442 !important;
+                border: 1px solid #ebccd1 !important;
+            }
         `;
         document.head.appendChild(estilosTemporales);
         
@@ -174,7 +205,7 @@ function generarPDFCorregido() {
             
             // Modo de optimización: 1 = velocidad, 2 = precisión
             html2canvas: {
-                scale: 0.75, // Reducido al 50% del valor original (1.5 * 0.5 = 0.75)
+                scale: 0.45, // Reducido al 30% del valor original (1.5 * 0.3 = 0.45)
                 useCORS: true,
                 allowTaint: true,
                 scrollX: 0,
@@ -185,7 +216,59 @@ function generarPDFCorregido() {
                 backgroundColor: '#FFFFFF',
                 imageTimeout: 15000,
                 removeContainer: true,
-                foreignObjectRendering: false // Deshabilitar para mayor compatibilidad
+                foreignObjectRendering: false, // Deshabilitar para mayor compatibilidad
+                onclone: function(clonedDoc) {
+                    // Forzar la visibilidad de los fondos
+                    const style = clonedDoc.createElement('style');
+                    style.innerHTML = `
+                        * {
+                            -webkit-print-color-adjust: exact !important;
+                            print-color-adjust: exact !important;
+                            color-adjust: exact !important;
+                        }
+                        
+                        body, .container, table, td, th, tr, div {
+                            background-color: inherit !important;
+                            background-image: inherit !important;
+                            background: inherit !important;
+                        }
+                        
+                        .header-row, th {
+                            background-color: #003366 !important;
+                            color: white !important;
+                        }
+                        
+                        tr:nth-child(even) {
+                            background-color: #f9f9f9 !important;
+                        }
+                        
+                        .info-section, .summary {
+                            background-color: #f9f9f9 !important;
+                        }
+                        
+                        .result.seguro {
+                            background-color: #dff0d8 !important;
+                            color: #3c763d !important;
+                        }
+                        
+                        .result.riesgo {
+                            background-color: #fcf8e3 !important;
+                            color: #8a6d3b !important;
+                        }
+                        
+                        .result.inseguro {
+                            background-color: #f2dede !important;
+                            color: #a94442 !important;
+                        }
+                    `;
+                    clonedDoc.head.appendChild(style);
+                    
+                    // Asegurar que las imágenes se muestran correctamente
+                    Array.from(clonedDoc.querySelectorAll('img')).forEach(img => {
+                        img.style.display = 'block';
+                        img.style.maxWidth = '100%';
+                    });
+                }
             },
             
             jsPDF: {
@@ -210,7 +293,16 @@ function generarPDFCorregido() {
             margin: [15, 10, 15, 10], // top, right, bottom, left
             
             // Importante: Esta opción optimiza el proceso y evita páginas en blanco
-            html2canvas: { scale: 0.75, scrollY: 0, scrollX: 0 } // Reducido al 50% del valor original
+            html2canvas: { 
+                scale: 0.45, 
+                scrollY: 0, 
+                scrollX: 0,
+                backgroundColor: null, // Permitir fondos transparentes
+                removeContainer: true,
+                allowTaint: true, // Permitir contenido cruzado
+                useCORS: true,
+                letterRendering: true
+            }
         };
         
         // Generar el PDF con el manejo optimizado
