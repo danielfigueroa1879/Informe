@@ -1,6 +1,8 @@
 /**
- * Solución optimizada para la generación de PDF sin páginas en blanco intermedias
- * y con observaciones completas
+ * Solución optimizada para la generación de PDF con secciones en páginas separadas:
+ * - Cada ítem principal (1-5) en página separada
+ * - Set fotográfico en página separada
+ * - Resumen de fiscalización en página separada
  */
 
 // Función principal que configura y genera el PDF
@@ -53,13 +55,65 @@ function generarPDFCorregido() {
                 overflow: document.body.style.overflow,
                 height: document.body.style.height
             },
-            elementosCreados: [] // Para rastrear elementos creados durante la preparación
+            elementosCreados: [], // Para rastrear elementos creados durante la preparación
+            atributos: new Map()  // Para rastrear atributos añadidos
         };
         
-        // 1. Eliminar espacios en blanco y elementos vacíos que pueden causar páginas en blanco
+        // 1. Forzar saltos de página en cada sección principal
+        // Encontrar y marcar las secciones principales (1-5, set fotográfico, resumen)
+        const seccionesPrincipales = [
+            // Documentación obligatoria (ítem 1)
+            ...container.querySelectorAll('h2:nth-of-type(1)'),
+            // Personal de seguridad (ítem 2)
+            ...container.querySelectorAll('h2:nth-of-type(2)'),
+            // Uniformes y equipamiento (ítem 3)
+            ...container.querySelectorAll('h2:nth-of-type(3)'),
+            // Sistemas tecnológicos (ítem 4)
+            ...container.querySelectorAll('h2:nth-of-type(4)'),
+            // Características de la instalación (ítem 5)
+            ...container.querySelectorAll('h2:nth-of-type(5)'),
+            // Resumen de fiscalización
+            ...container.querySelectorAll('h2:nth-of-type(6)'),
+            // Set fotográfico
+            ...container.querySelectorAll('h2:nth-of-type(7)')
+        ];
+        
+        // También incluir los elementos con ID específicos
+        ['#seccion-personal', '#seccion-uniformes', '#seccion-sistemas', 
+         '#seccion-caracteristicas', '#seccion-resumen', '#seccion-fotos'].forEach(selector => {
+            const elemento = container.querySelector(selector);
+            if (elemento && !seccionesPrincipales.includes(elemento)) {
+                seccionesPrincipales.push(elemento);
+            }
+        });
+        
+        // Aplicar estilo de salto de página a cada sección principal
+        seccionesPrincipales.forEach((seccion, index) => {
+            // Guardar estado original
+            estadoOriginal.estilos.set(seccion, {
+                pageBreakBefore: seccion.style.pageBreakBefore,
+                breakBefore: seccion.style.breakBefore,
+                display: seccion.style.display,
+                marginTop: seccion.style.marginTop
+            });
+            
+            // Forzar salto de página
+            seccion.style.pageBreakBefore = 'always';
+            seccion.style.breakBefore = 'page';
+            seccion.style.display = 'block';
+            seccion.style.marginTop = '20px';
+            
+            // Añadir un atributo para identificarlo fácilmente
+            seccion.setAttribute('data-page-section', 'true');
+            estadoOriginal.atributos.set(seccion, ['data-page-section']);
+            
+            console.log(`Sección con salto de página: ${seccion.textContent || seccion.id}`);
+        });
+        
+        // 2. Eliminar espacios en blanco y elementos vacíos que pueden causar páginas en blanco
         const espaciosVacios = container.querySelectorAll('[style*="page-break"]');
         espaciosVacios.forEach(el => {
-            if (!el.textContent.trim() && !el.querySelector('img') && el.clientHeight < 5) {
+            if (!el.hasAttribute('data-page-section') && !el.textContent.trim() && !el.querySelector('img') && el.clientHeight < 5) {
                 estadoOriginal.ocultos.push({
                     element: el,
                     display: el.style.display,
@@ -71,7 +125,7 @@ function generarPDFCorregido() {
             }
         });
         
-        // 2. Ocultar elementos con clase no-print y botones
+        // 3. Ocultar elementos con clase no-print y botones
         const elementosOcultar = container.querySelectorAll('.botones, .no-print');
         elementosOcultar.forEach(el => {
             estadoOriginal.ocultos.push({
@@ -81,7 +135,7 @@ function generarPDFCorregido() {
             el.style.display = 'none';
         });
         
-        // 3. Mejorar el manejo de las textareas (observaciones)
+        // 4. Mejorar el manejo de las textareas (observaciones)
         const textareas = container.querySelectorAll('textarea');
         textareas.forEach(textarea => {
             // Guardar estado original
@@ -114,7 +168,7 @@ function generarPDFCorregido() {
             estadoOriginal.elementosCreados.push(contenidoTexto);
         });
         
-        // 4. Aplicar estilos óptimos para la impresión
+        // 5. Aplicar estilos óptimos para la impresión
         const elementosEstilizar = [
             { selector: '.forced-page-break', estilos: {
                 display: 'block',
@@ -122,11 +176,6 @@ function generarPDFCorregido() {
                 pageBreakBefore: 'always',
                 margin: '0',
                 padding: '0'
-            }},
-            { selector: 'h2', estilos: {
-                pageBreakBefore: 'always',
-                marginTop: '20px',
-                paddingTop: '10px'
             }},
             { selector: 'table', estilos: {
                 pageBreakInside: 'auto'
@@ -161,7 +210,7 @@ function generarPDFCorregido() {
             });
         });
         
-        // 5. Añadir una hoja de estilos temporal con reglas específicas para PDF
+        // 6. Añadir una hoja de estilos temporal con reglas específicas para PDF
         const estilosTemporales = document.createElement('style');
         estilosTemporales.id = 'estilos-temporales-pdf';
         estilosTemporales.textContent = `
@@ -182,10 +231,14 @@ function generarPDFCorregido() {
                 margin: 0 !important;
             }
             h2 {
+                margin-top: 20px !important;
+            }
+            h2[data-page-section="true"] {
                 page-break-before: always !important;
                 break-before: page !important;
                 page-break-after: avoid !important;
                 break-after: avoid !important;
+                display: block !important;
             }
             h3 {
                 page-break-after: avoid !important;
@@ -204,6 +257,14 @@ function generarPDFCorregido() {
                 break-before: page !important;
                 height: 1px !important;
                 visibility: hidden !important;
+            }
+            
+            /* Para asegurar que las secciones específicas comienzan en nueva página */
+            #seccion-personal, #seccion-uniformes, #seccion-sistemas, 
+            #seccion-caracteristicas, #seccion-resumen, #seccion-fotos {
+                page-break-before: always !important;
+                break-before: page !important;
+                display: block !important;
             }
             
             /* Eliminar saltos de página no deseados */
@@ -271,9 +332,13 @@ function generarPDFCorregido() {
         document.head.appendChild(estilosTemporales);
         estadoOriginal.elementosCreados.push(estilosTemporales);
         
-        // 6. Eliminar elementos vacíos que puedan causar páginas en blanco
+        // 7. Eliminar elementos vacíos que puedan causar páginas en blanco
         const elementosVacios = Array.from(container.querySelectorAll('div, p, span'))
-            .filter(el => !el.textContent.trim() && !el.querySelector('img') && el.clientHeight < 20 && !el.id);
+            .filter(el => !el.hasAttribute('data-page-section') && 
+                !el.textContent.trim() && 
+                !el.querySelector('img') && 
+                el.clientHeight < 20 && 
+                !el.id);
             
         elementosVacios.forEach(el => {
             // Solo eliminar si no tienen hijos o solo tienen espacios en blanco
@@ -291,7 +356,7 @@ function generarPDFCorregido() {
             }
         });
         
-        // 7. Restringir el flujo del documento para evitar problemas de renderizado
+        // 8. Restringir el flujo del documento para evitar problemas de renderizado
         document.body.style.overflow = 'visible';
         document.body.style.height = 'auto';
         
@@ -328,6 +393,21 @@ function generarPDFCorregido() {
                             -webkit-print-color-adjust: exact !important;
                             print-color-adjust: exact !important;
                             color-adjust: exact !important;
+                        }
+                        
+                        /* Forzar saltos de página en secciones marcadas */
+                        [data-page-section="true"] {
+                            page-break-before: always !important;
+                            break-before: page !important;
+                            display: block !important;
+                        }
+                        
+                        /* Para asegurar que las secciones específicas comienzan en nueva página */
+                        #seccion-personal, #seccion-uniformes, #seccion-sistemas, 
+                        #seccion-caracteristicas, #seccion-resumen, #seccion-fotos {
+                            page-break-before: always !important;
+                            break-before: page !important;
+                            display: block !important;
                         }
                         
                         /* Evitar páginas en blanco */
@@ -389,7 +469,11 @@ function generarPDFCorregido() {
                     // Eliminar elementos vacíos en el clon que podrían causar páginas en blanco
                     const divs = Array.from(clonedDoc.querySelectorAll('div, p, span'));
                     divs.forEach(div => {
-                        if (!div.textContent.trim() && !div.querySelector('img') && div.clientHeight < 20 && !div.classList.contains('textarea-contenido-pdf')) {
+                        if (!div.hasAttribute('data-page-section') && 
+                            !div.textContent.trim() && 
+                            !div.querySelector('img') && 
+                            div.clientHeight < 20 && 
+                            !div.classList.contains('textarea-contenido-pdf')) {
                             if (div.parentNode) {
                                 div.parentNode.removeChild(div);
                             }
@@ -407,10 +491,12 @@ function generarPDFCorregido() {
                 putOnlyUsedFonts: true
             },
             
-            // Configuración de saltos de página - Modificada para evitar páginas en blanco
+            // Configuración de saltos de página - Personalizada para nuestras secciones
             pagebreak: {
-                mode: ['avoid-all'], // Simplificar el algoritmo
-                before: ['h2'], // Solo saltos explícitos en h2
+                mode: ['css'], // Usar las reglas CSS para los saltos
+                before: ['[data-page-section="true"]', 
+                         '#seccion-personal', '#seccion-uniformes', '#seccion-sistemas', 
+                         '#seccion-caracteristicas', '#seccion-resumen', '#seccion-fotos'],
                 avoid: ['table', 'img', '.textarea-contenido-pdf']
             },
             
@@ -550,19 +636,28 @@ function generarPDFCorregido() {
             });
         }
         
-        // 4. Restaurar estilos del body
+        // 4. Remover atributos añadidos
+        if (estadoOriginal.atributos) {
+            estadoOriginal.atributos.forEach((atributos, elemento) => {
+                atributos.forEach(attr => {
+                    elemento.removeAttribute(attr);
+                });
+            });
+        }
+        
+        // 5. Restaurar estilos del body
         if (estadoOriginal.documentBody) {
             document.body.style.overflow = estadoOriginal.documentBody.overflow || '';
             document.body.style.height = estadoOriginal.documentBody.height || '';
         }
         
-        // 5. Eliminar hoja de estilos temporal si aún existe
+        // 6. Eliminar hoja de estilos temporal si aún existe
         const estilosTemporales = document.getElementById('estilos-temporales-pdf');
         if (estilosTemporales && estilosTemporales.parentNode) {
             estilosTemporales.parentNode.removeChild(estilosTemporales);
         }
         
-        // 6. Ocultar indicador de carga si aún está visible
+        // 7. Ocultar indicador de carga si aún está visible
         ocultarIndicadorCarga();
         
         console.log("Documento restaurado correctamente");
@@ -748,7 +843,7 @@ function instalarBotonPDFCorregido() {
         
         // Actualizar texto y estilos para distinguirlo
         if (btn.textContent.includes('PDF')) {
-            btn.textContent = 'Descargar PDF Completo';
+            btn.textContent = 'Descargar PDF por Secciones';
         }
         
         // Estilos destacados
@@ -784,7 +879,7 @@ function instalarBotonPDFCorregido() {
         botonesDivs.forEach(div => {
             const nuevoBoton = document.createElement('button');
             nuevoBoton.type = 'button';
-            nuevoBoton.textContent = 'Descargar PDF Completo';
+            nuevoBoton.textContent = 'Descargar PDF por Secciones';
             nuevoBoton.onclick = generarPDFCorregido;
             nuevoBoton.className = 'no-print';
             
