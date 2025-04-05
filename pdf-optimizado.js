@@ -901,8 +901,8 @@ function eliminarBotonesDuplicados() {
   }
 }
 /**
- * Función mejorada con texto ultramicroscópico para PDF
- * Esta implementación usa múltiples técnicas combinadas para asegurar texto extremadamente pequeño
+ * Función actualizada para reducir significativamente todos los títulos, 
+ * enumeraciones y encabezados en el PDF exportado
  */
 function ajustarTamañoTextoPDF() {
   // Crear o actualizar la hoja de estilos específica para PDF
@@ -915,133 +915,155 @@ function ajustarTamañoTextoPDF() {
     document.head.appendChild(estilosPDF);
   }
   
-  // Definir estilos específicos para impresión y PDF con tamaños ultramicroscópicos
+  // Definir estilos específicos para impresión y PDF
+  // NOTA: Hemos reducido significativamente todos los tamaños de fuente
+  // incluidos los títulos y elementos enumerados
   estilosPDF.textContent = `
     @media print {
-      /* Aplicar a todos los elementos un tamaño de base extremadamente pequeño */
-      * {
-        font-size: 0.8pt !important;
-        line-height: 0.7 !important;
-        letter-spacing: -0.1pt !important;
-        word-spacing: -0.1pt !important;
+      /* Reducir tamaño de texto general - AHORA MÁS PEQUEÑO */
+      body, p, td, th, li, span, div {
+        font-size: 7pt !important;
+        line-height: 1.2 !important;
       }
       
-      /* Texto normal ultramicroscópico - Más pequeño que antes */
-      body, p, td, th, li, span, div, input, textarea {
-        font-size: 0.8pt !important;
-        line-height: 0.7 !important;
-        transform: scale(0.9);
-        transform-origin: left top;
-      }
-      
-      /* Títulos principales ultramicroscópicos */
+      /* Reducir SIGNIFICATIVAMENTE tamaño de encabezados */
       h1 {
-        font-size: 1.5pt !important;
-        margin: 0.8pt 0 !important;
-        transform: scale(0.9);
-        transform-origin: left top;
+        font-size: 10pt !important;
+        margin-bottom: 8pt !important;
+        margin-top: 8pt !important;
       }
       
       h2 {
-        font-size: 1.2pt !important;
-        margin: 0.6pt 0 !important;
-        transform: scale(0.9);
-        transform-origin: left top;
+        font-size: 9pt !important;
+        margin-top: 12pt !important;
+        margin-bottom: 6pt !important;
       }
       
       h3 {
-        font-size: 1pt !important;
-        margin: 0.5pt 0 !important;
-        transform: scale(0.9);
-        transform-origin: left top;
+        font-size: 8pt !important;
+        margin-top: 10pt !important;
+        margin-bottom: 5pt !important;
       }
       
-      /* Otros títulos */
-      h4, h5, h6 {
-        font-size: 0.9pt !important;
-        margin: 0.5pt 0 !important;
-        transform: scale(0.9);
-        transform-origin: left top;
-      }
-      
-      /* Texto en negrita */
+      /* Reducir TODOS los títulos, incluyendo los numerados */
+      h1, h2, h3, h4, h5, h6, 
+      .header-row th, th, 
+      .result, 
+      .titulo-seccion,
+      .titulo-principal,
       strong, b {
-        font-size: 0.8pt !important;
+        font-size: 8pt !important;
+      }
+      
+      /* Encabezados específicos más pequeños */
+      .header-row th {
+        padding: 3pt !important;
+        font-size: 7pt !important;
         font-weight: bold !important;
       }
       
-      /* Celdas de tabla ultramicroscópicas */
+      /* Reducir tamaño de los elementos en tablas */
       table {
-        font-size: 0.8pt !important;
-        margin: 1pt 0 !important;
-        border-collapse: collapse !important;
-        border-spacing: 0 !important;
-        transform: scale(0.9);
-        transform-origin: left top;
+        font-size: 7pt !important;
+        margin-bottom: 10pt !important;
       }
       
       th, td {
-        padding: 0.2pt !important;
-        font-size: 0.8pt !important;
-        border-width: 0.1pt !important;
+        padding: 2pt !important;
+        font-size: 6pt !important;
       }
       
-      /* Título principal */
-      .container h1 {
-        font-size: 1.5pt !important;
-        margin: 0.8pt 0 !important;
+      /* Reducir tamaño y espacio en listas y enumeraciones */
+      ul, ol {
+        margin: 3pt 0 !important;
+        padding-left: 12pt !important;
       }
       
-      /* Comprimir todo el documento para que quepa más */
-      .container {
-        transform: scale(0.8) !important;
-        transform-origin: top left !important;
-        width: 125% !important;
-        max-width: 125% !important;
+      li {
+        font-size: 6pt !important;
+        margin: 1pt 0 !important;
+        line-height: 1.1 !important;
       }
       
-      /* Márgenes de página ultramínimos */
+      /* Reducir tamaño de texto en las áreas de observaciones */
+      textarea, .textarea-contenido-pdf {
+        font-size: 6pt !important;
+        line-height: 1.1 !important;
+        padding: 2pt !important;
+        min-height: 30pt !important;
+      }
+      
+      /* Reducir espacio entre elementos */
+      .info-section, .summary {
+        padding: 6pt !important;
+        margin-bottom: 8pt !important;
+      }
+      
+      /* Reducir tamaño de elementos en el resumen */
+      #resumen-automatico, .resumen-seccion {
+        font-size: 6pt !important;
+      }
+      
+      #resumen-automatico strong {
+        font-size: 6pt !important;
+      }
+      
+      #resumen-automatico ul, 
+      #resumen-automatico ul li, 
+      #resumen-automatico ul ul li {
+        font-size: 6pt !important;
+        margin: 1pt 0 !important;
+        line-height: 1.1 !important;
+      }
+      
+      .no-cumple-tag {
+        font-size: 5pt !important;
+      }
+      
+      /* Reducir el espacio del editor de texto enriquecido */
+      #plan-accion-editor, .rich-text-editor {
+        font-size: 7pt !important;
+        line-height: 1.1 !important;
+      }
+      
+      /* Reducir las info-section y elementos clave */
+      .info-section p {
+        font-size: 7pt !important;
+        margin: 3pt 0 !important;
+      }
+      
+      .info-section p strong {
+        font-size: 7pt !important;
+      }
+      
+      /* Reducir tamaño de la sección de resultados */
+      .resultados-compacto h3 {
+        font-size: 8pt !important;
+        margin: 6pt 0 3pt 0 !important;
+      }
+      
+      .resultados-compacto p, .resultados-info p {
+        font-size: 6pt !important;
+        margin: 2pt 0 !important;
+      }
+      
+      .result {
+        font-size: 9pt !important;
+        padding: 6pt !important;
+        margin: 6pt 0 !important;
+      }
+      
+      /* Reducir espacio entre filas de tabla */
+      tr {
+        line-height: 1.1 !important;
+      }
+      
+      /* Reducir márgenes de página */
       @page {
-        margin: 1mm !important;
-        size: legal !important;
+        margin: 10mm 8mm !important;
       }
       
-      /* Aplicar escala reducida a todos los elementos para asegurar tamaño mínimo */
-      .info-section, .summary, table, .resumen-seccion, .resultados-compacto,
-      .rich-text-container, .foto-container, .firmas-seccion, .footer {
-        transform: scale(0.9);
-        transform-origin: left top;
-      }
-      
-      /* Márgenes internos mínimos */
-      .info-section, .summary, .resumen-seccion {
-        padding: 0.2pt !important;
-        margin: 0.2pt 0 !important;
-      }
-
-      /* Tablas ultramicroscópicas */
-      table, th, td {
-        border-width: 0.1pt !important;
-      }
-      
-      .check-column {
-        width: 15px !important;
-      }
-      
-      /* Compresión extrema para texto y elementos */
-      .textarea-contenido-pdf, #plan-accion-editor, .rich-text-editor {
-        font-size: 0.8pt !important;
-        line-height: 0.7 !important;
-        min-height: 5pt !important;
-      }
-      
-      /* Comprimir elementos de formulario */
-      input[type="radio"], input[type="checkbox"] {
-        width: 3px !important;
-        height: 3px !important;
-      }
-      
-      /* Preservar colores */
+      /* Asegurar que los colores y fondos se impriman correctamente */
       * {
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
@@ -1050,134 +1072,5 @@ function ajustarTamañoTextoPDF() {
     }
   `;
   
-  // Insertar script para manipular el DOM antes de imprimir
-  const scriptExtra = document.createElement('script');
-  scriptExtra.textContent = `
-    // Función para asegurar que el texto sea extremadamente pequeño en el PDF
-    function asegurarTextoUltraPequeño() {
-      console.log('Aplicando reducción de tamaño extrema antes de imprimir...');
-      
-      // Aplicar CSS inline para forzar tamaño ultramicroscópico
-      document.querySelectorAll('body *').forEach(el => {
-        if (el.tagName.toLowerCase() === 'h1') {
-          el.style.cssText += 'font-size: 1.5pt !important; line-height: 0.7 !important; transform: scale(0.9); transform-origin: left top;';
-        } 
-        else if (el.tagName.toLowerCase() === 'h2') {
-          el.style.cssText += 'font-size: 1.2pt !important; line-height: 0.7 !important; transform: scale(0.9); transform-origin: left top;';
-        }
-        else if (el.tagName.toLowerCase() === 'h3') {
-          el.style.cssText += 'font-size: 1pt !important; line-height: 0.7 !important; transform: scale(0.9); transform-origin: left top;';
-        }
-        else {
-          el.style.cssText += 'font-size: 0.8pt !important; line-height: 0.7 !important; letter-spacing: -0.1pt; word-spacing: -0.1pt;';
-        }
-        
-        // Eliminar espacios
-        el.style.margin = '0';
-        el.style.padding = '0';
-      });
-      
-      // Reducir el tamaño general del documento
-      const container = document.querySelector('.container');
-      if (container) {
-        container.style.transform = 'scale(0.8)';
-        container.style.transformOrigin = 'top left';
-        container.style.width = '125%';
-        container.style.maxWidth = '125%';
-      }
-      
-      // Reducir tamaño de tablas
-      document.querySelectorAll('table').forEach(table => {
-        table.style.borderCollapse = 'collapse';
-        table.style.borderSpacing = '0';
-        table.style.transform = 'scale(0.9)';
-        table.style.transformOrigin = 'left top';
-        
-        // Reducir celdas
-        table.querySelectorAll('th, td').forEach(cell => {
-          cell.style.padding = '0.2pt';
-          cell.style.fontSize = '0.8pt';
-          cell.style.lineHeight = '0.7';
-          cell.style.borderWidth = '0.1pt';
-        });
-      });
-    }
-    
-    // Registrar para ejecución antes de imprimir
-    window.addEventListener('beforeprint', asegurarTextoUltraPequeño);
-    
-    // También ejecutar ahora para afectar cuando se genere el PDF con librerías externas
-    if (typeof html2pdf !== 'undefined') {
-      const originalFromMethod = html2pdf.Worker.prototype.from;
-      html2pdf.Worker.prototype.from = function(src) {
-        // Aplicar reducción antes de generar el PDF
-        asegurarTextoUltraPequeño();
-        return originalFromMethod.call(this, src);
-      };
-    }
-  `;
-  document.head.appendChild(scriptExtra);
-  
-  // Modificar cualquier función de generación de PDF existente
-  if (typeof window.generarPDFCorregido === 'function') {
-    const originalFn = window.generarPDFCorregido;
-    window.generarPDFCorregido = function() {
-      // Aplicar ajustes adicionales para texto microscópico
-      const scriptTemp = document.createElement('script');
-      scriptTemp.textContent = `asegurarTextoUltraPequeño();`;
-      document.head.appendChild(scriptTemp);
-      setTimeout(() => {
-        if (scriptTemp.parentNode) scriptTemp.parentNode.removeChild(scriptTemp);
-      }, 100);
-      
-      // Ejecutar función original
-      return originalFn.apply(this, arguments);
-    };
-  }
-  
-  console.log('Estilos ultramicroscópicos para PDF aplicados - Texto en tamaño extremadamente reducido.');
+  console.log('Estilos para reducir SIGNIFICATIVAMENTE TODOS los títulos y texto en PDF aplicados.');
 }
-
-// Ejecutar la función ahora para aplicar los estilos
-ajustarTamañoTextoPDF();
-
-// Si se está utilizando html2pdf, modificar su comportamiento
-if (typeof window.html2pdf !== 'undefined') {
-  // Guardar referencia a la función original
-  const originalHtml2pdf = window.html2pdf;
-  
-  // Sobreescribir con versión que aplica reducción de tamaño
-  window.html2pdf = function() {
-    // Aplicar nuestros estilos primero
-    ajustarTamañoTextoPDF();
-    
-    // Asegurar texto pequeño
-    if (typeof window.asegurarTextoUltraPequeño === 'function') {
-      window.asegurarTextoUltraPequeño();
-    }
-    
-    // Usar opciones extremas
-    const args = arguments;
-    const options = args[0]?.options || {};
-    if (options.jsPDF) {
-      options.jsPDF.scale = 0.5; // Reducir escala
-      options.jsPDF.compress = true;
-    }
-    
-    // Llamar a la función original
-    return originalHtml2pdf.apply(this, args);
-  };
-}
-
-// Modificar cualquier función de impresión de PDF también
-const originalPrint = window.print;
-window.print = function() {
-  // Aplicar reducción extrema antes de imprimir
-  ajustarTamañoTextoPDF();
-  if (typeof window.asegurarTextoUltraPequeño === 'function') {
-    window.asegurarTextoUltraPequeño();
-  }
-  
-  // Imprimir
-  return originalPrint.apply(this, arguments);
-};
