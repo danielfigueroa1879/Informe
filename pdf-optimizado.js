@@ -1,603 +1,618 @@
 /**
- * Script optimizado para la generación de PDF en formato oficio
- * con mejor manejo de saltos de página y sin páginas en blanco
+ * Solución definitiva para la generación de PDF sin páginas en blanco
+ * y con saltos de página correctos
  */
 
-// Función principal para generar el PDF mejorado
-function generarPDFOptimizado() {
-    // Mostrar indicador de carga con estilo mejorado
-    const indicadorCarga = document.createElement('div');
-    indicadorCarga.id = 'indicador-pdf-optimizado';
-    indicadorCarga.style.position = 'fixed';
-    indicadorCarga.style.top = '0';
-    indicadorCarga.style.left = '0';
-    indicadorCarga.style.width = '100%';
-    indicadorCarga.style.height = '100%';
-    indicadorCarga.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
-    indicadorCarga.style.zIndex = '9999';
-    indicadorCarga.style.display = 'flex';
-    indicadorCarga.style.justifyContent = 'center';
-    indicadorCarga.style.alignItems = 'center';
-    indicadorCarga.style.fontFamily = "'Poppins', sans-serif";
+// Función principal que configura y genera el PDF
+function generarPDFCorregido() {
+    // Mostrar indicador de progreso
+    mostrarIndicadorCarga();
     
-    // Contenedor de mensaje con animación de carga
-    const mensajeContainer = document.createElement('div');
-    mensajeContainer.style.backgroundColor = '#003366';
-    mensajeContainer.style.padding = '25px 40px';
-    mensajeContainer.style.borderRadius = '10px';
-    mensajeContainer.style.boxShadow = '0 5px 25px rgba(0,0,0,0.5)';
-    mensajeContainer.style.textAlign = 'center';
-    mensajeContainer.style.color = 'white';
-    
-    // Mensaje principal
-    const mensajeTitulo = document.createElement('div');
-    mensajeTitulo.style.fontSize = '1.4rem';
-    mensajeTitulo.style.fontWeight = 'bold';
-    mensajeTitulo.style.marginBottom = '15px';
-    mensajeTitulo.textContent = 'Generando PDF';
-    
-    // Mensaje secundario
-    const mensajeSubtitulo = document.createElement('div');
-    mensajeSubtitulo.style.fontSize = '1rem';
-    mensajeSubtitulo.textContent = 'Por favor espere, esto puede tomar unos momentos...';
-    
-    // Agregar animación de carga
-    const loadingBar = document.createElement('div');
-    loadingBar.style.width = '100%';
-    loadingBar.style.height = '6px';
-    loadingBar.style.backgroundColor = 'rgba(255,255,255,0.2)';
-    loadingBar.style.marginTop = '20px';
-    loadingBar.style.borderRadius = '3px';
-    loadingBar.style.overflow = 'hidden';
-    
-    const loadingProgress = document.createElement('div');
-    loadingProgress.style.width = '30%';
-    loadingProgress.style.height = '100%';
-    loadingProgress.style.backgroundColor = '#4CAF50';
-    loadingProgress.style.borderRadius = '3px';
-    loadingProgress.style.animation = 'moveProgress 1.5s infinite ease-in-out';
-    
-    // Añadir animación al documento
-    const styleAnimation = document.createElement('style');
-    styleAnimation.textContent = `
-        @keyframes moveProgress {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(300%); }
-        }
-    `;
-    document.head.appendChild(styleAnimation);
-    
-    // Ensamblar todo
-    loadingBar.appendChild(loadingProgress);
-    mensajeContainer.appendChild(mensajeTitulo);
-    mensajeContainer.appendChild(mensajeSubtitulo);
-    mensajeContainer.appendChild(loadingBar);
-    indicadorCarga.appendChild(mensajeContainer);
-    document.body.appendChild(indicadorCarga);
-    
-    // Cargar html2pdf si no está disponible
+    // Verificar si html2pdf ya está cargado
     if (typeof html2pdf === 'undefined') {
-        console.log("Cargando librería html2pdf...");
         const script = document.createElement('script');
         script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
-        script.onload = function() {
-            console.log("Librería html2pdf cargada correctamente");
-            iniciarGeneracionPDF();
-        };
+        script.onload = prepararYGenerarPDF;
         script.onerror = function() {
-            console.error("Error al cargar html2pdf");
-            alert('Error al cargar la librería de generación de PDF. Compruebe su conexión a internet.');
-            limpiarYRestaurar();
+            ocultarIndicadorCarga();
+            alert('Error: No se pudo cargar la biblioteca necesaria para generar el PDF. Verifique su conexión a Internet.');
         };
         document.head.appendChild(script);
     } else {
-        console.log("Librería html2pdf ya está cargada");
-        iniciarGeneracionPDF();
+        prepararYGenerarPDF();
     }
     
-    // Función principal para generar el PDF
-    function iniciarGeneracionPDF() {
-        // Guardar estados originales para restaurar después
-        const estadosOriginales = prepararDocumentoParaPDF();
+    // Función principal de preparación y generación
+    function prepararYGenerarPDF() {
+        console.log("Iniciando generación de PDF optimizada...");
         
-        // Dejar un tiempo para que se apliquen los cambios en el DOM
+        // 1. Obtener una copia limpia del contenido que vamos a convertir
+        const container = document.querySelector('.container');
+        if (!container) {
+            ocultarIndicadorCarga();
+            alert('Error: No se pudo encontrar el contenedor principal del documento.');
+            return;
+        }
+        
+        // 2. Preparar el contenido limpiando elementos innecesarios
+        const estadoOriginal = prepararContenidoParaPDF(container);
+        
+        // 3. Generar el PDF con la configuración optimizada
         setTimeout(() => {
-            generarPDF(estadosOriginales);
-        }, 500);
+            generarPDFDesdeContenido(container, estadoOriginal);
+        }, 300); // Pequeño retraso para que los cambios de estilo se apliquen
     }
     
-    // Prepara el documento para la generación, ocultando elementos innecesarios
-    function prepararDocumentoParaPDF() {
-        console.log("Preparando documento para PDF...");
-        const estadosOriginales = {
-            botones: [],
-            noPrint: [],
-            secciones: [],
-            estilosPrevios: [],
-            elementosAgregados: []
+    // Función para preparar el contenido limpiando elementos no deseados
+    function prepararContenidoParaPDF(container) {
+        // Guardar el estado original para restaurar después
+        const estadoOriginal = {
+            estilos: new Map(),
+            ocultos: [],
+            documentBody: {
+                overflow: document.body.style.overflow,
+                height: document.body.style.height
+            }
         };
         
-        // 1. Ocultar botones
-        document.querySelectorAll('.botones').forEach(div => {
-            estadosOriginales.botones.push({
-                element: div,
-                display: div.style.display
-            });
-            div.style.display = 'none';
-        });
-        
-        // 2. Ocultar elementos con clase no-print
-        document.querySelectorAll('.no-print').forEach(el => {
-            estadosOriginales.noPrint.push({
+        // 1. Ocultar elementos con clase no-print y botones
+        const elementosOcultar = container.querySelectorAll('.botones, .no-print');
+        elementosOcultar.forEach(el => {
+            estadoOriginal.ocultos.push({
                 element: el,
                 display: el.style.display
             });
             el.style.display = 'none';
         });
         
-        // 3. Asegurar que las secciones con forced-page-break están visibles y mejorarlas
-        document.querySelectorAll('.forced-page-break').forEach(section => {
-            estadosOriginales.secciones.push({
-                element: section,
-                display: section.style.display,
-                height: section.style.height,
-                margin: section.style.margin
-            });
-            
-            // Reforzar el salto de página
-            section.style.display = 'block';
-            section.style.pageBreakBefore = 'always';
-            section.style.breakBefore = 'page';
-            section.style.height = '1px';
-            section.style.margin = '0';
-            section.style.padding = '0';
-            section.style.clear = 'both';
-        });
+        // 2. Aplicar estilos óptimos para la impresión
+        const elementosEstilizar = [
+            { selector: '.forced-page-break', estilos: {
+                display: 'block',
+                height: '1px',
+                pageBreakBefore: 'always',
+                margin: '0',
+                padding: '0'
+            }},
+            { selector: 'h2', estilos: {
+                pageBreakBefore: 'always',
+                marginTop: '20px',
+                paddingTop: '10px'
+            }},
+            { selector: 'table', estilos: {
+                pageBreakInside: 'auto'
+            }},
+            { selector: 'tr', estilos: {
+                pageBreakInside: 'avoid'
+            }},
+            { selector: '#plan-accion-editor', estilos: {
+                height: 'auto',
+                maxHeight: 'none',
+                overflow: 'visible'
+            }}
+        ];
         
-        // 4. Asegurar que el contenido del plan de acción sea visible y tenga altura adecuada
-        const planAccion = document.getElementById('plan-accion-editor');
-        if (planAccion) {
-            estadosOriginales.estilosPrevios.push({
-                element: planAccion,
-                height: planAccion.style.height,
-                overflow: planAccion.style.overflow,
-                maxHeight: planAccion.style.maxHeight
-            });
-            planAccion.style.height = 'auto';
-            planAccion.style.maxHeight = 'none';
-            planAccion.style.overflow = 'visible';
-        }
-        
-        // 5. Mejorar el comportamiento de las tablas
-        document.querySelectorAll('table').forEach(table => {
-            estadosOriginales.estilosPrevios.push({
-                element: table,
-                pageBreakInside: table.style.pageBreakInside,
-                maxWidth: table.style.maxWidth
-            });
-            
-            // Mejorar comportamiento de tablas en impresión
-            table.style.pageBreakInside = 'auto';
-            table.style.maxWidth = '100%';
-            
-            // Para tablas muy grandes, añadir atributos que ayuden en la generación del PDF
-            if (table.offsetHeight > 500) {
-                table.setAttribute('data-pdf-optimal-break', 'true');
-            }
-        });
-        
-        // 6. Asegurar que el contenedor principal tiene el tamaño adecuado
-        const container = document.querySelector('.container');
-        if (container) {
-            estadosOriginales.estilosPrevios.push({
-                element: container,
-                fontSize: container.style.fontSize,
-                width: container.style.width,
-                padding: container.style.padding
-            });
-            
-            // Ajustar el contenedor para impresión
-            container.style.width = '100%';
-            container.style.maxWidth = '800px';
-            container.style.margin = '0 auto';
-            container.style.padding = '10px 15px';
-        }
-        
-        // 7. Añadir marcadores de página visibles en cada h2 para forzar saltos
-        document.querySelectorAll('h2').forEach(h2 => {
-            // Solo añadir si no es el primer h2
-            if (h2.previousElementSibling) {
-                const pageBreakMarker = document.createElement('div');
-                pageBreakMarker.className = 'pdf-page-break-marker';
-                pageBreakMarker.style.pageBreakBefore = 'always';
-                pageBreakMarker.style.breakBefore = 'page';
-                pageBreakMarker.style.display = 'block';
-                pageBreakMarker.style.height = '1px';
-                pageBreakMarker.style.clear = 'both';
+        // Aplicar los estilos y guardar los originales
+        elementosEstilizar.forEach(config => {
+            const elementos = container.querySelectorAll(config.selector);
+            elementos.forEach(el => {
+                // Guardar estilos originales
+                const estilosOriginales = {};
+                Object.keys(config.estilos).forEach(prop => {
+                    estilosOriginales[prop] = el.style[prop];
+                });
+                estadoOriginal.estilos.set(el, estilosOriginales);
                 
-                h2.parentNode.insertBefore(pageBreakMarker, h2);
-                estadosOriginales.elementosAgregados.push(pageBreakMarker);
-            }
-        });
-        
-        // 8. Asegurar que elementos de salto de página estén visibles
-        document.querySelectorAll('#seccion-personal, #seccion-uniformes, #seccion-sistemas, #seccion-caracteristicas, #seccion-resumen, #seccion-fotos').forEach(section => {
-            estadosOriginales.estilosPrevios.push({
-                element: section,
-                display: section.style.display,
-                pageBreakBefore: section.style.pageBreakBefore
+                // Aplicar nuevos estilos
+                Object.keys(config.estilos).forEach(prop => {
+                    el.style[prop] = config.estilos[prop];
+                });
             });
-            
-            section.style.display = 'block';
-            section.style.pageBreakBefore = 'always';
-            section.style.breakBefore = 'page';
         });
         
-        return estadosOriginales;
+        // 3. Añadir una hoja de estilos temporal con reglas específicas para PDF
+        const estilosTemporales = document.createElement('style');
+        estilosTemporales.id = 'estilos-temporales-pdf';
+        estilosTemporales.textContent = `
+            @page {
+                size: legal portrait;
+                margin: 15mm 10mm;
+            }
+            body {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            .container {
+                font-size: 12pt !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+            h2 {
+                page-break-before: always !important;
+                break-before: page !important;
+                page-break-after: avoid !important;
+                break-after: avoid !important;
+            }
+            h3 {
+                page-break-after: avoid !important;
+                break-after: avoid !important;
+            }
+            table {
+                page-break-inside: auto !important;
+                break-inside: auto !important;
+            }
+            tr {
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+            }
+            .forced-page-break {
+                page-break-before: always !important;
+                break-before: page !important;
+                height: 1px !important;
+                visibility: hidden !important;
+            }
+            /* Añadir más reglas específicas según sea necesario */
+        `;
+        document.head.appendChild(estilosTemporales);
+        
+        // 4. Restringir el flujo del documento para evitar problemas de renderizado
+        document.body.style.overflow = 'visible';
+        document.body.style.height = 'auto';
+        
+        return estadoOriginal;
     }
     
-    // Genera el PDF con configuración optimizada
-    function generarPDF(estadosOriginales) {
-        // Obtener el contenedor principal
-        const contenido = document.querySelector('.container');
-        if (!contenido) {
-            console.error("No se encontró el contenedor principal");
-            alert('Error: No se pudo encontrar el contenedor del formulario.');
-            limpiarYRestaurar(estadosOriginales);
-            return;
-        }
+    // Función para generar el PDF con la configuración óptima
+    function generarPDFDesdeContenido(contenido, estadoOriginal) {
+        console.log("Generando PDF con configuración óptima...");
         
-        console.log("Configurando opciones para PDF tamaño oficio...");
-        
-        // Inyectar CSS temporal para mejorar el comportamiento de impresión
-        const styleTemp = document.createElement('style');
-        styleTemp.id = 'temp-print-style';
-        styleTemp.textContent = `
-            @media print {
-                body, html, .container {
-                    height: auto !important;
-                    overflow: visible !important;
-                }
-                table {
-                    page-break-inside: auto !important;
-                }
-                tr {
-                    page-break-inside: avoid !important;
-                    page-break-after: auto !important;
-                }
-                h2, h3 {
-                    page-break-after: avoid !important;
-                }
-                .forced-page-break {
-                    page-break-before: always !important;
-                    display: block !important;
-                    height: 1px !important;
-                }
-                .avoid-page-break {
-                    page-break-inside: avoid !important;
-                }
-            }
-        `;
-        document.head.appendChild(styleTemp);
-        
-        // Configuración optimizada para formato oficio (legal)
+        // Configuración optimizada para tamaño legal/oficio
         const opciones = {
-            // Tamaño oficio: 215.9 x 355.6 mm (8.5 x 14 pulgadas)
-            margin: [15, 10, 15, 10], // top, left, bottom, right en mm
             filename: `Fiscalizacion_${new Date().toLocaleDateString().replace(/\//g, '-')}.pdf`,
-            image: { 
-                type: 'jpeg', 
-                quality: 0.98
-            },
-            html2canvas: { 
-                scale: 1.5, // Escala reducida para evitar cortes
+            
+            // Modo de optimización: 1 = velocidad, 2 = precisión
+            html2canvas: {
+                scale: 1.5,
                 useCORS: true,
-                logging: true, // Activar logging para depuración
-                letterRendering: true,
                 allowTaint: true,
+                scrollX: 0,
+                scrollY: 0,
+                windowWidth: document.documentElement.offsetWidth,
+                windowHeight: document.documentElement.offsetHeight,
+                logging: false,
                 backgroundColor: '#FFFFFF',
-                // Ajustar ancho para evitar cortes laterales
-                windowWidth: 1000,
-                removeContainer: true, 
-                onclone: function(clonedDoc) {
-                    console.log("Procesando clon del documento...");
-                    
-                    // Ajustar todas las tablas para evitar que se corten
-                    Array.from(clonedDoc.querySelectorAll('table')).forEach((table, index) => {
-                        table.setAttribute('data-table-index', index);
-                        table.style.pageBreakInside = 'auto';
-                        table.style.maxWidth = '100%';
-                        
-                        // Verificar si la tabla es muy grande, reducir fuente si es necesario
-                        if (table.offsetHeight > 600) {
-                            console.log(`Tabla ${index} es muy alta (${table.offsetHeight}px), ajustando...`);
-                            table.style.fontSize = '0.9em';
-                        }
-                    });
-                    
-                    // Mejorar manejo de saltos de página forzados
-                    Array.from(clonedDoc.querySelectorAll('.forced-page-break')).forEach((el, index) => {
-                        console.log(`Procesando salto de página #${index}`);
-                        el.style.pageBreakBefore = 'always';
-                        el.style.breakBefore = 'page';
-                        el.style.display = 'block';
-                        el.style.height = '1px';
-                        el.style.margin = '0';
-                        el.style.padding = '0';
-                        el.style.clear = 'both';
-                        
-                        // Agregar espacio visible para asegurar el salto
-                        const spacer = clonedDoc.createElement('div');
-                        spacer.style.height = '10px';
-                        spacer.style.width = '100%';
-                        spacer.style.display = 'block';
-                        spacer.style.clear = 'both';
-                        el.parentNode.insertBefore(spacer, el);
-                    });
-                    
-                    // Procesar encabezados h2 para evitar cortes
-                    Array.from(clonedDoc.querySelectorAll('h2')).forEach((h2, index) => {
-                        h2.style.pageBreakBefore = 'always';
-                        h2.style.breakBefore = 'page';
-                        h2.style.marginTop = '15px';
-                        h2.setAttribute('data-h2-index', index);
-                        
-                        // Asegurar que el h2 no se corte de su contenido asociado
-                        h2.style.pageBreakAfter = 'avoid';
-                        h2.style.breakAfter = 'avoid';
-                    });
-                    
-                    // Intentar eliminar espacios en blanco excesivos
-                    const allElements = clonedDoc.querySelectorAll('*');
-                    for (let i = 0; i < allElements.length; i++) {
-                        if (allElements[i].style) {
-                            // Eliminar margen inferior excesivo
-                            if (parseInt(window.getComputedStyle(allElements[i]).marginBottom) > 50) {
-                                allElements[i].style.marginBottom = '20px';
-                            }
-                        }
-                    }
-                }
+                imageTimeout: 15000,
+                removeContainer: true,
+                foreignObjectRendering: false // Deshabilitar para mayor compatibilidad
             },
-            jsPDF: { 
-                unit: 'mm', 
-                format: [215.9, 355.6], // Formato legal en milímetros (8.5 x 14 pulgadas)
+            
+            jsPDF: {
+                unit: 'mm',
+                format: 'legal', // Formato oficio/legal
                 orientation: 'portrait',
                 compress: true,
-                hotfixes: ["px_scaling"], // Corregir problemas de escalado
-                putTotalPages: true // Permite numeración de páginas
+                precision: 16,
+                putOnlyUsedFonts: true
             },
-            pagebreak: { 
-                mode: ['css', 'legacy'], // Simplificar modos
-                before: ['.forced-page-break', 'h2', '#seccion-personal', '#seccion-uniformes', '#seccion-sistemas', '#seccion-caracteristicas', '#seccion-resumen', '#seccion-fotos'],
-                avoid: ['table', 'tr', '.avoid-break', 'h3']
-            }
+            
+            // Configuración de saltos de página
+            pagebreak: {
+                mode: ['css', 'legacy'],
+                before: ['h2', '.forced-page-break'],
+                avoid: ['table', 'img', '.avoid-break']
+            },
+            
+            // Usar el nuevo modo para división de contenido
+            enableLinks: false,
+            image: { type: 'jpeg', quality: 0.95 },
+            margin: [15, 10, 15, 10], // top, right, bottom, left
+            
+            // Importante: Esta opción optimiza el proceso y evita páginas en blanco
+            html2canvas: { scale: 1.5, scrollY: 0, scrollX: 0 }
         };
         
-        console.log("Iniciando generación del PDF...");
-        
-        // Crear el PDF con manejo de errores mejorado
+        // Generar el PDF con el manejo optimizado
         html2pdf()
-            .set(opciones)
             .from(contenido)
+            .set(opciones)
             .toPdf()
             .get('pdf')
-            .then((pdf) => {
-                // Verificar que el PDF tiene contenido adecuado
-                console.log("PDF generado con tamaño en bytes:", pdf.output('arraybuffer').byteLength);
-                
-                if (pdf.output('arraybuffer').byteLength < 5000) {
-                    console.warn("Advertencia: El PDF generado tiene un tamaño inusualmente pequeño");
-                }
-                
-                // Añadir información personalizada
-                pdf.setProperties({
-                    title: 'Cuadro de Fiscalización de Seguridad Privada',
-                    subject: 'Formulario de Evaluación de Seguridad',
-                    creator: 'Sistema Optimizado de PDF',
-                    author: document.querySelector('input[name="fiscalizador"]')?.value || 'Formulario de Fiscalización'
-                });
-                
-                // Intentar añadir numeración de páginas
-                try {
-                    const totalPaginas = pdf.internal.getNumberOfPages();
-                    console.log(`Total de páginas en el PDF: ${totalPaginas}`);
-                    
-                    // Añadir números de página en cada página
-                    for (let i = 1; i <= totalPaginas; i++) {
-                        pdf.setPage(i);
-                        pdf.setFontSize(10);
-                        pdf.setTextColor(100);
-                        const textoFooter = `Página ${i} de ${totalPaginas}`;
-                        const pageSize = pdf.internal.pageSize;
-                        const ancho = pageSize.width || pageSize.getWidth();
-                        pdf.text(textoFooter, ancho - 30, pageSize.height - 10);
-                    }
-                } catch (e) {
-                    console.warn("No se pudo añadir numeración de páginas", e);
-                }
+            .then(function(pdfObject) {
+                // Añadir metadatos y numeración
+                agregarMetadatosYNumeracion(pdfObject);
                 
                 // Guardar el PDF
-                pdf.save(opciones.filename);
-                console.log("PDF guardado exitosamente");
+                pdfObject.save(opciones.filename);
                 
-                // Esperar un momento antes de restaurar
+                console.log("PDF generado exitosamente");
+                actualizarIndicadorExito();
+                
+                // Restaurar el documento original después de un momento
                 setTimeout(() => {
-                    limpiarYRestaurar(estadosOriginales);
-                }, 1000);
+                    restaurarDocumentoOriginal(estadoOriginal);
+                }, 1200);
             })
-            .catch(err => {
-                console.error("Error generando PDF:", err);
-                alert("Ocurrió un error al generar el PDF. Por favor intente nuevamente.");
-                limpiarYRestaurar(estadosOriginales);
+            .catch(function(error) {
+                console.error("Error al generar el PDF:", error);
+                ocultarIndicadorCarga();
+                alert("Ocurrió un error al generar el PDF. Por favor, intente nuevamente.");
+                restaurarDocumentoOriginal(estadoOriginal);
             });
     }
     
-    // Restaura el documento a su estado original
-    function limpiarYRestaurar(estadosOriginales = {}) {
-        console.log("Restaurando el documento a su estado original...");
-        
-        // Eliminar el indicador de carga
-        const indicador = document.getElementById('indicador-pdf-optimizado');
-        if (indicador) {
-            document.body.removeChild(indicador);
-        }
-        
-        // Eliminar estilos temporales
-        const tempStyles = document.getElementById('temp-print-style');
-        if (tempStyles) {
-            document.head.removeChild(tempStyles);
-        }
-        
-        // Si no hay estados para restaurar, salimos
-        if (!estadosOriginales || Object.keys(estadosOriginales).length === 0) {
-            return;
-        }
-        
-        // Restaurar botones
-        if (estadosOriginales.botones) {
-            estadosOriginales.botones.forEach(item => {
-                item.element.style.display = item.display || '';
+    // Función para agregar metadatos y numeración al PDF
+    function agregarMetadatosYNumeracion(pdf) {
+        try {
+            // Añadir metadatos
+            pdf.setProperties({
+                title: 'Cuadro de Fiscalización de Seguridad Privada',
+                subject: 'Informe de Fiscalización',
+                author: document.querySelector('input[name="fiscalizador"]')?.value || 'Sistema de Fiscalización',
+                keywords: 'seguridad, fiscalización, informe',
+                creator: 'Sistema PDF Optimizado'
             });
-        }
-        
-        // Restaurar elementos no-print
-        if (estadosOriginales.noPrint) {
-            estadosOriginales.noPrint.forEach(item => {
-                item.element.style.display = item.display || '';
-            });
-        }
-        
-        // Restaurar secciones
-        if (estadosOriginales.secciones) {
-            estadosOriginales.secciones.forEach(item => {
-                item.element.style.display = item.display || '';
-                if (item.height !== undefined) item.element.style.height = item.height;
-                if (item.margin !== undefined) item.element.style.margin = item.margin;
+            
+            // Añadir numeración de páginas
+            const totalPaginas = pdf.internal.getNumberOfPages();
+            
+            for (let i = 1; i <= totalPaginas; i++) {
+                pdf.setPage(i);
                 
-                // Eliminar propiedades adicionales de salto de página
-                item.element.style.pageBreakBefore = '';
-                item.element.style.breakBefore = '';
-                item.element.style.clear = '';
+                // Configuración de texto para el pie de página
+                pdf.setFontSize(9);
+                pdf.setTextColor(100, 100, 100);
+                
+                // Obtener dimensiones de la página
+                const pageSize = pdf.internal.pageSize;
+                const pageWidth = pageSize.width ? pageSize.width : pageSize.getWidth();
+                const pageHeight = pageSize.height ? pageSize.height : pageSize.getHeight();
+                
+                // Texto de numeración
+                const texto = `Página ${i} de ${totalPaginas}`;
+                
+                // Posicionar en la esquina inferior derecha
+                const textWidth = pdf.getStringUnitWidth(texto) * 9 / pdf.internal.scaleFactor;
+                const x = pageWidth - textWidth - 15;
+                const y = pageHeight - 10;
+                
+                // Añadir el texto
+                pdf.text(texto, x, y);
+            }
+        } catch (error) {
+            console.warn("Error al añadir metadatos o numeración:", error);
+        }
+    }
+    
+    // Función para restaurar el documento a su estado original
+    function restaurarDocumentoOriginal(estadoOriginal) {
+        console.log("Restaurando documento a su estado original...");
+        
+        // 1. Restaurar elementos ocultos
+        if (estadoOriginal.ocultos) {
+            estadoOriginal.ocultos.forEach(item => {
+                item.element.style.display = item.display || '';
             });
         }
         
-        // Restaurar otros estilos
-        if (estadosOriginales.estilosPrevios) {
-            estadosOriginales.estilosPrevios.forEach(item => {
-                // Restaurar todas las propiedades guardadas
-                Object.keys(item).forEach(prop => {
-                    if (prop !== 'element' && item[prop] !== undefined) {
-                        item.element.style[prop] = item[prop];
-                    }
+        // 2. Restaurar estilos originales
+        if (estadoOriginal.estilos) {
+            estadoOriginal.estilos.forEach((estilos, elemento) => {
+                Object.keys(estilos).forEach(prop => {
+                    elemento.style[prop] = estilos[prop];
                 });
-                
-                // Limpiar atributos de datos adicionales
-                if (item.element.hasAttribute('data-pdf-optimal-break')) {
-                    item.element.removeAttribute('data-pdf-optimal-break');
-                }
             });
         }
         
-        // Eliminar elementos agregados temporalmente
-        if (estadosOriginales.elementosAgregados) {
-            estadosOriginales.elementosAgregados.forEach(element => {
-                if (element.parentNode) {
-                    element.parentNode.removeChild(element);
-                }
-            });
+        // 3. Restaurar estilos del body
+        if (estadoOriginal.documentBody) {
+            document.body.style.overflow = estadoOriginal.documentBody.overflow || '';
+            document.body.style.height = estadoOriginal.documentBody.height || '';
         }
         
-        console.log("Restauración completada");
+        // 4. Eliminar hoja de estilos temporal
+        const estilosTemporales = document.getElementById('estilos-temporales-pdf');
+        if (estilosTemporales) {
+            estilosTemporales.parentNode.removeChild(estilosTemporales);
+        }
+        
+        // 5. Ocultar indicador de carga si aún está visible
+        ocultarIndicadorCarga();
+        
+        console.log("Documento restaurado correctamente");
+    }
+    
+    // Función para mostrar el indicador de carga con un diseño mejorado
+    function mostrarIndicadorCarga() {
+        // Eliminar indicador existente si lo hay
+        const indicadorExistente = document.getElementById('indicador-pdf-carga');
+        if (indicadorExistente) {
+            document.body.removeChild(indicadorExistente);
+        }
+        
+        // Crear nuevo indicador
+        const indicador = document.createElement('div');
+        indicador.id = 'indicador-pdf-carga';
+        
+        // Estilos para el contenedor principal
+        Object.assign(indicador.style, {
+            position: 'fixed',
+            top: '0',
+            left: '0',
+            width: '100%',
+            height: '100%',
+            backgroundColor: 'rgba(0, 0, 0, 0.7)',
+            zIndex: '9999',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            fontFamily: "'Poppins', sans-serif",
+            transition: 'opacity 0.3s ease'
+        });
+        
+        // Crear un contenedor para el mensaje
+        const mensajeContainer = document.createElement('div');
+        Object.assign(mensajeContainer.style, {
+            backgroundColor: '#003366',
+            padding: '25px 40px',
+            borderRadius: '12px',
+            boxShadow: '0 5px 25px rgba(0,0,0,0.5)',
+            textAlign: 'center',
+            maxWidth: '80%',
+            color: 'white'
+        });
+        
+        // Añadir título
+        const titulo = document.createElement('h3');
+        titulo.textContent = 'Generando PDF';
+        Object.assign(titulo.style, {
+            margin: '0 0 15px 0',
+            fontSize: '1.5rem',
+            fontWeight: '600',
+            color: 'white'
+        });
+        
+        // Añadir subtítulo con mensaje explicativo
+        const subtitulo = document.createElement('p');
+        subtitulo.textContent = 'Por favor espere mientras se procesa el documento...';
+        Object.assign(subtitulo.style, {
+            margin: '0 0 20px 0',
+            fontSize: '1rem',
+            color: 'rgba(255,255,255,0.9)'
+        });
+        
+        // Crear una barra de progreso animada
+        const barraContenedor = document.createElement('div');
+        Object.assign(barraContenedor.style, {
+            width: '100%',
+            height: '8px',
+            backgroundColor: 'rgba(255,255,255,0.2)',
+            borderRadius: '4px',
+            overflow: 'hidden',
+            margin: '10px 0'
+        });
+        
+        const barraProgreso = document.createElement('div');
+        barraProgreso.id = 'barra-progreso-pdf';
+        Object.assign(barraProgreso.style, {
+            width: '0%',
+            height: '100%',
+            backgroundColor: '#4CAF50',
+            borderRadius: '4px',
+            transition: 'width 0.5s ease'
+        });
+        
+        // Añadir texto de estado que cambiará durante el proceso
+        const textoEstado = document.createElement('p');
+        textoEstado.id = 'texto-estado-pdf';
+        textoEstado.textContent = 'Preparando documento...';
+        Object.assign(textoEstado.style, {
+            margin: '15px 0 0 0',
+            fontSize: '0.9rem',
+            color: 'rgba(255,255,255,0.8)',
+            fontStyle: 'italic'
+        });
+        
+        // Ensamblar todos los elementos
+        barraContenedor.appendChild(barraProgreso);
+        mensajeContainer.appendChild(titulo);
+        mensajeContainer.appendChild(subtitulo);
+        mensajeContainer.appendChild(barraContenedor);
+        mensajeContainer.appendChild(textoEstado);
+        indicador.appendChild(mensajeContainer);
+        
+        // Añadir al body
+        document.body.appendChild(indicador);
+        
+        // Animar la barra de progreso
+        setTimeout(() => {
+            barraProgreso.style.width = '30%';
+            textoEstado.textContent = 'Procesando contenido...';
+        }, 300);
+        
+        setTimeout(() => {
+            barraProgreso.style.width = '60%';
+            textoEstado.textContent = 'Generando PDF...';
+        }, 1500);
+        
+        setTimeout(() => {
+            barraProgreso.style.width = '80%';
+            textoEstado.textContent = 'Aplicando formato final...';
+        }, 3000);
+    }
+    
+    // Función para actualizar el indicador con mensaje de éxito
+    function actualizarIndicadorExito() {
+        const barraProgreso = document.getElementById('barra-progreso-pdf');
+        const textoEstado = document.getElementById('texto-estado-pdf');
+        
+        if (barraProgreso && textoEstado) {
+            barraProgreso.style.width = '100%';
+            barraProgreso.style.backgroundColor = '#4CAF50';
+            textoEstado.textContent = '¡PDF generado exitosamente!';
+            
+            // Cambiar estilo para indicar éxito
+            const mensajeContainer = textoEstado.parentNode;
+            if (mensajeContainer) {
+                const titulo = mensajeContainer.querySelector('h3');
+                if (titulo) {
+                    titulo.textContent = '¡Proceso Completado!';
+                }
+            }
+        }
+        
+        // Ocultar después de un tiempo
+        setTimeout(ocultarIndicadorCarga, 1500);
+    }
+    
+    // Función para ocultar el indicador de carga
+    function ocultarIndicadorCarga() {
+        const indicador = document.getElementById('indicador-pdf-carga');
+        if (indicador) {
+            // Transición suave de salida
+            indicador.style.opacity = '0';
+            
+            // Remover después de la transición
+            setTimeout(() => {
+                if (indicador.parentNode) {
+                    indicador.parentNode.removeChild(indicador);
+                }
+            }, 300);
+        }
     }
 }
 
-// Remplaza el botón existente con uno que usa la nueva función
-function instalarBotonPDFOptimizado() {
-    console.log("Instalando botón de PDF optimizado...");
+// Función para reemplazar los botones existentes con la nueva funcionalidad
+function instalarBotonPDFCorregido() {
+    console.log("Instalando botón de PDF corregido...");
     
-    // Buscar todos los botones existentes que dicen "Guardar como PDF" o "Descargar PDF"
+    // Buscar todos los botones relacionados con PDF
     const botonesExistentes = Array.from(document.querySelectorAll('button')).filter(btn => 
         btn.textContent.includes('PDF') || 
-        btn.onclick?.toString().includes('PDF') ||
-        btn.id?.includes('pdf')
+        btn.id?.includes('pdf') ||
+        btn.onclick?.toString().includes('PDF')
     );
     
-    // Modificar la funcionalidad de esos botones
+    // Modificar cada botón encontrado
     botonesExistentes.forEach(btn => {
-        console.log(`Modificando botón: ${btn.textContent || btn.id}`);
-        btn.onclick = generarPDFOptimizado;
+        console.log(`Modificando botón de PDF existente: ${btn.textContent || btn.id}`);
         
-        // Añadir un estilo más destacado
-        btn.style.backgroundColor = '#28a745';
-        btn.style.color = 'white';
-        btn.style.fontWeight = 'bold';
-        btn.style.boxShadow = '0 4px 6px rgba(0,0,0,0.1)';
+        // Cambiar el evento onclick
+        btn.onclick = generarPDFCorregido;
+        
+        // Actualizar texto y estilos para distinguirlo
+        if (btn.textContent.includes('PDF')) {
+            btn.textContent = 'Descargar PDF Corregido';
+        }
+        
+        // Estilos destacados
+        Object.assign(btn.style, {
+            backgroundColor: '#28a745',
+            color: 'white',
+            fontWeight: 'bold',
+            padding: '10px 20px',
+            borderRadius: '5px',
+            border: 'none',
+            cursor: 'pointer',
+            boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+            transition: 'all 0.3s ease'
+        });
+        
+        // Añadir evento hover
+        btn.onmouseover = function() {
+            this.style.backgroundColor = '#218838';
+            this.style.transform = 'translateY(-2px)';
+            this.style.boxShadow = '0 6px 8px rgba(0,0,0,0.15)';
+        };
+        
+        btn.onmouseout = function() {
+            this.style.backgroundColor = '#28a745';
+            this.style.transform = 'translateY(0)';
+            this.style.boxShadow = '0 4px 6px rgba(0,0,0,0.1)';
+        };
     });
     
-    // Si no se encontraron botones, agregar uno nuevo en cada div de botones
+    // Si no se encontró ningún botón, crear uno nuevo
     if (botonesExistentes.length === 0) {
         const botonesDivs = document.querySelectorAll('.botones');
         botonesDivs.forEach(div => {
             const nuevoBoton = document.createElement('button');
             nuevoBoton.type = 'button';
-            nuevoBoton.textContent = 'Descargar PDF Optimizado';
-            nuevoBoton.onclick = generarPDFOptimizado;
+            nuevoBoton.textContent = 'Descargar PDF Corregido';
+            nuevoBoton.onclick = generarPDFCorregido;
             nuevoBoton.className = 'no-print';
-            nuevoBoton.id = 'btn-pdf-optimizado';
             
-            // Estilo especial
-            nuevoBoton.style.backgroundColor = '#28a745';
-            nuevoBoton.style.color = 'white';
-            nuevoBoton.style.padding = '12px 24px';
-            nuevoBoton.style.fontSize = '1.1rem';
-            nuevoBoton.style.fontWeight = 'bold';
-            nuevoBoton.style.margin = '0 5px';
-            nuevoBoton.style.border = 'none';
-            nuevoBoton.style.borderRadius = '5px';
-            nuevoBoton.style.cursor = 'pointer';
-            nuevoBoton.style.boxShadow = '0 4px 6px rgba(0,0,0,0.1)';
+            // Aplicar estilos
+            Object.assign(nuevoBoton.style, {
+                backgroundColor: '#28a745',
+                color: 'white',
+                fontWeight: 'bold',
+                padding: '10px 20px',
+                margin: '0 5px',
+                borderRadius: '5px',
+                border: 'none',
+                cursor: 'pointer',
+                boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+                transition: 'all 0.3s ease'
+            });
             
-            // Insertar al principio para que sea más visible
+            // Añadir eventos hover
+            nuevoBoton.onmouseover = function() {
+                this.style.backgroundColor = '#218838';
+                this.style.transform = 'translateY(-2px)';
+                this.style.boxShadow = '0 6px 8px rgba(0,0,0,0.15)';
+            };
+            
+            nuevoBoton.onmouseout = function() {
+                this.style.backgroundColor = '#28a745';
+                this.style.transform = 'translateY(0)';
+                this.style.boxShadow = '0 4px 6px rgba(0,0,0,0.1)';
+            };
+            
+            // Insertar al inicio
             div.insertBefore(nuevoBoton, div.firstChild);
         });
     }
     
-    // Sobrescribir funciones existentes
+    // Sobrescribir funciones existentes para asegurar que siempre se use la nueva implementación
     if (typeof window.guardarPDF === 'function') {
         console.log("Sobrescribiendo función guardarPDF existente");
-        window.guardarPDF = generarPDFOptimizado;
+        window.guardarPDF = generarPDFCorregido;
     }
     
     if (typeof window.descargarPDF === 'function') {
         console.log("Sobrescribiendo función descargarPDF existente");
-        window.descargarPDF = generarPDFOptimizado;
+        window.descargarPDF = generarPDFCorregido;
     }
     
     if (typeof window.generarPDFMejorado === 'function') {
         console.log("Sobrescribiendo función generarPDFMejorado existente");
-        window.generarPDFMejorado = generarPDFOptimizado;
+        window.generarPDFMejorado = generarPDFCorregido;
     }
     
-    console.log("Botón de PDF optimizado instalado correctamente");
+    console.log("Instalación de botón PDF corregido completada");
 }
 
-// Inicializar cuando el DOM esté listo
+// Iniciar cuando el DOM esté completamente cargado
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
-        setTimeout(instalarBotonPDFOptimizado, 1000); // Esperar 1 segundo para asegurarse de que todo esté cargado
+        // Esperar un segundo para asegurar que todos los scripts se han cargado
+        setTimeout(instalarBotonPDFCorregido, 1000);
     });
 } else {
-    // Si el DOM ya está cargado, ejecutar directamente
-    setTimeout(instalarBotonPDFOptimizado, 1000);
+    // Si el DOM ya está cargado, ejecutar directamente con un pequeño retraso
+    setTimeout(instalarBotonPDFCorregido, 1000);
 }
 
-// También ejecutar cuando la ventana haya cargado completamente
-window.addEventListener('load', function() {
-    // Ejecutar después de un pequeño retraso para asegurarse de que otros scripts han terminado
-    setTimeout(instalarBotonPDFOptimizado, 1500);
+// También asegurar que se ejecute cuando la ventana esté completamente cargada
+window.addEventListener('load', () => {
+    setTimeout(instalarBotonPDFCorregido, 1500);
 });
 
-// Exportar las funciones para que sean accesibles
-window.generarPDFOptimizado = generarPDFOptimizado;
-window.instalarBotonPDFOptimizado = instalarBotonPDFOptimizado;
+// Exponer funciones globalmente
+window.generarPDFCorregido = generarPDFCorregido;
+window.instalarBotonPDFCorregido = instalarBotonPDFCorregido;
+
+// Ejecutar inmediatamente para instalar el botón sin esperar eventos
+instalarBotonPDFCorregido();
