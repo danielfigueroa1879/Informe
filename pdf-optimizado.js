@@ -205,7 +205,7 @@ function generarPDFCorregido() {
             
             // Modo de optimización: 1 = velocidad, 2 = precisión
             html2canvas: {
-                scale: 0.45, // Reducido al 30% del valor original (1.5 * 0.3 = 0.45)
+                scale: 0.30, // Reducido aún más (20% del original)
                 useCORS: true,
                 allowTaint: true,
                 scrollX: 0,
@@ -218,6 +218,33 @@ function generarPDFCorregido() {
                 removeContainer: true,
                 foreignObjectRendering: false, // Deshabilitar para mayor compatibilidad
                 onclone: function(clonedDoc) {
+                    // Eliminar cualquier elemento que pueda estar causando la mancha vertical
+                    const posiblesElementosProblematicos = clonedDoc.querySelectorAll(
+                        '.container::before, .container::after, body::before, body::after, ' + 
+                        'div::before, div::after, td::before, td::after, ' +
+                        '[style*="position: absolute"], [style*="position:absolute"]'
+                    );
+                    
+                    posiblesElementosProblematicos.forEach(el => {
+                        if (el && el.parentNode) {
+                            el.parentNode.removeChild(el);
+                        }
+                    });
+                    
+                    // Eliminar elementos específicos que puedan estar causando la mancha
+                    const removeSelectors = [
+                        '.datos-guardados-info', '#indicador-guardado', 
+                        '.no-print', '[class*="indicador"]', '[id*="indicador"]'
+                    ];
+                    
+                    removeSelectors.forEach(selector => {
+                        clonedDoc.querySelectorAll(selector).forEach(el => {
+                            if (el && el.parentNode) {
+                                el.parentNode.removeChild(el);
+                            }
+                        });
+                    });
+                    
                     // Forzar la visibilidad de los fondos
                     const style = clonedDoc.createElement('style');
                     style.innerHTML = `
@@ -227,12 +254,19 @@ function generarPDFCorregido() {
                             color-adjust: exact !important;
                         }
                         
-                        body, .container, table, td, th, tr, div {
-                            background-color: inherit !important;
-                            background-image: inherit !important;
-                            background: inherit !important;
+                        /* Eliminar cualquier posible mancha o fondo no deseado */
+                        body, html {
+                            background: white !important;
+                            background-image: none !important;
                         }
                         
+                        .container {
+                            background: white !important;
+                            background-image: none !important;
+                            box-shadow: none !important;
+                        }
+                        
+                        /* Estilos específicos para asegurar fondos correctos */
                         .header-row, th {
                             background-color: #003366 !important;
                             color: white !important;
@@ -259,6 +293,12 @@ function generarPDFCorregido() {
                         .result.inseguro {
                             background-color: #f2dede !important;
                             color: #a94442 !important;
+                        }
+                        
+                        /* Eliminar pseudoelementos que puedan causar manchas */
+                        *::before, *::after {
+                            display: none !important;
+                            content: none !important;
                         }
                     `;
                     clonedDoc.head.appendChild(style);
@@ -294,12 +334,12 @@ function generarPDFCorregido() {
             
             // Importante: Esta opción optimiza el proceso y evita páginas en blanco
             html2canvas: { 
-                scale: 0.45, 
+                scale: 0.30, 
                 scrollY: 0, 
                 scrollX: 0,
-                backgroundColor: null, // Permitir fondos transparentes
+                backgroundColor: '#FFFFFF', // Fondo blanco explícito para eliminar manchas
                 removeContainer: true,
-                allowTaint: true, // Permitir contenido cruzado
+                allowTaint: true,
                 useCORS: true,
                 letterRendering: true
             }
@@ -384,7 +424,15 @@ function generarPDFCorregido() {
         // 1. Restaurar elementos ocultos
         if (estadoOriginal.ocultos) {
             estadoOriginal.ocultos.forEach(item => {
-                item.element.style.display = item.display || '';
+                // Si el elemento fue completamente eliminado, restaurarlo
+                if (item.parent && item.nextSibling) {
+                    item.parent.insertBefore(item.element, item.nextSibling);
+                } else if (item.parent) {
+                    item.parent.appendChild(item.element);
+                } else if (item.display !== undefined) {
+                    // Si solo se cambió el display
+                    item.element.style.display = item.display || '';
+                }
             });
         }
         
