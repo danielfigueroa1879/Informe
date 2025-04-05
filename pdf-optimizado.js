@@ -902,8 +902,8 @@ function eliminarBotonesDuplicados() {
 }
 
 /**
- * Función actualizada para reducir significativamente todos los títulos, 
- * enumeraciones y encabezados en el PDF exportado
+ * Función con tamaños de texto extremadamente reducidos para PDF
+ * Reemplaza la función ajustarTamañoTextoPDF() en tu archivo pdf-optimizado.js
  */
 function ajustarTamañoTextoPDF() {
   // Crear o actualizar la hoja de estilos específica para PDF
@@ -916,152 +916,151 @@ function ajustarTamañoTextoPDF() {
     document.head.appendChild(estilosPDF);
   }
   
-  // Definir estilos específicos para impresión y PDF
-  // NOTA: Hemos reducido significativamente todos los tamaños de fuente
-  // incluidos los títulos y elementos enumerados
+  // Definir estilos específicos para impresión y PDF con tamaños extremadamente reducidos
   estilosPDF.textContent = `
     @media print {
-      /* Reducir tamaño de texto general - AHORA MÁS PEQUEÑO */
+      /* Texto normal extremadamente reducido */
       body, p, td, th, li, span, div {
-        font-size: 7pt !important;
-        line-height: 1.2 !important;
+        font-size: 5pt !important;
+        line-height: 1.1 !important;
       }
       
-      /* Reducir SIGNIFICATIVAMENTE tamaño de encabezados */
+      /* Todos los títulos mucho más pequeños */
       h1 {
-        font-size: 10pt !important;
-        margin-bottom: 8pt !important;
-        margin-top: 8pt !important;
+        font-size: 8pt !important;
+        margin-bottom: 5pt !important;
+        margin-top: 5pt !important;
       }
       
       h2 {
-        font-size: 9pt !important;
-        margin-top: 12pt !important;
-        margin-bottom: 6pt !important;
+        font-size: 7pt !important;
+        margin-top: 10pt !important;
+        margin-bottom: 4pt !important;
       }
       
       h3 {
-        font-size: 8pt !important;
-        margin-top: 10pt !important;
-        margin-bottom: 5pt !important;
+        font-size: 6pt !important;
+        margin-top: 8pt !important;
+        margin-bottom: 3pt !important;
       }
       
-      /* Reducir TODOS los títulos, incluyendo los numerados */
-      h1, h2, h3, h4, h5, h6, 
-      .header-row th, th, 
-      .result, 
-      .titulo-seccion,
-      .titulo-principal,
+      /* Reducción extrema de títulos enumerados y elementos de lista */
+      h4, h5, h6 {
+        font-size: 5pt !important;
+        margin-top: 6pt !important;
+        margin-bottom: 2pt !important;
+      }
+      
       strong, b {
-        font-size: 8pt !important;
+        font-size: 5pt !important;
       }
       
-      /* Encabezados específicos más pequeños */
-      .header-row th {
-        padding: 3pt !important;
-        font-size: 7pt !important;
+      /* Encabezados de tabla muy reducidos */
+      .header-row th, th {
+        font-size: 5pt !important;
+        padding: 2pt !important;
         font-weight: bold !important;
       }
       
-      /* Reducir tamaño de los elementos en tablas */
+      /* Reducción extrema de tablas */
       table {
-        font-size: 7pt !important;
-        margin-bottom: 10pt !important;
+        font-size: 5pt !important;
+        margin-bottom: 8pt !important;
       }
       
       th, td {
         padding: 2pt !important;
-        font-size: 6pt !important;
+        font-size: 5pt !important;
       }
       
-      /* Reducir tamaño y espacio en listas y enumeraciones */
+      /* Listas muy comprimidas */
       ul, ol {
-        margin: 3pt 0 !important;
-        padding-left: 12pt !important;
+        margin: 2pt 0 !important;
+        padding-left: 10pt !important;
       }
       
       li {
-        font-size: 6pt !important;
+        font-size: 5pt !important;
         margin: 1pt 0 !important;
-        line-height: 1.1 !important;
+        line-height: 1 !important;
       }
       
-      /* Reducir tamaño de texto en las áreas de observaciones */
+      /* Campos de texto y observaciones */
       textarea, .textarea-contenido-pdf {
-        font-size: 6pt !important;
-        line-height: 1.1 !important;
+        font-size: 5pt !important;
+        line-height: 1 !important;
         padding: 2pt !important;
-        min-height: 30pt !important;
+        min-height: 25pt !important;
       }
       
-      /* Reducir espacio entre elementos */
+      /* Secciones de información muy comprimidas */
       .info-section, .summary {
-        padding: 6pt !important;
-        margin-bottom: 8pt !important;
+        padding: 5pt !important;
+        margin-bottom: 6pt !important;
       }
       
-      /* Reducir tamaño de elementos en el resumen */
+      /* Resumen automático extremadamente reducido */
       #resumen-automatico, .resumen-seccion {
-        font-size: 6pt !important;
+        font-size: 5pt !important;
       }
       
       #resumen-automatico strong {
-        font-size: 6pt !important;
+        font-size: 5pt !important;
       }
       
       #resumen-automatico ul, 
       #resumen-automatico ul li, 
       #resumen-automatico ul ul li {
-        font-size: 6pt !important;
+        font-size: 5pt !important;
         margin: 1pt 0 !important;
-        line-height: 1.1 !important;
+        line-height: 1 !important;
       }
       
       .no-cumple-tag {
-        font-size: 5pt !important;
+        font-size: 4pt !important;
       }
       
-      /* Reducir el espacio del editor de texto enriquecido */
+      /* Plan de acción muy reducido */
       #plan-accion-editor, .rich-text-editor {
-        font-size: 7pt !important;
-        line-height: 1.1 !important;
+        font-size: 5pt !important;
+        line-height: 1 !important;
       }
       
-      /* Reducir las info-section y elementos clave */
+      /* Información general muy compacta */
       .info-section p {
-        font-size: 7pt !important;
-        margin: 3pt 0 !important;
-      }
-      
-      .info-section p strong {
-        font-size: 7pt !important;
-      }
-      
-      /* Reducir tamaño de la sección de resultados */
-      .resultados-compacto h3 {
-        font-size: 8pt !important;
-        margin: 6pt 0 3pt 0 !important;
-      }
-      
-      .resultados-compacto p, .resultados-info p {
-        font-size: 6pt !important;
+        font-size: 5pt !important;
         margin: 2pt 0 !important;
       }
       
+      .info-section p strong {
+        font-size: 5pt !important;
+      }
+      
+      /* Sección de resultados muy comprimida */
+      .resultados-compacto h3 {
+        font-size: 6pt !important;
+        margin: 4pt 0 2pt 0 !important;
+      }
+      
+      .resultados-compacto p, .resultados-info p {
+        font-size: 5pt !important;
+        margin: 1pt 0 !important;
+      }
+      
       .result {
-        font-size: 9pt !important;
-        padding: 6pt !important;
-        margin: 6pt 0 !important;
+        font-size: 7pt !important;
+        padding: 4pt !important;
+        margin: 5pt 0 !important;
       }
       
       /* Reducir espacio entre filas de tabla */
       tr {
-        line-height: 1.1 !important;
+        line-height: 1 !important;
       }
       
-      /* Reducir márgenes de página */
+      /* Reducir márgenes de página al mínimo */
       @page {
-        margin: 10mm 8mm !important;
+        margin: 8mm 6mm !important;
       }
       
       /* Asegurar que los colores y fondos se impriman correctamente */
@@ -1073,5 +1072,5 @@ function ajustarTamañoTextoPDF() {
     }
   `;
   
-  console.log('Estilos para reducir SIGNIFICATIVAMENTE TODOS los títulos y texto en PDF aplicados.');
+  console.log('Estilos con texto extremadamente reducido para PDF aplicados.');
 }
