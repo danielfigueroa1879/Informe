@@ -1,1 +1,1645 @@
-<h1> HOLA MUNDO</h1>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Cuadro de Fiscalización de Seguridad Privada</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            font-size: 18px;
+            color: #333;
+            line-height: 1.6;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .resumen-seccion {
+            background-color: #f2f2f2;
+            padding: 17px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border: 1px solid #ddd;
+        }
+        
+        .resumen-seccion li {
+            margin-bottom: 10px;
+        }
+        
+        .resumen-seccion ul ul li {
+            color: #333;
+        }
+        
+        .no-cumple-tag {
+            font-weight: 700;
+            color: #ff0000;
+            margin-left: 5px;
+            font-size: 0.85rem;
+        }
+        
+        .firmas-seccion {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+        
+        .firma-bloque {
+            width: 300px;
+            text-align: center;
+            margin: 0 auto;
+        }
+        
+        .set-fotografico {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+        }
+        
+        .foto-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .foto-marco {
+            border: 2px dashed #ccc;
+            border-radius: 10px;
+            padding: 15px;
+            min-height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .foto-placeholder {
+            text-align: center;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .foto-placeholder p {
+            font-size: 1.2rem;
+            color: #666;
+            margin-bottom: 15px;
+        }
+        
+        .foto-input {
+            display: none;
+        }
+        
+        .foto-label {
+            background-color: #003366;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .foto-label:hover {
+            background-color: #004080;
+        }
+        
+        .foto-descripcion {
+            width: 100%;
+            min-height: 80px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        .preview-imagen {
+            width: 100%;
+            min-height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 15px;
+        }
+        
+        .foto-preview {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        
+        .linea-firma {
+            height: 1px;
+            background-color: #000;
+            margin: 40px 0 10px 0;
+        }
+        
+        .container {
+            width: 100%;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #003366;
+            margin-bottom: 30px;
+            font-size: 2.4rem;
+            font-weight: 600;
+        }
+        
+        h2 {
+            color: #003366;
+            margin-top: 35px;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #003366;
+            padding-bottom: 8px;
+            font-size: 1.7rem;
+            font-weight: 600;
+            clear: both;
+            page-break-before: auto;
+        }
+        
+        h2.page-title {
+            page-break-before: always;
+            margin-top: 20px;
+        }
+        
+        h3 {
+            color: #006699;
+            margin-top: 25px;
+            margin-bottom: 12px;
+            font-size: 1.4rem;
+            font-weight: 500;
+        }
+        
+        .info-section {
+            background-color: #f9f9f9;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+        
+        .info-section p {
+            margin: 12px 0;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .info-section p strong {
+            display: inline-block;
+            width: 240px;
+        }
+        
+        .info-section input {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.1rem;
+        }
+        
+        .fecha-inputs {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .fecha-inputs input {
+            width: 40px;
+            text-align: center;
+        }
+        
+        table {
+            width: 100%;
+            table-layout: fixed;
+            border-collapse: collapse;
+            margin-bottom: 25px;
+            font-size: 0.95rem;
+            border-radius: 10px;
+            overflow: visible;
+            box-shadow: 0 0 10px rgba(0,0,0,0.05);
+        }
+        
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+            vertical-align: top;
+            word-wrap: break-word;
+            font-size: 0.95rem;
+        }
+        
+        /* NUEVO: Aumento de tamaño de letra para las tablas */
+        table td {
+            font-size: 1.1rem; /* Aumenta el tamaño de letra de las celdas */
+        }
+        
+        th {
+            background-color: #003366;
+            color: white;
+            font-weight: 500;
+            text-align: center; /* MODIFICADO: Centrar el texto en todos los encabezados */
+        }
+        
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        
+        .header-row {
+            background-color: #004080;
+            color: white;
+            font-weight: 500;
+        }
+        
+        .check-column {
+            width: 80px; /* MODIFICADO: Aumentado de 50px a 80px para dar más espacio */
+            text-align: center;
+        }
+        
+        .observaciones {
+            min-width: 350px;
+            width: 40%;
+        }
+        
+        /* AÑADIDO: Ajustar el ancho de la columna de ítems */
+        tr.header-row th:first-child {
+            width: 45%; /* Ligeramente reducido para compensar el aumento en las columnas de check */
+        }
+        
+        input[type="radio"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            vertical-align: middle;
+        }
+        
+        .summary {
+            margin-top: 40px;
+            padding: 30px;
+            background-color: #f8f8f8;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.05);
+        }
+        
+        .summary h3 {
+            margin-top: 0;
+            color: #003366;
+        }
+        
+        .result {
+            font-weight: 600;
+            margin-top: 25px;
+            padding: 25px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 1.4rem;
+        }
+        
+        .seguro {
+            background-color: #dff0d8;
+            color: #3c763d;
+            border: 1px solid #d6e9c6;
+        }
+        
+        .riesgo {
+            background-color: #fcf8e3;
+            color: #8a6d3b;
+            border: 1px solid #faebcc;
+        }
+        
+        .inseguro {
+            background-color: #f2dede;
+            color: #a94442;
+            border: 1px solid #ebccd1;
+        }
+        
+        .count {
+            margin-bottom: 25px;
+            font-size: 1.2rem;
+        }
+        
+        .footer {
+            margin-top: 40px;
+            border-top: 1px solid #ddd;
+            padding-top: 25px;
+            text-align: center;
+            font-size: 1rem;
+            color: #666;
+        }
+        
+        textarea {
+            width: 100%;
+            min-height: 100px;  /* Aumentado a 100px */
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.9rem;
+            resize: vertical;
+            box-sizing: border-box;
+            margin-bottom: 0;
+        }
+        
+        button {
+            padding: 16px 32px;
+            background-color: #003366;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 500;
+            transition: background-color 0.3s;
+            margin: 0 10px;
+        }
+        
+        button:hover {
+            background-color: #00264d;
+        }
+        
+        .botones {
+            display: flex;
+            justify-content: center;
+            margin-top: 30px;
+        }
+        
+        .forced-page-break {
+            page-break-before: always;
+            height: 0;
+            margin: 0;
+            padding: 0;
+        }
+        
+        /* Nuevos estilos para el formato de resultados */
+        .resultados-compacto {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 20px;
+        }
+        
+        .resultados-compacto h3 {
+            margin-bottom: 10px;
+        }
+        
+        .resultados-info {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .resultados-info p {
+            margin: 0;
+            flex: 1 1 45%;
+            min-width: 200px;
+        }
+        
+        /* Nuevos estilos para hacer el resumen más compacto */
+        .resumen-info-compacto {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0;
+            margin-bottom: 8px;
+        }
+        
+        .resumen-info-compacto p {
+            margin: 3px 10px 3px 0;
+            font-size: 0.95rem;
+        }
+        
+        .areas-atencion h4 {
+            margin: 8px 0 3px 0;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+        
+        .areas-atencion ul {
+            margin: 3px 0;
+            padding-left: 18px;
+        }
+        
+        .areas-atencion ul li {
+            margin-bottom: 2px;
+            font-size: 0.9rem;
+        }
+        
+        .areas-atencion ul ul {
+            margin: 2px 0;
+            padding-left: 15px;
+        }
+        
+        .areas-atencion ul ul li {
+            margin-bottom: 1px;
+            font-size: 0.85rem;
+            line-height: 1.4;
+        }
+        
+        /* AÑADIDO: Estilos para el editor de texto enriquecido */
+        .rich-text-container {
+          border: 1px solid #ddd;
+          border-radius: 8px;
+          overflow: hidden;
+          box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .rich-text-toolbar {
+          background: #f5f5f5;
+          padding: 8px;
+          border-bottom: 1px solid #ddd;
+          display: flex;
+          flex-wrap: wrap;
+          gap: 5px;
+        }
+
+        .rich-text-toolbar button {
+          background: white;
+          border: 1px solid #ccc;
+          border-radius: 4px;
+          padding: 6px 10px;
+          cursor: pointer;
+          font-size: 14px;
+          margin: 0;
+          min-width: 30px;
+          color: #333;
+          transition: all 0.2s;
+        }
+
+        .rich-text-toolbar button:hover {
+          background: #e9e9e9;
+        }
+
+        .rich-text-toolbar .separator {
+          color: #ccc;
+          margin: 0 5px;
+          align-self: center;
+        }
+
+        /* MODIFICADO: Editor de texto ahora se expande automáticamente */
+        .rich-text-editor {
+          min-height: 300px;
+          height: auto;         /* Permite que la altura se ajuste automáticamente */
+          max-height: none;     /* Elimina la altura máxima que causa el scroll */
+          overflow-y: visible;  /* Cambia de 'auto' a 'visible' para que no aparezca la barra de desplazamiento */
+          padding: 15px;
+          font-size: 1.2rem;
+          line-height: 1.5;
+        }
+
+        .rich-text-editor:empty:before {
+          content: attr(data-placeholder);
+          color: #999;
+          font-style: italic;
+        }
+
+        .rich-text-editor:focus {
+          outline: none;
+        }
+
+        /* Para que el texto justificado se vea mejor */
+        .rich-text-editor p {
+          margin: 0 0 10px 0;
+        }
+        
+        /* Estilos para el resumen automático - TAMAÑO MÁS PEQUEÑO */
+        #resumen-automatico {
+            font-size: 1.05rem; /* Reducido */
+            line-height: 1.4; /* Espaciado entre líneas ligeramente reducido */
+        }
+
+        #resumen-automatico strong {
+            font-size: 1.1rem; /* Reducido */
+        }
+
+        /* Para los elementos de la lista principal */
+        #resumen-automatico ul {
+            margin: 6px 0;
+            padding-left: 18px; 
+        }
+
+        #resumen-automatico ul li {
+            margin-bottom: 5px;
+            font-size: 1.05rem; /* Reducido */
+        }
+
+        /* Para las sublistas (los items que no cumplen) */
+        #resumen-automatico ul ul {
+            margin: 5px 0;
+            padding-left: 15px;
+        }
+
+        #resumen-automatico ul ul li {
+            margin-bottom: 3px;
+            font-size: 1rem; /* Tamaño estándar */
+            line-height: 1.35;
+        }
+
+        /* Para la etiqueta NO CUMPLE */
+        #resumen-automatico .no-cumple-tag {
+            font-weight: 700;
+            color: #ff0000;
+            margin-left: 5px;
+            font-size: 0.9rem; /* Reducido */
+        }
+
+        /* Ajustes para la información compacta al inicio */
+        #resumen-automatico .resumen-info-compacto {
+            margin-bottom: 10px;
+        }
+
+        #resumen-automatico .resumen-info-compacto p {
+            font-size: 1.05rem; /* Reducido */
+            margin: 3px 0;
+        }
+
+        /* Hacer los títulos de sección más pequeños */
+        #resumen-automatico ul li strong {
+            font-size: 1.1rem; /* Reducido */
+        }
+
+        /* Ajustar el espacio entre secciones */
+        #resumen-automatico .areas-atencion h4 {
+            font-size: 1.1rem; /* Reducido */
+            margin-top: 10px;
+            margin-bottom: 5px;
+        }
+
+/* Estilos de impresión para resumen automático */
+@media print {
+    /* Ajustes para el resumen automático */
+    #resumen-automatico {
+        font-size: 12px !important; /* Un poco más grande que el tamaño anterior */
+        line-height: 1.4 !important;
+    }
+
+    #resumen-automatico strong {
+        font-size: 12px !important;
+    }
+
+    #resumen-automatico ul {
+        margin: 6px 0;
+        padding-left: 15px;
+    }
+
+    #resumen-automatico ul li {
+        margin-bottom: 4px;
+        font-size: 11px !important;
+    }
+
+    #resumen-automatico ul ul {
+        margin: 4px 0;
+        padding-left: 12px;
+    }
+
+    #resumen-automatico ul ul li {
+        margin-bottom: 3px;
+        font-size: 10px !important;
+        line-height: 1.3;
+    }
+
+    .no-cumple-tag {
+        font-size: 11px !important;
+        color: #ff0000;
+        font-weight: bold;
+    }
+
+    /* Ajustes adicionales para mantener coherencia */
+    .resumen-info-compacto p {
+        font-size: 12px !important;
+    }
+}
+        /* Estilos responsivos para dispositivos móviles y pantallas pequeñas */
+        @media screen and (max-width: 768px) {
+            .container {
+                padding: 10px;
+                width: 100%;
+                max-width: 100%;
+            }
+            
+            body {
+                font-size: 14px;
+                padding: 0;
+                margin: 0;
+            }
+            
+            h1 {
+                font-size: 1.5rem;
+                margin-bottom: 15px;
+            }
+            
+            h2 {
+                font-size: 1.3rem;
+                margin-top: 20px;
+            }
+            
+            h3 {
+                font-size: 1.1rem;
+                margin-top: 15px;
+            }
+            
+            /* Hacer la tabla responsive */
+            table {
+                display: block;
+                overflow-x: auto;
+                white-space: normal;
+                box-shadow: none;
+                font-size: 0.9rem;
+                width: 100%;
+            }
+            
+            th, td {
+                padding: 10px;
+            }
+            
+            .observaciones {
+                min-width: 250px;
+                width: auto;
+            }
+            
+            input[type="radio"] {
+                width: 22px;
+                height: 22px;
+            }
+            
+            .check-column {
+                width: 60px; /* Ajustado para dispositivos móviles */
+            }
+            
+            .info-section {
+                padding: 15px;
+            }
+            
+            .info-section p {
+                flex-direction: column;
+                align-items: flex-start;
+                margin: 10px 0;
+            }
+            
+            .info-section p strong {
+                width: 100%;
+                margin-bottom: 5px;
+            }
+            
+            .info-section input {
+                width: 100%;
+            }
+            
+            .fecha-inputs {
+                width: 100%;
+                max-width: 200px;
+            }
+            
+            .summary {
+                padding: 15px;
+            }
+            
+            .result {
+                padding: 15px;
+                font-size: 1.2rem;
+            }
+            
+            .count {
+                font-size: 0.9rem;
+            }
+            
+            .botones {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            button {
+                width: 100%;
+                max-width: 250px;
+                margin: 10px 0;
+                padding: 12px;
+                font-size: 1rem;
+            }
+            
+            textarea {
+                min-height: 70px;
+            }
+            
+            .foto-marco {
+                min-height: 200px;
+            }
+            
+            .foto-descripcion {
+                min-height: 60px;
+            }
+        }
+        
+        /* Ajustes específicos para dispositivos muy pequeños */
+        @media screen and (max-width: 480px) {
+            /* Ajustes específicos para móviles pequeños */
+            .container {
+                padding: 5px; /* Reduce padding para optimizar espacio */
+            }
+            
+            body {
+                font-size: 13px;
+            }
+            
+            h1 {
+                font-size: 1.2rem; /* Título principal más pequeño */
+            }
+            
+            h2 {
+                font-size: 1.1rem;
+            }
+            
+            h3 {
+                font-size: 1rem;
+            }
+            
+            /* Hacer las tablas más compactas */
+            table {
+                font-size: 0.85rem;
+            }
+            
+            th, td {
+                padding: 6px;
+            }
+            
+            /* Mejorar visualización de radios */
+            input[type="radio"] {
+                width: 20px;
+                height: 20px;
+                margin: 0 auto;
+                display: block;
+            }
+            
+            .check-column {
+                width: 40px; /* Reducir para móviles */
+            }
+            
+            /* Mejorar sección de resultados */
+            .resultados-info p {
+                font-size: 0.9rem;
+                margin: 5px 0;
+            }
+            
+            /* Ajustar botones */
+            button {
+                font-size: 0.9rem;
+                padding: 10px;
+                margin: 5px 0;
+            }
+            
+            /* Reducir tamaño del resumen en móviles */
+            #resumen-automatico {
+                font-size: 0.9rem !important;
+            }
+            
+            #resumen-automatico ul li, 
+            #resumen-automatico ul ul li {
+                font-size: 0.9rem !important;
+            }
+            
+            .observaciones {
+                min-width: 150px;
+            }
+            
+            .info-section, .summary {
+                padding: 12px;
+            }
+        }
+/* Estilos para la nueva sección de características de la instalación */
+.facility-characteristics {
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 25px;
+    border: 1px solid #ddd;
+}
+
+.facility-characteristics ul {
+    margin: 10px 0;
+    padding-left: 20px;
+}
+
+.facility-characteristics li {
+    margin-bottom: 12px;
+    line-height: 1.5;
+}
+        
+    </style>
+</head>
+<script>
+    function contarCumplimiento() {
+        var totalItems = document.querySelectorAll('input[type="radio"][name^="item_"]').length / 2;
+        var itemsCumplen = document.querySelectorAll('input[type="radio"][value="cumple"]:checked').length;
+        var itemsNoCumplen = document.querySelectorAll('input[type="radio"][value="no-cumple"]:checked').length;
+        
+        document.getElementById('total-items').textContent = totalItems;
+        document.getElementById('items-cumplen').textContent = itemsCumplen;
+        document.getElementById('items-no-cumplen').textContent = itemsNoCumplen;
+        
+        var porcentaje = 0;
+        if (itemsCumplen + itemsNoCumplen > 0) {
+            porcentaje = Math.round((itemsCumplen / (itemsCumplen + itemsNoCumplen)) * 100);
+        }
+        
+        document.getElementById('porcentaje-cumplimiento').textContent = porcentaje;
+        
+        var resultElement = document.getElementById('resultado-evaluacion');
+        resultElement.classList.remove('seguro', 'riesgo', 'inseguro');
+        
+        // Determinar el resultado de la evaluación
+        var estadoSeguridad = "PENDIENTE DE EVALUACIÓN";
+        var recomendacionTexto = "Complete la evaluación para generar un análisis de vulnerabilidades.";
+        
+        if (itemsCumplen + itemsNoCumplen > 0) {
+            if (porcentaje >= 80) {
+                estadoSeguridad = "ESTABLECIMIENTO SEGURO";
+                resultElement.classList.add('seguro');
+                recomendacionTexto = "El establecimiento cumple con la mayoría de los requisitos de seguridad. Se recomienda mantener las medidas actuales y mejorar los aspectos no conformes.";
+            } else if (porcentaje >= 60) {
+                estadoSeguridad = "ESTABLECIMIENTO EN RIESGO";
+                resultElement.classList.add('riesgo');
+                recomendacionTexto = "El establecimiento presenta vulnerabilidades significativas que deben ser subsanadas a corto plazo. Se requiere un plan de acción inmediato.";
+            } else {
+                estadoSeguridad = "ESTABLECIMIENTO INSEGURO";
+                resultElement.classList.add('inseguro');
+                recomendacionTexto = "El establecimiento presenta graves deficiencias de seguridad que lo hacen vulnerable. Se requiere intervención urgente y un plan integral de mejora.";
+            }
+        }
+        
+        resultElement.textContent = estadoSeguridad;
+        document.getElementById('recomendacion').textContent = recomendacionTexto;
+        
+        // Generar resumen automático
+        generarResumenAutomatico(itemsCumplen, itemsNoCumplen, porcentaje, estadoSeguridad);
+    }
+    
+    function generarResumenAutomatico(itemsCumplen, itemsNoCumplen, porcentaje, estadoSeguridad) {
+        var resumenElement = document.getElementById('resumen-automatico');
+        
+        // Obtener la entidad y fecha
+        var nombreEntidad = document.querySelector('input[name="nombre_entidad"]').value || "[Nombre no especificado]";
+        var fechaDia = document.querySelector('input[name="dia"]').value || "XX";
+        var fechaMes = document.querySelector('input[name="mes"]').value || "XX";
+        var fechaAno = document.querySelector('input[name="ano"]').value || "XX";
+        
+        // Recopilar información sobre items no cumplidos
+        var itemsNoCumplidosElements = document.querySelectorAll('input[type="radio"][value="no-cumple"]:checked');
+        var areasProblematicas = [];
+        
+        itemsNoCumplidosElements.forEach(function(radioButton) {
+            var fila = radioButton.closest('tr');
+            var itemDescripcion = fila.querySelector('td:first-child').textContent;
+            // Excluir cualquier ítem relacionado con armamento si hubiera
+            if (!itemDescripcion.toLowerCase().includes("arma") && 
+                !itemDescripcion.toLowerCase().includes("armamento") &&
+                                                                   !itemDescripcion.toLowerCase().includes("munición") &&
+                !itemDescripcion.toLowerCase().includes("pistola") &&
+                !itemDescripcion.toLowerCase().includes("revólver")) {
+                var seccion = fila.closest('table').previousElementSibling.textContent;
+                areasProblematicas.push({ seccion: seccion, item: itemDescripcion });
+            }
+        });
+        
+        // Construir el resumen en formato compacto
+        var resumenHTML = `
+            <div class="resumen-info-compacto">
+                <p><strong>Fecha de Evaluación:</strong> ${fechaDia}/${fechaMes}/${fechaAno}</p>
+                <p><strong>Entidad Evaluada:</strong> ${nombreEntidad}</p>
+                <p><strong>Resultado:</strong> ${estadoSeguridad}</p>
+                <p><strong>Cumplimiento General:</strong> ${porcentaje}% (${itemsCumplen} de ${itemsCumplen + itemsNoCumplen} ítems)</p>
+            </div>
+        `;
+        
+        // Añadir áreas problemáticas si existen
+        if (areasProblematicas.length > 0) {
+            resumenHTML += `<div class="areas-atencion">
+                <h4>Áreas que requieren atención:</h4><ul>`;
+            
+            // Agrupar por sección
+            var seccionesAgrupadas = {};
+            areasProblematicas.forEach(function(area) {
+                if (!seccionesAgrupadas[area.seccion]) {
+                    seccionesAgrupadas[area.seccion] = [];
+                }
+                seccionesAgrupadas[area.seccion].push(area.item);
+            });
+            
+            // Añadir cada sección con sus items
+            for (var seccion in seccionesAgrupadas) {
+                resumenHTML += `<li><strong>${seccion}</strong><ul>`;
+                seccionesAgrupadas[seccion].forEach(function(item) {
+                    resumenHTML += `<li>${item} <span class="no-cumple-tag">NO CUMPLE</span></li>`;
+                });
+                resumenHTML += `</ul></li>`;
+            }
+            
+            resumenHTML += `</ul></div>`;
+        } else if (itemsCumplen + itemsNoCumplen > 0) {
+            resumenHTML += `<p><strong>¡Felicitaciones!</strong> Todos los ítems evaluados cumplen con los requisitos de seguridad.</p>`;
+        } else {
+            resumenHTML += `<p>No se han evaluado ítems todavía. Complete la evaluación para generar un análisis detallado.</p>`;
+        }
+        
+        resumenElement.innerHTML = resumenHTML;
+    }
+    
+    function imprimirFormulario() {
+        window.print();
+    }
+    
+    function limpiarFormulario() {
+        if (confirm("¿Está seguro que desea limpiar todo el formulario?")) {
+            document.getElementById("formulario-fiscalizacion").reset();
+            contarCumplimiento();
+            
+            // Limpiar campos de observaciones
+            var observaciones = document.querySelectorAll('td.observaciones textarea');
+            for (var i = 0; i < observaciones.length; i++) {
+                observaciones[i].value = '';
+            }
+            
+            // Limpiar resumen automático
+            document.getElementById('resumen-automatico').innerHTML = '<p>El resumen detallado se generará automáticamente al completar la evaluación.</p>';
+            
+            // Limpiar plan de acción
+            var planEditor = document.getElementById('plan-accion-editor');
+            if (planEditor) {
+                planEditor.innerHTML = '';
+            }
+            var planHidden = document.getElementById('plan-accion');
+            if (planHidden) {
+                planHidden.value = '';
+            }
+            
+            // Limpiar previsualizaciones de fotos
+            document.getElementById('preview-foto1').innerHTML = '';
+            document.getElementById('preview-foto2').innerHTML = '';
+            
+            // Restaurar etiquetas y textos de fotografías
+            var fotoPlaceholders = document.querySelectorAll('.foto-placeholder');
+            for (var i = 0; i < fotoPlaceholders.length; i++) {
+                fotoPlaceholders[i].querySelector('p').style.display = 'block';
+                fotoPlaceholders[i].querySelector('label').style.display = 'inline-block';
+            }
+            
+            // Limpiar descripciones de fotos
+            var fotoDescripciones = document.querySelectorAll('.foto-descripcion');
+            for (var i = 0; i < fotoDescripciones.length; i++) {
+                fotoDescripciones[i].value = '';
+            }
+        }
+    }
+    
+    // Función para aplicar formato al texto en el editor de texto enriquecido
+    function formatText(command, value = null) {
+      document.execCommand(command, false, value);
+      document.getElementById('plan-accion-editor').focus();
+                                                              // Actualizar el campo oculto para enviar con el formulario
+      updateHiddenField();
+    }
+
+    // Función para actualizar el campo oculto con el contenido HTML
+    function updateHiddenField() {
+      const editor = document.getElementById('plan-accion-editor');
+      const hiddenField = document.getElementById('plan-accion');
+      
+      if (editor && hiddenField) {
+        hiddenField.value = editor.innerHTML;
+      }
+    }
+    
+    // NUEVA FUNCIÓN: Ajusta automáticamente la altura del editor
+    function autoResizeEditor() {
+      const editor = document.getElementById('plan-accion-editor');
+      if (!editor) return;
+      
+      // Función para ajustar la altura según el contenido
+      function adjustHeight() {
+        // Guardar la posición de scroll actual
+        const scrollPos = window.scrollY;
+        
+        // Resetear altura para calcular correctamente
+        editor.style.height = 'auto';
+        
+        // Añadir un poco de espacio extra al final
+        editor.style.height = (editor.scrollHeight + 20) + 'px';
+        
+        // Restaurar la posición de scroll para evitar saltos
+        window.scrollTo(0, scrollPos);
+      }
+      
+      // Ajustar la altura cuando cambie el contenido
+      editor.addEventListener('input', adjustHeight);
+      
+      // Ajustar también cuando se formatea el texto
+      const formatButtons = document.querySelectorAll('.rich-text-toolbar button');
+      formatButtons.forEach(button => {
+        button.addEventListener('click', function() {
+          // Pequeño retraso para permitir que el formato se aplique primero
+          setTimeout(adjustHeight, 10);
+        });
+      });
+      
+      // Ajustar la altura inicial
+      adjustHeight();
+    }
+    
+    window.onload = function() {
+        // Añadir textareas a las celdas de observaciones (excluyendo los encabezados)
+        var observaciones = document.querySelectorAll('td.observaciones');
+        for (var i = 0; i < observaciones.length; i++) {
+            var textarea = document.createElement('textarea');
+            textarea.rows = 3;
+            textarea.style.minHeight = "70px";
+            textarea.style.width = "100%";
+            textarea.style.boxSizing = "border-box";
+        //  textarea.placeholder = "Ingrese sus observaciones aquí...";
+            observaciones[i].appendChild(textarea);
+        }
+        
+        // Convertir divs a radio buttons
+        var checkboxes = document.querySelectorAll('td.check-column div.check-box');
+        for(var i = 0; i < checkboxes.length; i++) {
+            var div = checkboxes[i];
+            var td = div.parentNode;
+            var row = td.parentNode;
+            var itemNumber = Math.floor(i/2);
+            var isCumple = td.cellIndex === 1;
+            
+            var radio = document.createElement('input');
+            radio.type = 'radio';
+            radio.name = 'item_' + itemNumber;
+            radio.value = isCumple ? 'cumple' : 'no-cumple';
+            radio.onclick = function() { contarCumplimiento(); };
+            
+            div.parentNode.replaceChild(radio, div);
+        }
+
+        // Inicializar con ejemplo de datos predefinidos
+        document.querySelector('input[name="nombre_entidad"]').value = "CENTRO DE SALUD FAMILIAR (CESFAM) SAN JUAN";
+        document.querySelector('input[name="dia"]').value = "27";
+        document.querySelector('input[name="mes"]').value = "03";
+        document.querySelector('input[name="ano"]').value = "25";
+        
+        // Marcar algunos items como ejemplo
+        // Esta parte es solo para simular los datos que se enviaron (12 cumplen, 18 no cumplen)
+        for(var i = 0; i < 30; i++) {
+            if(i < 12) {
+                if (document.getElementsByName('item_' + i)[0]) {
+                    document.getElementsByName('item_' + i)[0].checked = true; // Cumple
+                }
+            } else {
+                if (document.getElementsByName('item_' + (i-12))[1]) {
+                    document.getElementsByName('item_' + (i-12))[1].checked = true; // No cumple
+                }
+            }
+        }
+        
+        // Inicializar el editor de texto enriquecido
+        initRichEditor();
+        
+        // AÑADIDO: Inicializar la función de autoexpansión del editor
+        autoResizeEditor();
+        
+        // Actualizar conteo
+        contarCumplimiento();
+    };
+    
+    // Inicializar el editor de texto enriquecido
+    function initRichEditor() {
+      const editor = document.getElementById('plan-accion-editor');
+      if (!editor) return;
+      
+      // Asegurarse de que el contenido se guarde cuando se modifique
+      editor.addEventListener('input', updateHiddenField);
+      editor.addEventListener('blur', updateHiddenField);
+      
+      // Si el formulario tiene un evento submit, asegúrate de actualizar el campo oculto
+      const form = editor.closest('form');
+      if (form) {
+        form.addEventListener('submit', function() {
+          updateHiddenField();
+        });
+      }
+      
+      // Para asegurar que el editor siempre tenga un párrafo
+      editor.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+          // Usar setTimeout para que se ejecute después de que el navegador haya procesado el Enter
+          setTimeout(function() {
+            const selection = window.getSelection();
+            const range = selection.getRangeAt(0);
+            const currentNode = range.startContainer;
+            
+            // Si no estamos dentro de un párrafo, crear uno
+            if (currentNode.nodeType === Node.TEXT_NODE && currentNode.parentNode === editor) {
+              document.execCommand('formatBlock', false, 'p');
+            }
+          }, 0);
+        }
+      });
+    }
+    
+    // Función para guardar como PDF
+    function guardarPDF() {
+        window.alert("Para guardar como PDF, utilice la opción de imprimir y seleccione 'Guardar como PDF' en las opciones de destino de su navegador.");
+        setTimeout(function() {
+            window.print();
+        }, 500);
+    }
+    
+    // Función para mostrar la imagen seleccionada
+    function mostrarImagen(input, previewId) {
+        var preview = document.getElementById(previewId);
+        preview.innerHTML = '';
+        
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+            
+            reader.onload = function(e) {
+                var img = document.createElement('img');
+                img.src = e.target.result;
+                img.className = 'foto-preview';
+                preview.appendChild(img);
+                
+                // Ocultar el texto y el botón cuando hay una imagen
+                var placeholder = input.parentElement;
+                placeholder.querySelector('p').style.display = 'none';
+                placeholder.querySelector('label').style.display = 'none';
+            };
+            
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+</script>
+<script src="autoguardado.js"></script>
+<body>
+   <div class="container">
+        <form id="formulario-fiscalizacion">
+            <h1>CUADRO DE FISCALIZACIÓN DE SEGURIDAD PRIVADA</h1>
+            
+            <div class="info-section">
+                <p><strong>Nombre Entidad:</strong> <input type="text" name="nombre_entidad" /></p>
+                <p><strong>Dirección:</strong> <input type="text" name="direccion" /></p>
+                <p><strong>Empresa de Seguridad Privada:</strong> <input type="text" name="empresa_seguridad" /></p>
+                <p>
+                    <strong>Fecha de Fiscalización:</strong> 
+                    <span class="fecha-inputs">
+                        <input type="text" name="dia" maxlength="2" placeholder="DD" /> / 
+                        <input type="text" name="mes" maxlength="2" placeholder="MM" /> / 
+                        <input type="text" name="ano" maxlength="2" placeholder="AA" />
+                    </span>
+                </p>
+                <p><strong>Fiscalizador:</strong> <input type="text" name="fiscalizador" /></p>
+            </div>
+
+            <h2>1. DOCUMENTACIÓN OBLIGATORIA</h2>
+
+            <h3>A. Directiva de Funcionamiento</h3>
+            <table>
+                <tr class="header-row">
+                    <th width="45%">Ítem a Fiscalizar</th>
+                    <th class="check-column" width="80px">Cumple</th>
+                    <th class="check-column" width="80px">No Cumple</th>
+                    <th class="observaciones">Observaciones</th>
+                </tr>
+                <tr>
+                    <td>Directiva de funcionamiento aprobada por OS-10 (Art. 15, Decreto 93)</td>
+                    <td class="check-column"><div class="check-box"></div></td>
+                    <td class="check-column"><div class="check-box"></div></td>
+                    <td class="observaciones"></td>
+                </tr>
+                <tr>
+                    <td>Vigencia no superior a 3 años (Decreto 32, modifica Decreto 261)</td>
+                    <td class="check-column"><div class="check-box"></div></td>
+                    <td class="check-column"><div class="check-box"></div></td>
+                    <td class="observaciones"></td>
+                </tr>
+                <tr>
+                    <td>Contiene seguro de vida, contrato trabajo, responsabilidad civil.</td>
+                    <td class="check-column"><div class="check-box"></div></td>
+                    <td class="check-column"><div class="check-box"></div></td>
+                    <td class="observaciones"></td>
+                </tr>
+            </table>
+
+            <h3>B. Empresa de Seguridad y Personal</h3>
+            <table>
+                <tr class="header-row">
+                    <th width="45%">Ítem a Fiscalizar</th>
+                    <th class="check-column" width="80px">Cumple</th>
+                    <th class="check-column" width="80px">No Cumple</th>
+                    <th class="observaciones">Observaciones</th>
+                </tr>
+                <tr>
+                    <td>Autorización vigente de la empresa de seguridad.</td>
+                    <td class="check-column"><div class="check-box"></div></td>
+                    <td class="check-column"><div class="check-box"></div></td>
+                    <td class="observaciones"></td>
+                </tr>
+                <tr>
+                    <td>Contrato de prestación de servicios vigente entre hospital y empresa de seguridad.</td>
+                    <td class="check-column"><div class="check-box"></div></td>
+                    <td class="check-column"><div class="check-box"></div></td>
+                    <td class="observaciones"></td>
+                </tr>
+                <tr>
+                    <td>Nómina actualizada de guardias de seguridad que prestan servicios en el hospital.</td>
+                    <td class="check-column"><div class="check-box"></div></td>
+                    <td class="check-column"><div class="check-box"></div></td>
+                    <td class="observaciones"></td>
+                </tr>
+            </table>
+
+            <!-- Salto de página controlado -->
+            <div id="seccion-personal" class="forced-page-break"></div>
+            <h2>2. PERSONAL DE SEGURIDAD</h2>
+
+            <h3>A. Guardias de Seguridad</h3>
+            <table>
+                <tr class="header-row">
+                    <th width="45%">Ítem a Fiscalizar</th>
+                    <th class="check-column" width="80px">Cumple</th>
+                    <th class="check-column" width="80px">No Cumple</th>
+                    <th class="observaciones">Observaciones</th>
+                </tr>
+                <tr>
+                    <td>Credenciales vigentes emitidas por OS-10.</td>
+                    <td class="check-column"><div class="check-box"></div></td>
+                    <td class="check-column"><div class="check-box"></div></td>
+                    <td class="observaciones"></td>
+                </tr>
+                <tr>
+                    <td>Relación nominal actualizada con turno y área asignada.</td>
+                    <td class="check-column"><div class="check-box"></div></td>
+                    <td class="check-column"><div class="check-box"></div></td>
+                    <td class="observaciones"></td>
+                </tr>
+                <tr>
+                    <td>Copia de certificados de cursos de formación vigentes (Art. 50, Ley 21.659)</td>
+                    <td class="check-column"><div class="check-box"></div></td>
+                    <td class="check-column"><div class="check-box"></div></td>
+                    <td class="observaciones"></td>
+                </tr>
+                <tr>
+                    <td>SERVICIOS DE 12 HORAS (F-35-B o RES. AcuerdoMarco Dirección del Trabajo).</td>
+                    <td class="check-column"><div class="check-box"></div></td>
+                    <td class="check-column"><div class="check-box"></div></td>
+                    <td class="observaciones"></td>
+                </tr>
+            </table>
+
+            <h3>B. Dotación y Turnos</h3>
+                                             <table>
+                <tr class="header-row">
+                    <th width="45%">Ítem a Fiscalizar</th>
+                    <th class="check-column" width="80px">Cumple</th>
+                    <th class="check-column" width="80px">No Cumple</th>
+                    <th class="observaciones">Observaciones</th>
+                </tr>
+                <tr>
+                    <td>Cantidad de guardias coincide con lo exigido en directiva de funcionamiento.</td>
+                    <td class="check-column"><div class="check-box"></div></td>
+                    <td class="check-column"><div class="check-box"></div></td>
+                    <td class="observaciones"></td>
+                </tr>
+                <tr>
+                    <td>Distribución adecuada según áreas críticas del hospital.</td>
+                    <td class="check-column"><div class="check-box"></div></td>
+                    <td class="check-column"><div class="check-box"></div></td>
+                    <td class="observaciones"></td>
+                </tr>
+                <tr>
+                    <td>Cumplimiento de dotación mínima en turnos nocturnos.</td>
+                    <td class="check-column"><div class="check-box"></div></td>
+                    <td class="check-column"><div class="check-box"></div></td>
+                    <td class="observaciones"></td>
+                </tr>
+                <tr>
+                    <td>Existencia de plan de contingencia ante ausencia de personal.</td>
+                    <td class="check-column"><div class="check-box"></div></td>
+                    <td class="check-column"><div class="check-box"></div></td>
+                    <td class="observaciones"></td>
+                </tr>
+                <tr>
+                    <td>Libro de novedades actualizado con registro de incidentes.</td>
+                    <td class="check-column"><div class="check-box"></div></td>
+                    <td class="check-column"><div class="check-box"></div></td>
+                    <td class="observaciones"></td>
+                </tr>
+            </table>
+
+            <!-- Salto de página controlado -->
+            <div id="seccion-uniformes" class="forced-page-break"></div>
+            <h2>3. UNIFORMES Y EQUIPAMIENTO</h2>
+
+            <h3>A. Uniformes</h3>
+            <table>
+                <tr class="header-row">
+                    <th width="45%">Ítem a Fiscalizar</th>
+                    <th class="check-column" width="80px">Cumple</th>
+                    <th class="check-column" width="80px">No Cumple</th>
+                    <th class="observaciones">Observaciones</th>
+                </tr>
+                <tr>
+                    <td>Uniforme según Art. 8 del Decreto 867 o autorización especial (APARTADO II, 1.4. Decreto 32)</td>
+                    <td class="check-column"><div class="check-box"></div></td>
+                    <td class="check-column"><div class="check-box"></div></td>
+                    <td class="observaciones"></td>
+                </tr>
+                <tr>
+                    <td>Camisa color negro, manga corta o larga según temporada.</td>
+                    <td class="check-column"><div class="check-box"></div></td>
+                    <td class="check-column"><div class="check-box"></div></td>
+                    <td class="observaciones"></td>
+                </tr>
+                <tr>
+                    <td>Pantalón color negro.</td>
+                    <td class="check-column"><div class="check-box"></div></td>
+                    <td class="check-column"><div class="check-box"></div></td>
+                    <td class="observaciones"></td>
+                </tr>
+                <tr>
+                    <td>Calzado y calcetines negros.</td>
+                    <td class="check-column"><div class="check-box"></div></td>
+                    <td class="check-column"><div class="check-box"></div></td>
+                    <td class="observaciones"></td>
+                </tr>
+                <tr>
+                    <td>Chaleco alta visibilidad color rojo con bandas retrorreflectantes plateadas.</td>
+                    <td class="check-column"><div class="check-box"></div></td>
+                    <td class="check-column"><div class="check-box"></div></td>
+                    <td class="observaciones"></td>
+                </tr>
+                <tr>
+                    <td>Leyenda "SEGURIDAD PRIVADA" visible en parte trasera del chaleco</td>
+                    <td class="check-column"><div class="check-box"></div></td>
+                    <td class="check-column"><div class="check-box"></div></td>
+                    <td class="observaciones"></td>
+                </tr>
+                <tr>
+                    <td>Chaquetón impermeable para turnos nocturnos según características reglamentarias</td>
+                    <td class="check-column"><div class="check-box"></div></td>
+                    <td class="check-column"><div class="check-box"></div></td>
+                    <td class="observaciones"></td>
+                </tr>
+            </table>
+
+            <h3>B. Implementos de Seguridad</h3>
+            <table>
+                <tr class="header-row">
+                    <th width="45%">Ítem a Fiscalizar</th>
+                    <th class="check-column" width="80px">Cumple</th>
+                    <th class="check-column" width="80px">No Cumple</th>
+                    <th class="observaciones">Observaciones</th>
+                </tr>
+                <tr>
+                    <td>Elementos disuasivos autorizados (D.32 del 2024)</td>
+                    <td class="check-column"><div class="check-box"></div></td>
+                    <td class="check-column"><div class="check-box"></div></td>
+                    <td class="observaciones"></td>
+                </tr>
+                <tr>
+                    <td>Cumplimiento de normativa sobre elementos prohibidos.</td>
+                    <td class="check-column"><div class="check-box"></div></td>
+                    <td class="check-column"><div class="check-box"></div></td>
+                    <td class="observaciones"></td>
+                </tr>
+                <tr>
+                    <td>Equipos de comunicación operativos y con alcance en todas las áreas.</td>
+                    <td class="check-column"><div class="check-box"></div></td>
+                    <td class="check-column"><div class="check-box"></div></td>
+                    <td class="observaciones"></td>
+                </tr>
+            </table>
+
+            <!-- Salto de página controlado -->
+            <div id="seccion-sistemas" class="forced-page-break"></div>
+            <h2>4. SISTEMAS TECNOLÓGICOS</h2>
+
+            <h3>A. Circuito Cerrado de Televisión (CCTV)</h3>
+            <table>
+                <tr class="header-row">
+                    <th width="45%">Ítem a Fiscalizar</th>
+                    <th class="check-column" width="80px">Cumple</th>
+                    <th class="check-column" width="80px">No Cumple</th>
+                    <th class="observaciones">Observaciones</th>
+                </tr>
+                <tr>
+                    <td>Sistema operativo las 24 horas (Art. 17, Decreto 1122)</td>
+                    <td class="check-column"><div class="check-box"></div></td>
+                    <td class="check-column"><div class="check-box"></div></td>
+                    <td class="observaciones"></td>
+                </tr>
+                <tr>
+                    <td>Cámaras en áreas críticas: accesos, urgencias, farmacia, estacionamientos.</td>
+                    <td class="check-column"><div class="check-box"></div></td>
+                    <td class="check-column"><div class="check-box"></div></td>
+                    <td class="observaciones"></td>
+                </tr>
+                <tr>
+                    <td>Grabación digital con almacenamiento mínimo de 60 días.</td>
+                    <td class="check-column"><div class="check-box"></div></td>
+                    <td class="check-column"><div class="check-box"></div></td>
+                    <td class="observaciones"></td>
+                </tr>
+                <tr>
+                    <td>Sala de monitoreo Operador CCTV Capacitado (Decreto 32 Exento del 2024)</td>
+                    <td class="check-column"><div class="check-box"></div></td>
+                    <td class="check-column"><div class="check-box"></div></td>
+                    <td class="observaciones"></td>
+                </tr>
+                <tr>
+                    <td>Protocolo de acción ante detección de incidentes.</td>
+                    <td class="check-column"><div class="check-box"></div></td>
+                    <td class="check-column"><div class="check-box"></div></td>
+                    <td class="observaciones"></td>
+                </tr>
+            </table>
+
+            <div class="botones no-print">
+                <button type="button" onclick="imprimirFormulario()">Imprimir Formulario</button>
+                <button type="button" onclick="limpiarFormulario()">Limpiar Formulario</button>
+                <button type="button" onclick="guardarPDF()">Guardar como PDF</button>
+            </div>
+            
+            <!-- Salto de página controlado -->
+<div id="seccion-caracteristicas" class="forced-page-break"></div>
+<h2>5. CARACTERÍSTICAS DE LA INSTALACIÓN</h2>
+
+<h3>A. Infraestructura y Accesos</h3>
+<table>
+    <tr class="header-row">
+        <th width="45%">Ítem a Fiscalizar</th>
+        <th class="check-column" width="80px">Cumple</th>
+        <th class="check-column" width="80px">No Cumple</th>
+        <th class="observaciones">Observaciones</th>
+    </tr>
+    <tr>
+        <td>Múltiples sectores y pasillos de conexiones que no permiten desplazarse fácilmente entre áreas.</td>
+        <td class="check-column"><div class="check-box"></div></td>
+        <td class="check-column"><div class="check-box"></div></td>
+        <td class="observaciones"></td>
+    </tr>
+    <tr>
+        <td>Control de acceso de personas es realizado por personal de seguridad.</td>
+        <td class="check-column"><div class="check-box"></div></td>
+        <td class="check-column"><div class="check-box"></div></td>
+        <td class="observaciones"></td>
+    </tr>
+    <tr>
+        <td>Aglomeración en salas de espera que dificulta la gestión ante emergencias, existe protocolo de acción para evitarlo.</td>
+        <td class="check-column"><div class="check-box"></div></td>
+        <td class="check-column"><div class="check-box"></div></td>
+        <td class="observaciones"></td>
+    </tr>
+    <tr>
+        <td>La iluminación nocturna es suficiente en sectores vulnerables.</td>
+        <td class="check-column"><div class="check-box"></div></td>
+        <td class="check-column"><div class="check-box"></div></td>
+        <td class="observaciones"></td>
+    </tr>
+</table>
+
+<h3>B. Seguridad y Control</h3>
+<table>
+    <tr class="header-row">
+        <th width="45%">Ítem a Fiscalizar</th>
+        <th class="check-column" width="80px">Cumple</th>
+        <th class="check-column" width="80px">No Cumple</th>
+        <th class="observaciones">Observaciones</th>
+    </tr>
+    <tr>
+        <td>Portón vehicular con horario controlado (cerrado de 20:00 a 07:00)</td>
+        <td class="check-column"><div class="check-box"></div></td>
+        <td class="check-column"><div class="check-box"></div></td>
+        <td class="observaciones"></td>
+    </tr>
+    <tr>
+        <td>Sistema dactilar para control de asistencia del personal.</td>
+        <td class="check-column"><div class="check-box"></div></td>
+        <td class="check-column"><div class="check-box"></div></td>
+        <td class="observaciones"></td>
+    </tr>
+    <tr>
+        <td>Existen detectores de metales o sistemas de registro personal.</td>
+        <td class="check-column"><div class="check-box"></div></td>
+        <td class="check-column"><div class="check-box"></div></td>
+        <td class="observaciones"></td>
+    </tr>
+    <tr>
+        <td>La instalación posee un cierre perimetral adecuado.</td>
+        <td class="check-column"><div class="check-box"></div></td>
+        <td class="check-column"><div class="check-box"></div></td>
+        <td class="observaciones"></td>
+    </tr>
+    </table>
+            <!-- Salto de página controlado -->
+            <div id="seccion-resumen" class="forced-page-break"></div>
+            <h2>RESUMEN DE FISCALIZACIÓN</h2>
+            
+            <div class="summary">
+                <!-- Sección de resultados modificada para ser más compacta -->
+                <div class="resultados-compacto">
+                    <h3>Resultados de la Fiscalización</h3>
+                    <div class="resultados-info">
+                        <p>Total de ítems evaluados: <span id="total-items">0</span></p>
+                        <p>Ítems que cumplen: <span id="items-cumplen">0</span></p>
+                        <p>Ítems que no cumplen: <span id="items-no-cumplen">0</span></p>
+                        <p>Porcentaje de cumplimiento: <span id="porcentaje-cumplimiento">0</span>%</p>
+                    </div>
+                    <div id="resultado-evaluacion" class="result">PENDIENTE DE EVALUACIÓN</div>
+                    <p id="recomendacion">Complete la evaluación para generar un análisis de vulnerabilidades.</p>
+                </div>
+                
+                <h3>Resumen Automático de la Fiscalización</h3>
+                <div id="resumen-automatico" class="resumen-seccion">
+                   <p>El resumen detallado se generará automáticamente al completar la evaluación.</p>
+                </div>
+                
+                <h3>Recomendaciones y Plan de Acción</h3>
+                <!-- Editor de texto enriquecido con barra de herramientas completa -->
+                <div class="rich-text-container">
+                  <div class="rich-text-toolbar">
+                    <button type="button" onclick="formatText('bold')" title="Negrita"><b>N</b></button>
+                    <button type="button" onclick="formatText('italic')" title="Cursiva"><i>C</i></button>
+                    <button type="button" onclick="formatText('underline')" title="Subrayado"><u>S</u></button>
+                    <span class="separator">|</span>
+                    <button type="button" onclick="formatText('justifyLeft')" title="Alinear a la izquierda">⟨⟨</button>
+                    <button type="button" onclick="formatText('justifyCenter')" title="Centrar">≡</button>
+                    <button type="button" onclick="formatText('justifyRight')" title="Alinear a la derecha">⟩⟩</button>
+                    <button type="button" onclick="formatText('justifyFull')" title="Justificar">≡≡</button>
+                    <span class="separator">|</span>
+                    <button type="button" onclick="formatText('insertUnorderedList')" title="Lista con viñetas">• Lista</button>
+                    <button type="button" onclick="formatText('insertOrderedList')" title="Lista numerada">1. Lista</button>
+                  </div>
+                  <div id="plan-accion-editor" class="rich-text-editor" contenteditable="true" data-placeholder="Ingrese las recomendaciones específicas y el plan de acción propuesto..."></div>
+                  <input type="hidden" id="plan-accion" name="plan-accion">
+                </div>
+                
+                <h3>Firmas</h3>
+                <div class="firmas-seccion">
+                    <div class="firma-bloque">
+                        <p>Fiscalizador</p>
+                        <div class="linea-firma"></div>
+                        <p>Nombre y Firma</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Salto de página controlado -->
+            <div id="seccion-fotos" class="forced-page-break"></div>
+            <h2>SET FOTOGRÁFICO</h2>
+            
+            <div class="set-fotografico">
+                <div class="foto-container">
+                    <div class="foto-marco">
+                        <div class="foto-placeholder">
+                            <p>FOTOGRAFÍA 1</p>
+                            <input type="file" accept="image/*" id="foto1" class="foto-input" onchange="mostrarImagen(this, 'preview-foto1')">
+                            <label for="foto1" class="foto-label">Seleccionar imagen</label>
+                            <div id="preview-foto1" class="preview-imagen"></div>
+                        </div>
+                    </div>
+                    <textarea class="foto-descripcion" placeholder="Descripción de la fotografía 1..."></textarea>
+                </div>
+                
+                <div class="foto-container">
+                    <div class="foto-marco">
+                        <div class="foto-placeholder">
+                            <p>FOTOGRAFÍA 2</p>
+                            <input type="file" accept="image/*" id="foto2" class="foto-input" onchange="mostrarImagen(this, 'preview-foto2')">
+                            <label for="foto2" class="foto-label">Seleccionar imagen</label>
+                            <div id="preview-foto2" class="preview-imagen"></div>
+                        </div>
+                    </div>
+                    <textarea class="foto-descripcion" placeholder="Descripción de la fotografía 2..."></textarea>
+                </div>
+            </div>
+            
+            <div class="botones no-print">
+                <button type="button" onclick="imprimirFormulario()">Imprimir Formulario</button>
+                <button type="button" onclick="limpiarFormulario()">Limpiar Formulario</button>
+                <button type="button" onclick="guardarPDF()">Guardar como PDF</button>
+            </div>
+            
+            <div class="footer">
+                <p>Realizado según normativa vigente de seguridad privada.</p>
+                <p>© 2025 - Daniel Figueroa Ch. Ing. Informática</p>
+            </div>
+        </form>
+    </div>
+    
+</body>
+</html>
