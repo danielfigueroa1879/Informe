@@ -1,6 +1,6 @@
 /**
- * Solución definitiva para la generación de PDF sin páginas en blanco
- * con saltos de página correctos y todos los gráficos visibles
+ * Solución optimizada para la generación de PDF sin páginas en blanco intermedias
+ * y con observaciones completas
  */
 
 // Función principal que configura y genera el PDF
@@ -52,10 +52,26 @@ function generarPDFCorregido() {
             documentBody: {
                 overflow: document.body.style.overflow,
                 height: document.body.style.height
-            }
+            },
+            elementosCreados: [] // Para rastrear elementos creados durante la preparación
         };
         
-        // 1. Ocultar elementos con clase no-print y botones
+        // 1. Eliminar espacios en blanco y elementos vacíos que pueden causar páginas en blanco
+        const espaciosVacios = container.querySelectorAll('[style*="page-break"]');
+        espaciosVacios.forEach(el => {
+            if (!el.textContent.trim() && !el.querySelector('img') && el.clientHeight < 5) {
+                estadoOriginal.ocultos.push({
+                    element: el,
+                    display: el.style.display,
+                    parent: el.parentNode
+                });
+                if (el.parentNode) {
+                    el.parentNode.removeChild(el);
+                }
+            }
+        });
+        
+        // 2. Ocultar elementos con clase no-print y botones
         const elementosOcultar = container.querySelectorAll('.botones, .no-print');
         elementosOcultar.forEach(el => {
             estadoOriginal.ocultos.push({
@@ -65,7 +81,40 @@ function generarPDFCorregido() {
             el.style.display = 'none';
         });
         
-        // 2. Aplicar estilos óptimos para la impresión
+        // 3. Mejorar el manejo de las textareas (observaciones)
+        const textareas = container.querySelectorAll('textarea');
+        textareas.forEach(textarea => {
+            // Guardar estado original
+            estadoOriginal.estilos.set(textarea, {
+                height: textarea.style.height,
+                overflow: textarea.style.overflow,
+                value: textarea.value
+            });
+            
+            // Crear un div con el contenido de la textarea para asegurar que todo se muestre
+            const contenidoTexto = document.createElement('div');
+            contenidoTexto.textContent = textarea.value;
+            contenidoTexto.className = 'textarea-contenido-pdf';
+            Object.assign(contenidoTexto.style, {
+                minHeight: '50px',
+                width: '100%',
+                fontFamily: textarea.style.fontFamily || 'inherit',
+                fontSize: textarea.style.fontSize || 'inherit',
+                lineHeight: '1.4',
+                paddingLeft: '5px',
+                whiteSpace: 'pre-wrap', // Preservar espacios y saltos de línea
+                wordBreak: 'break-word'
+            });
+            
+            // Insertar el div antes de la textarea y ocultar la textarea original
+            textarea.parentNode.insertBefore(contenidoTexto, textarea);
+            textarea.style.display = 'none';
+            
+            // Registrar este elemento para eliminarlo después
+            estadoOriginal.elementosCreados.push(contenidoTexto);
+        });
+        
+        // 4. Aplicar estilos óptimos para la impresión
         const elementosEstilizar = [
             { selector: '.forced-page-break', estilos: {
                 display: 'block',
@@ -96,12 +145,14 @@ function generarPDFCorregido() {
         elementosEstilizar.forEach(config => {
             const elementos = container.querySelectorAll(config.selector);
             elementos.forEach(el => {
-                // Guardar estilos originales
-                const estilosOriginales = {};
-                Object.keys(config.estilos).forEach(prop => {
-                    estilosOriginales[prop] = el.style[prop];
-                });
-                estadoOriginal.estilos.set(el, estilosOriginales);
+                // Guardar estilos originales si aún no se han guardado
+                if (!estadoOriginal.estilos.has(el)) {
+                    const estilosOriginales = {};
+                    Object.keys(config.estilos).forEach(prop => {
+                        estilosOriginales[prop] = el.style[prop];
+                    });
+                    estadoOriginal.estilos.set(el, estilosOriginales);
+                }
                 
                 // Aplicar nuevos estilos
                 Object.keys(config.estilos).forEach(prop => {
@@ -110,7 +161,7 @@ function generarPDFCorregido() {
             });
         });
         
-        // 3. Añadir una hoja de estilos temporal con reglas específicas para PDF
+        // 5. Añadir una hoja de estilos temporal con reglas específicas para PDF
         const estilosTemporales = document.createElement('style');
         estilosTemporales.id = 'estilos-temporales-pdf';
         estilosTemporales.textContent = `
@@ -153,6 +204,23 @@ function generarPDFCorregido() {
                 break-before: page !important;
                 height: 1px !important;
                 visibility: hidden !important;
+            }
+            
+            /* Eliminar saltos de página no deseados */
+            div:empty {
+                display: none !important;
+            }
+            
+            /* Mejorar visualización de observaciones */
+            .textarea-contenido-pdf {
+                min-height: 50px;
+                padding: 5px !important;
+                font-family: inherit !important;
+                font-size: inherit !important;
+                line-height: 1.4 !important;
+                white-space: pre-wrap !important;
+                word-break: break-word !important;
+                margin-bottom: 5px !important;
             }
             
             /* Estilos para asegurar que los fondos se muestren correctamente */
@@ -201,8 +269,29 @@ function generarPDFCorregido() {
             }
         `;
         document.head.appendChild(estilosTemporales);
+        estadoOriginal.elementosCreados.push(estilosTemporales);
         
-        // 4. Restringir el flujo del documento para evitar problemas de renderizado
+        // 6. Eliminar elementos vacíos que puedan causar páginas en blanco
+        const elementosVacios = Array.from(container.querySelectorAll('div, p, span'))
+            .filter(el => !el.textContent.trim() && !el.querySelector('img') && el.clientHeight < 20 && !el.id);
+            
+        elementosVacios.forEach(el => {
+            // Solo eliminar si no tienen hijos o solo tienen espacios en blanco
+            if (el.children.length === 0 || (el.children.length === 1 && el.children[0].textContent.trim() === '')) {
+                estadoOriginal.ocultos.push({
+                    element: el,
+                    display: el.style.display,
+                    parent: el.parentNode,
+                    nextSibling: el.nextSibling
+                });
+                
+                if (el.parentNode) {
+                    el.parentNode.removeChild(el);
+                }
+            }
+        });
+        
+        // 7. Restringir el flujo del documento para evitar problemas de renderizado
         document.body.style.overflow = 'visible';
         document.body.style.height = 'auto';
         
@@ -219,7 +308,7 @@ function generarPDFCorregido() {
             
             // Modo de optimización: 1 = velocidad, 2 = precisión
             html2canvas: {
-                scale: 1.5, // ESCALA ORIGINAL
+                scale: 1.5, // Escala original
                 useCORS: true,
                 allowTaint: true,
                 scrollX: 0,
@@ -239,6 +328,11 @@ function generarPDFCorregido() {
                             -webkit-print-color-adjust: exact !important;
                             print-color-adjust: exact !important;
                             color-adjust: exact !important;
+                        }
+                        
+                        /* Evitar páginas en blanco */
+                        div:empty, p:empty, span:empty {
+                            display: none !important;
                         }
                         
                         /* Estilos específicos para asegurar fondos correctos */
@@ -272,6 +366,17 @@ function generarPDFCorregido() {
                             color: #a94442 !important;
                             border: 1px solid #ebccd1 !important;
                         }
+                        
+                        /* Asegurar que las textareas se muestran correctamente */
+                        .textarea-contenido-pdf {
+                            min-height: 50px;
+                            padding: 5px !important;
+                            font-family: inherit !important;
+                            font-size: inherit !important;
+                            line-height: 1.4 !important;
+                            white-space: pre-wrap !important;
+                            word-break: break-word !important;
+                        }
                     `;
                     clonedDoc.head.appendChild(style);
                     
@@ -279,6 +384,16 @@ function generarPDFCorregido() {
                     Array.from(clonedDoc.querySelectorAll('img')).forEach(img => {
                         img.style.display = 'block';
                         img.style.maxWidth = '100%';
+                    });
+                    
+                    // Eliminar elementos vacíos en el clon que podrían causar páginas en blanco
+                    const divs = Array.from(clonedDoc.querySelectorAll('div, p, span'));
+                    divs.forEach(div => {
+                        if (!div.textContent.trim() && !div.querySelector('img') && div.clientHeight < 20 && !div.classList.contains('textarea-contenido-pdf')) {
+                            if (div.parentNode) {
+                                div.parentNode.removeChild(div);
+                            }
+                        }
                     });
                 }
             },
@@ -292,11 +407,11 @@ function generarPDFCorregido() {
                 putOnlyUsedFonts: true
             },
             
-            // Configuración de saltos de página
+            // Configuración de saltos de página - Modificada para evitar páginas en blanco
             pagebreak: {
-                mode: ['css', 'legacy'],
-                before: ['h2', '.forced-page-break'],
-                avoid: ['table', 'img', '.avoid-break']
+                mode: ['avoid-all'], // Simplificar el algoritmo
+                before: ['h2'], // Solo saltos explícitos en h2
+                avoid: ['table', 'img', '.textarea-contenido-pdf']
             },
             
             // Usar el nuevo modo para división de contenido
@@ -306,7 +421,7 @@ function generarPDFCorregido() {
             
             // Importante: Esta opción optimiza el proceso y evita páginas en blanco
             html2canvas: { 
-                scale: 1.5, // ESCALA ORIGINAL
+                scale: 1.5, // Escala original
                 scrollY: 0, 
                 scrollX: 0,
                 backgroundColor: '#FFFFFF',
@@ -395,35 +510,59 @@ function generarPDFCorregido() {
     function restaurarDocumentoOriginal(estadoOriginal) {
         console.log("Restaurando documento a su estado original...");
         
-        // 1. Restaurar elementos ocultos
-        if (estadoOriginal.ocultos) {
-            estadoOriginal.ocultos.forEach(item => {
-                item.element.style.display = item.display || '';
+        // 1. Remover elementos creados durante la preparación
+        if (estadoOriginal.elementosCreados) {
+            estadoOriginal.elementosCreados.forEach(el => {
+                if (el && el.parentNode) {
+                    el.parentNode.removeChild(el);
+                }
             });
         }
         
-        // 2. Restaurar estilos originales
+        // 2. Restaurar elementos ocultos
+        if (estadoOriginal.ocultos) {
+            estadoOriginal.ocultos.forEach(item => {
+                // Si el elemento fue removido completamente
+                if (item.parent && item.nextSibling) {
+                    item.parent.insertBefore(item.element, item.nextSibling);
+                } else if (item.parent) {
+                    item.parent.appendChild(item.element);
+                }
+                
+                // Restaurar visibilidad
+                if (item.display !== undefined) {
+                    item.element.style.display = item.display;
+                }
+            });
+        }
+        
+        // 3. Restaurar estilos originales
         if (estadoOriginal.estilos) {
             estadoOriginal.estilos.forEach((estilos, elemento) => {
                 Object.keys(estilos).forEach(prop => {
-                    elemento.style[prop] = estilos[prop];
+                    // Manejar caso especial para textareas
+                    if (prop === 'value' && elemento.tagName === 'TEXTAREA') {
+                        elemento.value = estilos.value;
+                    } else {
+                        elemento.style[prop] = estilos[prop] || '';
+                    }
                 });
             });
         }
         
-        // 3. Restaurar estilos del body
+        // 4. Restaurar estilos del body
         if (estadoOriginal.documentBody) {
             document.body.style.overflow = estadoOriginal.documentBody.overflow || '';
             document.body.style.height = estadoOriginal.documentBody.height || '';
         }
         
-        // 4. Eliminar hoja de estilos temporal
+        // 5. Eliminar hoja de estilos temporal si aún existe
         const estilosTemporales = document.getElementById('estilos-temporales-pdf');
-        if (estilosTemporales) {
+        if (estilosTemporales && estilosTemporales.parentNode) {
             estilosTemporales.parentNode.removeChild(estilosTemporales);
         }
         
-        // 5. Ocultar indicador de carga si aún está visible
+        // 6. Ocultar indicador de carga si aún está visible
         ocultarIndicadorCarga();
         
         console.log("Documento restaurado correctamente");
@@ -609,7 +748,7 @@ function instalarBotonPDFCorregido() {
         
         // Actualizar texto y estilos para distinguirlo
         if (btn.textContent.includes('PDF')) {
-            btn.textContent = 'Descargar PDF Optimizado';
+            btn.textContent = 'Descargar PDF Completo';
         }
         
         // Estilos destacados
@@ -645,7 +784,7 @@ function instalarBotonPDFCorregido() {
         botonesDivs.forEach(div => {
             const nuevoBoton = document.createElement('button');
             nuevoBoton.type = 'button';
-            nuevoBoton.textContent = 'Descargar PDF Optimizado';
+            nuevoBoton.textContent = 'Descargar PDF Completo';
             nuevoBoton.onclick = generarPDFCorregido;
             nuevoBoton.className = 'no-print';
             
