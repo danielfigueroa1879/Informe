@@ -174,7 +174,7 @@ function generarPDFCorregido() {
             
             // Modo de optimización: 1 = velocidad, 2 = precisión
             html2canvas: {
-                scale: 1.5,
+                scale: 1.05, // Reducido a ~70% del valor original (1.5 * 0.7 = 1.05)
                 useCORS: true,
                 allowTaint: true,
                 scrollX: 0,
@@ -210,7 +210,7 @@ function generarPDFCorregido() {
             margin: [15, 10, 15, 10], // top, right, bottom, left
             
             // Importante: Esta opción optimiza el proceso y evita páginas en blanco
-            html2canvas: { scale: 1.5, scrollY: 0, scrollX: 0 }
+            html2canvas: { scale: 1.05, scrollY: 0, scrollX: 0 } // Reducido a ~70% del valor original
         };
         
         // Generar el PDF con el manejo optimizado
