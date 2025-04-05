@@ -113,7 +113,8 @@ function generarPDFOptimizado() {
             botones: [],
             noPrint: [],
             secciones: [],
-            estilosPrevios: []
+            estilosPrevios: [],
+            elementosAgregados: []
         };
         
         // 1. Ocultar botones
@@ -134,14 +135,23 @@ function generarPDFOptimizado() {
             el.style.display = 'none';
         });
         
-        // 3. Asegurar que las secciones con forced-page-break están visibles
+        // 3. Asegurar que las secciones con forced-page-break están visibles y mejorarlas
         document.querySelectorAll('.forced-page-break').forEach(section => {
             estadosOriginales.secciones.push({
                 element: section,
-                display: section.style.display
+                display: section.style.display,
+                height: section.style.height,
+                margin: section.style.margin
             });
-            // Asegurar visibilidad pero mantener comportamiento de salto de página
+            
+            // Reforzar el salto de página
             section.style.display = 'block';
+            section.style.pageBreakBefore = 'always';
+            section.style.breakBefore = 'page';
+            section.style.height = '1px';
+            section.style.margin = '0';
+            section.style.padding = '0';
+            section.style.clear = 'both';
         });
         
         // 4. Asegurar que el contenido del plan de acción sea visible y tenga altura adecuada
@@ -150,21 +160,78 @@ function generarPDFOptimizado() {
             estadosOriginales.estilosPrevios.push({
                 element: planAccion,
                 height: planAccion.style.height,
-                overflow: planAccion.style.overflow
+                overflow: planAccion.style.overflow,
+                maxHeight: planAccion.style.maxHeight
             });
             planAccion.style.height = 'auto';
+            planAccion.style.maxHeight = 'none';
             planAccion.style.overflow = 'visible';
         }
         
-        // 5. Asegurar que el tamaño de fuente sea adecuado para el PDF
+        // 5. Mejorar el comportamiento de las tablas
+        document.querySelectorAll('table').forEach(table => {
+            estadosOriginales.estilosPrevios.push({
+                element: table,
+                pageBreakInside: table.style.pageBreakInside,
+                maxWidth: table.style.maxWidth
+            });
+            
+            // Mejorar comportamiento de tablas en impresión
+            table.style.pageBreakInside = 'auto';
+            table.style.maxWidth = '100%';
+            
+            // Para tablas muy grandes, añadir atributos que ayuden en la generación del PDF
+            if (table.offsetHeight > 500) {
+                table.setAttribute('data-pdf-optimal-break', 'true');
+            }
+        });
+        
+        // 6. Asegurar que el contenedor principal tiene el tamaño adecuado
         const container = document.querySelector('.container');
         if (container) {
             estadosOriginales.estilosPrevios.push({
                 element: container,
-                fontSize: container.style.fontSize
+                fontSize: container.style.fontSize,
+                width: container.style.width,
+                padding: container.style.padding
             });
-            // Mantener el tamaño de fuente actual que funciona bien para impresión
+            
+            // Ajustar el contenedor para impresión
+            container.style.width = '100%';
+            container.style.maxWidth = '800px';
+            container.style.margin = '0 auto';
+            container.style.padding = '10px 15px';
         }
+        
+        // 7. Añadir marcadores de página visibles en cada h2 para forzar saltos
+        document.querySelectorAll('h2').forEach(h2 => {
+            // Solo añadir si no es el primer h2
+            if (h2.previousElementSibling) {
+                const pageBreakMarker = document.createElement('div');
+                pageBreakMarker.className = 'pdf-page-break-marker';
+                pageBreakMarker.style.pageBreakBefore = 'always';
+                pageBreakMarker.style.breakBefore = 'page';
+                pageBreakMarker.style.display = 'block';
+                pageBreakMarker.style.height = '1px';
+                pageBreakMarker.style.clear = 'both';
+                
+                h2.parentNode.insertBefore(pageBreakMarker, h2);
+                estadosOriginales.elementosAgregados.push(pageBreakMarker);
+            }
+        });
+        
+        // 8. Asegurar que elementos de salto de página estén visibles
+        document.querySelectorAll('#seccion-personal, #seccion-uniformes, #seccion-sistemas, #seccion-caracteristicas, #seccion-resumen, #seccion-fotos').forEach(section => {
+            estadosOriginales.estilosPrevios.push({
+                element: section,
+                display: section.style.display,
+                pageBreakBefore: section.style.pageBreakBefore
+            });
+            
+            section.style.display = 'block';
+            section.style.pageBreakBefore = 'always';
+            section.style.breakBefore = 'page';
+        });
         
         return estadosOriginales;
     }
@@ -182,40 +249,114 @@ function generarPDFOptimizado() {
         
         console.log("Configurando opciones para PDF tamaño oficio...");
         
+        // Inyectar CSS temporal para mejorar el comportamiento de impresión
+        const styleTemp = document.createElement('style');
+        styleTemp.id = 'temp-print-style';
+        styleTemp.textContent = `
+            @media print {
+                body, html, .container {
+                    height: auto !important;
+                    overflow: visible !important;
+                }
+                table {
+                    page-break-inside: auto !important;
+                }
+                tr {
+                    page-break-inside: avoid !important;
+                    page-break-after: auto !important;
+                }
+                h2, h3 {
+                    page-break-after: avoid !important;
+                }
+                .forced-page-break {
+                    page-break-before: always !important;
+                    display: block !important;
+                    height: 1px !important;
+                }
+                .avoid-page-break {
+                    page-break-inside: avoid !important;
+                }
+            }
+        `;
+        document.head.appendChild(styleTemp);
+        
         // Configuración optimizada para formato oficio (legal)
         const opciones = {
             // Tamaño oficio: 215.9 x 355.6 mm (8.5 x 14 pulgadas)
-            margin: [10, 10, 10, 10], // top, left, bottom, right en mm
+            margin: [15, 10, 15, 10], // top, left, bottom, right en mm
             filename: `Fiscalizacion_${new Date().toLocaleDateString().replace(/\//g, '-')}.pdf`,
             image: { 
                 type: 'jpeg', 
                 quality: 0.98
             },
             html2canvas: { 
-                scale: 2, // Mayor escala para mejor calidad
+                scale: 1.5, // Escala reducida para evitar cortes
                 useCORS: true,
-                logging: false,
+                logging: true, // Activar logging para depuración
                 letterRendering: true,
                 allowTaint: true,
                 backgroundColor: '#FFFFFF',
-                // Mejorar manejo para evitar páginas en blanco
-                windowWidth: 1200, // Ancho fijo para consistencia
-                removeContainer: true, // Evita problemas con contenedores temporales
+                // Ajustar ancho para evitar cortes laterales
+                windowWidth: 1000,
+                removeContainer: true, 
                 onclone: function(clonedDoc) {
-                    // Ajustar elementos en el clon para mejor renderizado
-                    Array.from(clonedDoc.querySelectorAll('.forced-page-break')).forEach(el => {
-                        // Asegurar que los saltos de página sean respetados
-                        el.style.pageBreakBefore = 'always';
-                        el.style.display = 'block';
-                        el.style.height = '1px'; // Hacerlo visible pero mínimo
-                        el.style.margin = '0';
-                        el.style.padding = '0';
+                    console.log("Procesando clon del documento...");
+                    
+                    // Ajustar todas las tablas para evitar que se corten
+                    Array.from(clonedDoc.querySelectorAll('table')).forEach((table, index) => {
+                        table.setAttribute('data-table-index', index);
+                        table.style.pageBreakInside = 'auto';
+                        table.style.maxWidth = '100%';
+                        
+                        // Verificar si la tabla es muy grande, reducir fuente si es necesario
+                        if (table.offsetHeight > 600) {
+                            console.log(`Tabla ${index} es muy alta (${table.offsetHeight}px), ajustando...`);
+                            table.style.fontSize = '0.9em';
+                        }
                     });
                     
-                    // Ajustar h2 que deberían causar salto de página
-                    Array.from(clonedDoc.querySelectorAll('h2.page-title')).forEach(el => {
+                    // Mejorar manejo de saltos de página forzados
+                    Array.from(clonedDoc.querySelectorAll('.forced-page-break')).forEach((el, index) => {
+                        console.log(`Procesando salto de página #${index}`);
                         el.style.pageBreakBefore = 'always';
+                        el.style.breakBefore = 'page';
+                        el.style.display = 'block';
+                        el.style.height = '1px';
+                        el.style.margin = '0';
+                        el.style.padding = '0';
+                        el.style.clear = 'both';
+                        
+                        // Agregar espacio visible para asegurar el salto
+                        const spacer = clonedDoc.createElement('div');
+                        spacer.style.height = '10px';
+                        spacer.style.width = '100%';
+                        spacer.style.display = 'block';
+                        spacer.style.clear = 'both';
+                        el.parentNode.insertBefore(spacer, el);
                     });
+                    
+                    // Procesar encabezados h2 para evitar cortes
+                    Array.from(clonedDoc.querySelectorAll('h2')).forEach((h2, index) => {
+                        h2.style.pageBreakBefore = 'always';
+                        h2.style.breakBefore = 'page';
+                        h2.style.marginTop = '15px';
+                        h2.setAttribute('data-h2-index', index);
+                        
+                        // Asegurar que el h2 no se corte de su contenido asociado
+                        h2.style.pageBreakAfter = 'avoid';
+                        h2.style.breakAfter = 'avoid';
+                    });
+                    
+                    // Intentar eliminar espacios en blanco excesivos
+                    const allElements = clonedDoc.querySelectorAll('*');
+                    for (let i = 0; i < allElements.length; i++) {
+                        if (allElements[i].style) {
+                            // Eliminar margen inferior excesivo
+                            if (parseInt(window.getComputedStyle(allElements[i]).marginBottom) > 50) {
+                                allElements[i].style.marginBottom = '20px';
+                            }
+                        }
+                    }
                 }
             },
             jsPDF: { 
@@ -227,9 +368,9 @@ function generarPDFOptimizado() {
                 putTotalPages: true // Permite numeración de páginas
             },
             pagebreak: { 
-                mode: ['avoid-all', 'css', 'legacy'], 
-                before: '.forced-page-break, h2.page-title',
-                avoid: 'tr, .avoid-break'
+                mode: ['css', 'legacy'], // Simplificar modos
+                before: ['.forced-page-break', 'h2', '#seccion-personal', '#seccion-uniformes', '#seccion-sistemas', '#seccion-caracteristicas', '#seccion-resumen', '#seccion-fotos'],
+                avoid: ['table', 'tr', '.avoid-break', 'h3']
             }
         };
         
@@ -247,6 +388,33 @@ function generarPDFOptimizado() {
                 
                 if (pdf.output('arraybuffer').byteLength < 5000) {
                     console.warn("Advertencia: El PDF generado tiene un tamaño inusualmente pequeño");
+                }
+                
+                // Añadir información personalizada
+                pdf.setProperties({
+                    title: 'Cuadro de Fiscalización de Seguridad Privada',
+                    subject: 'Formulario de Evaluación de Seguridad',
+                    creator: 'Sistema Optimizado de PDF',
+                    author: document.querySelector('input[name="fiscalizador"]')?.value || 'Formulario de Fiscalización'
+                });
+                
+                // Intentar añadir numeración de páginas
+                try {
+                    const totalPaginas = pdf.internal.getNumberOfPages();
+                    console.log(`Total de páginas en el PDF: ${totalPaginas}`);
+                    
+                    // Añadir números de página en cada página
+                    for (let i = 1; i <= totalPaginas; i++) {
+                        pdf.setPage(i);
+                        pdf.setFontSize(10);
+                        pdf.setTextColor(100);
+                        const textoFooter = `Página ${i} de ${totalPaginas}`;
+                        const pageSize = pdf.internal.pageSize;
+                        const ancho = pageSize.width || pageSize.getWidth();
+                        pdf.text(textoFooter, ancho - 30, pageSize.height - 10);
+                    }
+                } catch (e) {
+                    console.warn("No se pudo añadir numeración de páginas", e);
                 }
                 
                 // Guardar el PDF
@@ -275,6 +443,12 @@ function generarPDFOptimizado() {
             document.body.removeChild(indicador);
         }
         
+        // Eliminar estilos temporales
+        const tempStyles = document.getElementById('temp-print-style');
+        if (tempStyles) {
+            document.head.removeChild(tempStyles);
+        }
+        
         // Si no hay estados para restaurar, salimos
         if (!estadosOriginales || Object.keys(estadosOriginales).length === 0) {
             return;
@@ -298,15 +472,39 @@ function generarPDFOptimizado() {
         if (estadosOriginales.secciones) {
             estadosOriginales.secciones.forEach(item => {
                 item.element.style.display = item.display || '';
+                if (item.height !== undefined) item.element.style.height = item.height;
+                if (item.margin !== undefined) item.element.style.margin = item.margin;
+                
+                // Eliminar propiedades adicionales de salto de página
+                item.element.style.pageBreakBefore = '';
+                item.element.style.breakBefore = '';
+                item.element.style.clear = '';
             });
         }
         
         // Restaurar otros estilos
         if (estadosOriginales.estilosPrevios) {
             estadosOriginales.estilosPrevios.forEach(item => {
-                if (item.height !== undefined) item.element.style.height = item.height;
-                if (item.overflow !== undefined) item.element.style.overflow = item.overflow;
-                if (item.fontSize !== undefined) item.element.style.fontSize = item.fontSize;
+                // Restaurar todas las propiedades guardadas
+                Object.keys(item).forEach(prop => {
+                    if (prop !== 'element' && item[prop] !== undefined) {
+                        item.element.style[prop] = item[prop];
+                    }
+                });
+                
+                // Limpiar atributos de datos adicionales
+                if (item.element.hasAttribute('data-pdf-optimal-break')) {
+                    item.element.removeAttribute('data-pdf-optimal-break');
+                }
+            });
+        }
+        
+        // Eliminar elementos agregados temporalmente
+        if (estadosOriginales.elementosAgregados) {
+            estadosOriginales.elementosAgregados.forEach(element => {
+                if (element.parentNode) {
+                    element.parentNode.removeChild(element);
+                }
             });
         }
         
