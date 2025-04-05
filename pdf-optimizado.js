@@ -205,7 +205,7 @@ function generarPDFCorregido() {
             
             // Modo de optimización: 1 = velocidad, 2 = precisión
             html2canvas: {
-                scale: 0.30, // Reducido aún más (20% del original)
+                scale: 1.65, // Ajustado al 110% del valor original (1.5 * 1.10 = 1.65)
                 useCORS: true,
                 allowTaint: true,
                 scrollX: 0,
@@ -334,7 +334,7 @@ function generarPDFCorregido() {
             
             // Importante: Esta opción optimiza el proceso y evita páginas en blanco
             html2canvas: { 
-                scale: 0.30, 
+                scale: 1.65, // Ajustado al 110% del valor original
                 scrollY: 0, 
                 scrollX: 0,
                 backgroundColor: '#FFFFFF', // Fondo blanco explícito para eliminar manchas
