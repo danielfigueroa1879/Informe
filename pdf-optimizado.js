@@ -56,6 +56,45 @@ function generarPDFCorregido() {
             elementosCreados: [] // Para rastrear elementos creados durante la preparación
         };
         
+        // 0. Forzar que el set fotográfico aparezca en página separada
+        const setFotografico = container.querySelector('.set-fotografico, #seccion-fotos');
+        const h2SetFotografico = Array.from(container.querySelectorAll('h2')).find(h2 => 
+            h2.textContent.trim().toUpperCase().includes('FOTOGRÁFICO') || 
+            h2.textContent.trim().toUpperCase().includes('FOTOGRAFICO')
+        );
+        
+        if (setFotografico) {
+            estadoOriginal.estilos.set(setFotografico, {
+                pageBreakBefore: setFotografico.style.pageBreakBefore,
+                breakBefore: setFotografico.style.breakBefore,
+                display: setFotografico.style.display
+            });
+            
+            setFotografico.style.pageBreakBefore = 'always';
+            setFotografico.style.breakBefore = 'page';
+            setFotografico.style.display = 'block';
+            
+            // Añadimos un atributo especial para identificarlo fácilmente
+            setFotografico.setAttribute('data-page-section', 'foto');
+            console.log("Set fotográfico configurado para aparecer en página separada");
+        }
+        
+        if (h2SetFotografico) {
+            estadoOriginal.estilos.set(h2SetFotografico, {
+                pageBreakBefore: h2SetFotografico.style.pageBreakBefore,
+                breakBefore: h2SetFotografico.style.breakBefore,
+                display: h2SetFotografico.style.display
+            });
+            
+            h2SetFotografico.style.pageBreakBefore = 'always';
+            h2SetFotografico.style.breakBefore = 'page';
+            h2SetFotografico.style.display = 'block';
+            
+            // Añadimos un atributo especial para identificarlo fácilmente
+            h2SetFotografico.setAttribute('data-page-section', 'foto-title');
+            console.log("Título del set fotográfico configurado para aparecer en página separada");
+        }
+        
         // 1. Eliminar espacios en blanco y elementos vacíos que pueden causar páginas en blanco
         const espaciosVacios = container.querySelectorAll('[style*="page-break"]');
         espaciosVacios.forEach(el => {
@@ -224,6 +263,17 @@ function generarPDFCorregido() {
                 visibility: hidden !important;
             }
             
+            /* Set fotográfico siempre en página separada */
+            .set-fotografico, 
+            #seccion-fotos,
+            [data-page-section="foto"],
+            [data-page-section="foto-title"],
+            h2:nth-of-type(7) /* Asumiendo que el título del set fotográfico es el séptimo h2 */ {
+                page-break-before: always !important;
+                break-before: page !important;
+                display: block !important;
+            }
+            
             /* Eliminar saltos de página no deseados */
             div:empty {
                 display: none !important;
@@ -377,6 +427,17 @@ function generarPDFCorregido() {
                             color-adjust: exact !important;
                         }
                         
+                        /* Forzar que el set fotográfico comience en página nueva */
+                        [data-page-section="foto"], 
+                        [data-page-section="foto-title"],
+                        .set-fotografico,
+                        h2:contains("FOTOGRÁFICO"),
+                        h2:contains("FOTOGRAFICO") {
+                            page-break-before: always !important;
+                            break-before: page !important;
+                            display: block !important;
+                        }
+                        
                         /* Reducir tamaño de fuente general */
                         body, .container {
                             font-size: 10pt !important;
@@ -437,6 +498,25 @@ function generarPDFCorregido() {
                     `;
                     clonedDoc.head.appendChild(style);
                     
+                    // Forzar que el set fotográfico comience en página nueva
+                    const setFotograficoElements = clonedDoc.querySelectorAll('.set-fotografico, #seccion-fotos');
+                    setFotograficoElements.forEach(el => {
+                        el.style.pageBreakBefore = 'always';
+                        el.style.breakBefore = 'page';
+                        el.style.display = 'block';
+                    });
+                    
+                    // También buscar el título del set fotográfico por su texto
+                    const h2Elements = clonedDoc.querySelectorAll('h2');
+                    h2Elements.forEach(h2 => {
+                        if (h2.textContent.trim().toUpperCase().includes('FOTOGRÁFICO') || 
+                            h2.textContent.trim().toUpperCase().includes('FOTOGRAFICO')) {
+                            h2.style.pageBreakBefore = 'always';
+                            h2.style.breakBefore = 'page';
+                            h2.style.display = 'block';
+                        }
+                    });
+                    
                     // Asegurar que las imágenes se muestran correctamente
                     Array.from(clonedDoc.querySelectorAll('img')).forEach(img => {
                         img.style.display = 'block';
@@ -446,7 +526,11 @@ function generarPDFCorregido() {
                     // Eliminar elementos vacíos en el clon que podrían causar páginas en blanco
                     const divs = Array.from(clonedDoc.querySelectorAll('div, p, span'));
                     divs.forEach(div => {
-                        if (!div.textContent.trim() && !div.querySelector('img') && div.clientHeight < 20 && !div.classList.contains('textarea-contenido-pdf')) {
+                        if (!div.hasAttribute('data-page-section') && 
+                            !div.textContent.trim() && 
+                            !div.querySelector('img') && 
+                            div.clientHeight < 20 && 
+                            !div.classList.contains('textarea-contenido-pdf')) {
                             if (div.parentNode) {
                                 div.parentNode.removeChild(div);
                             }
@@ -466,8 +550,8 @@ function generarPDFCorregido() {
             
             // Configuración de saltos de página - Modificada para evitar páginas en blanco
             pagebreak: {
-                mode: ['avoid-all'], // Simplificar el algoritmo
-                before: ['h2'], // Solo saltos explícitos en h2
+                mode: ['avoid-all', 'css'], // Usar reglas CSS y evitar cortes
+                before: ['h2', '.set-fotografico', '#seccion-fotos', '[data-page-section="foto"]', '[data-page-section="foto-title"]'], // Incluir set fotográfico
                 avoid: ['table', 'img', '.textarea-contenido-pdf']
             },
             
