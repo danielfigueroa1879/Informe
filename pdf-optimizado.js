@@ -276,6 +276,21 @@ function generarPDFCorregido() {
                 margin: 8px 0 !important; /* Reducido */
             }
             
+            /* Reducir específicamente el tamaño del texto en los campos de entrada */
+            .info-section input[type="text"] {
+                font-size: 9pt !important; /* Tamaño reducido para el texto dentro de los inputs */
+                padding: 4px !important; /* Padding reducido */
+                height: auto !important; /* Altura automática basada en el contenido */
+            }
+            
+            /* Ajustar específicamente los inputs de fecha */
+            .fecha-inputs input[type="text"] {
+                font-size: 9pt !important;
+                padding: 2px !important;
+                width: 30px !important; /* Ancho reducido */
+                text-align: center !important;
+            }
+            
             /* Reducir tamaño para el resumen */
             .summary {
                 padding: 15px !important; /* Reducido */
@@ -443,6 +458,21 @@ function generarPDFCorregido() {
                         
                         th {
                             font-size: 9.5pt !important;
+                        }
+                        
+                        /* Inputs de texto en la sección de información */
+                        .info-section input[type="text"] {
+                            font-size: 9pt !important;
+                            padding: 4px !important;
+                            height: auto !important;
+                        }
+                        
+                        /* Inputs específicos para fecha */
+                        .fecha-inputs input[type="text"] {
+                            font-size: 9pt !important;
+                            padding: 2px !important;
+                            width: 30px !important;
+                            text-align: center !important;
                         }
                         
                         /* Evitar páginas en blanco */
