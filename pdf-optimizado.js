@@ -698,3 +698,4 @@ window.guardarDatosManualmente = guardarDatosFormulario;
 window.cargarDatosManualmente = cargarDatosFormulario;
 window.limpiarDatosGuardados = limpiarDatosGuardados;
 window.descargarPDF = descargarPDF;
+
