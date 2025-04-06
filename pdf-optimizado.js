@@ -1,6 +1,7 @@
 /**
- * Solución optimizada para la generación de PDF sin páginas en blanco intermedias
- * y con observaciones completas
+ * pdf-optimizado.js - Versión con tamaño de letra reducido
+ * Solución optimizada para la generación de PDF sin páginas en blanco intermedias,
+ * con observaciones completas y tamaño de letra reducido
  */
 
 // Función principal que configura y genera el PDF
@@ -99,8 +100,8 @@ function generarPDFCorregido() {
                 minHeight: '50px',
                 width: '100%',
                 fontFamily: textarea.style.fontFamily || 'inherit',
-                fontSize: textarea.style.fontSize || 'inherit',
-                lineHeight: '1.4',
+                fontSize: '10pt', // Reducido de tamaño
+                lineHeight: '1.3', // Reducido
                 paddingLeft: '5px',
                 whiteSpace: 'pre-wrap', // Preservar espacios y saltos de línea
                 wordBreak: 'break-word'
@@ -125,8 +126,14 @@ function generarPDFCorregido() {
             }},
             { selector: 'h2', estilos: {
                 pageBreakBefore: 'always',
-                marginTop: '20px',
-                paddingTop: '10px'
+                marginTop: '15px', // Reducido
+                paddingTop: '8px', // Reducido
+                fontSize: '14pt' // Tamaño reducido
+            }},
+            { selector: 'h3', estilos: {
+                fontSize: '12pt', // Tamaño reducido
+                marginTop: '12px', // Reducido
+                marginBottom: '5px' // Reducido
             }},
             { selector: 'table', estilos: {
                 pageBreakInside: 'auto'
@@ -137,7 +144,8 @@ function generarPDFCorregido() {
             { selector: '#plan-accion-editor', estilos: {
                 height: 'auto',
                 maxHeight: 'none',
-                overflow: 'visible'
+                overflow: 'visible',
+                fontSize: '10pt' // Tamaño reducido
             }}
         ];
         
@@ -161,7 +169,24 @@ function generarPDFCorregido() {
             });
         });
         
-        // 5. Añadir una hoja de estilos temporal con reglas específicas para PDF
+        // 5. Reducir tamaño de texto de todos los párrafos y elementos de texto
+        const elementosTexto = container.querySelectorAll('p, span, td, div:not(.header-row):not(.rich-text-toolbar)');
+        elementosTexto.forEach(el => {
+            if (!estadoOriginal.estilos.has(el)) {
+                estadoOriginal.estilos.set(el, {
+                    fontSize: el.style.fontSize,
+                    lineHeight: el.style.lineHeight
+                });
+            }
+            
+            // No modificar elementos que ya tengan estilos específicos establecidos
+            if (!el.classList.contains('result') && !el.classList.contains('header-row')) {
+                el.style.fontSize = '10pt'; // Tamaño reducido
+                el.style.lineHeight = '1.3'; // Ajustar interlineado
+            }
+        });
+        
+        // 6. Añadir una hoja de estilos temporal con reglas específicas para PDF
         const estilosTemporales = document.createElement('style');
         estilosTemporales.id = 'estilos-temporales-pdf';
         estilosTemporales.textContent = `
@@ -175,25 +200,43 @@ function generarPDFCorregido() {
                 color-adjust: exact !important;
             }
             .container {
-                font-size: 12pt !important;
+                font-size: 10pt !important; /* Reducido de 12pt */
                 width: 100% !important;
                 max-width: 100% !important;
                 padding: 0 !important;
                 margin: 0 !important;
             }
+            h1 {
+                font-size: 16pt !important; /* Reducido */
+                margin-bottom: 20px !important;
+            }
             h2 {
+                font-size: 14pt !important; /* Reducido */
                 page-break-before: always !important;
                 break-before: page !important;
                 page-break-after: avoid !important;
                 break-after: avoid !important;
+                margin-top: 15px !important;
+                padding-top: 8px !important;
             }
             h3 {
+                font-size: 12pt !important; /* Reducido */
                 page-break-after: avoid !important;
                 break-after: avoid !important;
+                margin-top: 12px !important;
+                margin-bottom: 5px !important;
             }
             table {
                 page-break-inside: auto !important;
                 break-inside: auto !important;
+                font-size: 9pt !important; /* Reducido */
+            }
+            th {
+                font-size: 9.5pt !important; /* Reducido */
+            }
+            td {
+                font-size: 9pt !important; /* Reducido */
+                padding: 5px 8px !important; /* Reducido */
             }
             tr {
                 page-break-inside: avoid !important;
@@ -213,14 +256,60 @@ function generarPDFCorregido() {
             
             /* Mejorar visualización de observaciones */
             .textarea-contenido-pdf {
-                min-height: 50px;
+                min-height: 40px !important; /* Reducido */
                 padding: 5px !important;
                 font-family: inherit !important;
-                font-size: inherit !important;
-                line-height: 1.4 !important;
+                font-size: 9pt !important; /* Reducido */
+                line-height: 1.3 !important; /* Reducido */
                 white-space: pre-wrap !important;
                 word-break: break-word !important;
                 margin-bottom: 5px !important;
+            }
+            
+            /* Reducir tamaño del texto en información de secciones */
+            .info-section {
+                padding: 15px !important; /* Reducido */
+            }
+            
+            .info-section p {
+                font-size: 10pt !important; /* Reducido */
+                margin: 8px 0 !important; /* Reducido */
+            }
+            
+            /* Reducir tamaño para el resumen */
+            .summary {
+                padding: 15px !important; /* Reducido */
+            }
+            
+            .count {
+                font-size: 10pt !important; /* Reducido */
+            }
+            
+            .result {
+                font-size: 12pt !important; /* Reducido */
+                padding: 15px !important; /* Reducido */
+            }
+            
+            /* Ajustar resumen automático */
+            #resumen-automatico {
+                font-size: 9pt !important; /* Reducido */
+                line-height: 1.3 !important; /* Reducido */
+            }
+            
+            #resumen-automatico ul li {
+                font-size: 9pt !important; /* Reducido */
+                margin-bottom: 3px !important; /* Reducido */
+            }
+            
+            #resumen-automatico ul ul li {
+                font-size: 8.5pt !important; /* Reducido */
+                line-height: 1.2 !important; /* Reducido */
+            }
+            
+            /* Ajustar plan de acción */
+            #plan-accion-editor {
+                font-size: 10pt !important; /* Reducido */
+                line-height: 1.3 !important; /* Reducido */
             }
             
             /* Estilos para asegurar que los fondos se muestren correctamente */
@@ -271,7 +360,7 @@ function generarPDFCorregido() {
         document.head.appendChild(estilosTemporales);
         estadoOriginal.elementosCreados.push(estilosTemporales);
         
-        // 6. Eliminar elementos vacíos que puedan causar páginas en blanco
+        // 7. Eliminar elementos vacíos que puedan causar páginas en blanco
         const elementosVacios = Array.from(container.querySelectorAll('div, p, span'))
             .filter(el => !el.textContent.trim() && !el.querySelector('img') && el.clientHeight < 20 && !el.id);
             
@@ -291,7 +380,7 @@ function generarPDFCorregido() {
             }
         });
         
-        // 7. Restringir el flujo del documento para evitar problemas de renderizado
+        // 8. Restringir el flujo del documento para evitar problemas de renderizado
         document.body.style.overflow = 'visible';
         document.body.style.height = 'auto';
         
@@ -330,6 +419,32 @@ function generarPDFCorregido() {
                             color-adjust: exact !important;
                         }
                         
+                        /* Reducir tamaños de fuente */
+                        body {
+                            font-size: 10pt !important;
+                        }
+                        
+                        h1 {
+                            font-size: 16pt !important;
+                        }
+                        
+                        h2 {
+                            font-size: 14pt !important;
+                        }
+                        
+                        h3 {
+                            font-size: 12pt !important;
+                        }
+                        
+                        p, span, div, td {
+                            font-size: 10pt !important;
+                            line-height: 1.3 !important;
+                        }
+                        
+                        th {
+                            font-size: 9.5pt !important;
+                        }
+                        
                         /* Evitar páginas en blanco */
                         div:empty, p:empty, span:empty {
                             display: none !important;
@@ -339,6 +454,7 @@ function generarPDFCorregido() {
                         .header-row, th {
                             background-color: #003366 !important;
                             color: white !important;
+                            font-size: 9.5pt !important;
                         }
                         
                         tr:nth-child(even) {
@@ -353,29 +469,49 @@ function generarPDFCorregido() {
                             background-color: #dff0d8 !important;
                             color: #3c763d !important;
                             border: 1px solid #d6e9c6 !important;
+                            font-size: 12pt !important;
                         }
                         
                         .result.riesgo {
                             background-color: #fcf8e3 !important;
                             color: #8a6d3b !important;
                             border: 1px solid #faebcc !important;
+                            font-size: 12pt !important;
                         }
                         
                         .result.inseguro {
                             background-color: #f2dede !important;
                             color: #a94442 !important;
                             border: 1px solid #ebccd1 !important;
+                            font-size: 12pt !important;
                         }
                         
                         /* Asegurar que las textareas se muestran correctamente */
                         .textarea-contenido-pdf {
-                            min-height: 50px;
+                            min-height: 40px;
                             padding: 5px !important;
                             font-family: inherit !important;
-                            font-size: inherit !important;
-                            line-height: 1.4 !important;
+                            font-size: 9pt !important;
+                            line-height: 1.3 !important;
                             white-space: pre-wrap !important;
                             word-break: break-word !important;
+                        }
+                        
+                        /* Ajustar resumen automático */
+                        #resumen-automatico {
+                            font-size: 9pt !important;
+                        }
+                        
+                        #resumen-automatico ul li {
+                            font-size: 9pt !important;
+                        }
+                        
+                        #resumen-automatico ul ul li {
+                            font-size: 8.5pt !important;
+                        }
+                        
+                        #plan-accion-editor {
+                            font-size: 10pt !important;
                         }
                     `;
                     clonedDoc.head.appendChild(style);
@@ -482,7 +618,7 @@ function generarPDFCorregido() {
                 pdf.setPage(i);
                 
                 // Configuración de texto para el pie de página
-                pdf.setFontSize(9);
+                pdf.setFontSize(8); // Tamaño reducido
                 pdf.setTextColor(100, 100, 100);
                 
                 // Obtener dimensiones de la página
@@ -494,7 +630,7 @@ function generarPDFCorregido() {
                 const texto = `Página ${i} de ${totalPaginas}`;
                 
                 // Posicionar en la esquina inferior derecha
-                const textWidth = pdf.getStringUnitWidth(texto) * 9 / pdf.internal.scaleFactor;
+                const textWidth = pdf.getStringUnitWidth(texto) * 8 / pdf.internal.scaleFactor;
                 const x = pageWidth - textWidth - 15;
                 const y = pageHeight - 10;
                 
