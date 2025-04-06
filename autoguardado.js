@@ -1,873 +1,700 @@
 /**
- * Solución optimizada para la generación de PDF sin páginas en blanco intermedias
- * y con observaciones completas, optimizada para texto compacto
+ * autoguardado.js - versión completa con descarga PDF
+ * Sistema de persistencia de datos para formulario de fiscalización de seguridad privada
  */
 
-// Función principal que configura y genera el PDF
-function generarPDFCorregido() {
-    // Mostrar indicador de progreso
-    mostrarIndicadorCarga();
-    
-    // Verificar si html2pdf ya está cargado
-    if (typeof html2pdf === 'undefined') {
-        const script = document.createElement('script');
-        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
-        script.onload = prepararYGenerarPDF;
-        script.onerror = function() {
-            ocultarIndicadorCarga();
-            alert('Error: No se pudo cargar la biblioteca necesaria para generar el PDF. Verifique su conexión a Internet.');
-        };
-        document.head.appendChild(script);
-    } else {
-        prepararYGenerarPDF();
+// Verificar disponibilidad de localStorage
+function verificarLocalStorage() {
+    try {
+        localStorage.setItem('test', 'test');
+        localStorage.removeItem('test');
+        return true;
+    } catch (e) {
+        console.error('localStorage no está disponible. Error:', e);
+        return false;
     }
+}
+
+// Guardar todos los datos del formulario
+function guardarDatosFormulario() {
+    if (!verificarLocalStorage()) return;
     
-    // Función principal de preparación y generación
-    function prepararYGenerarPDF() {
-        console.log("Iniciando generación de PDF optimizada...");
+    console.log('Guardando datos del formulario...');
+    
+    try {
+        // Guardar campos de texto
+        const inputFields = document.querySelectorAll('input[type="text"]');
+        inputFields.forEach(input => {
+            if (input.name) {
+                localStorage.setItem(input.name, input.value);
+                console.log(`Guardado: ${input.name} = ${input.value}`);
+            }
+        });
         
-        // 1. Obtener una copia limpia del contenido que vamos a convertir
-        const container = document.querySelector('.container');
-        if (!container) {
-            ocultarIndicadorCarga();
-            alert('Error: No se pudo encontrar el contenedor principal del documento.');
+        // Guardar radios (estado de cumplimiento)
+        const radioButtons = document.querySelectorAll('input[type="radio"]:checked');
+        radioButtons.forEach(radio => {
+            if (radio.name) {
+                localStorage.setItem(radio.name, radio.value);
+                console.log(`Guardado radio: ${radio.name} = ${radio.value}`);
+            }
+        });
+        
+        // Guardar textareas de observaciones
+        const observaciones = document.querySelectorAll('td.observaciones textarea');
+        observaciones.forEach((textarea, index) => {
+            localStorage.setItem('observacion_' + index, textarea.value);
+        });
+        
+        // Guardar descripciones de fotos
+        const fotoDescripciones = document.querySelectorAll('.foto-descripcion');
+        fotoDescripciones.forEach((desc, index) => {
+            localStorage.setItem('foto_desc_' + index, desc.value);
+        });
+        
+        // Guardar el plan de acción (editor de texto enriquecido)
+        const planAccion = document.getElementById('plan-accion-editor');
+        if (planAccion) {
+            localStorage.setItem('plan_accion', planAccion.innerHTML);
+        }
+        
+        // Guardar fecha y hora de la última actualización
+        localStorage.setItem('ultima_actualizacion', new Date().toLocaleString());
+        console.log('Todos los datos guardados correctamente');
+        
+        // Mostrar indicador de guardado
+        mostrarIndicadorGuardado();
+    } catch (e) {
+        console.error('Error al guardar datos:', e);
+    }
+}
+
+// Mostrar indicador de guardado
+function mostrarIndicadorGuardado() {
+    const indicador = document.getElementById('indicador-guardado');
+    if (indicador) {
+        indicador.textContent = 'Guardado automático completado';
+        indicador.style.display = 'block';
+        
+        // Ocultar después de 2 segundos
+        setTimeout(() => {
+            indicador.style.display = 'none';
+        }, 2000);
+    }
+}
+
+// Cargar todos los datos guardados previamente
+function cargarDatosFormulario() {
+    if (!verificarLocalStorage()) return;
+    
+    console.log('Cargando datos guardados...');
+    
+    try {
+        // Verificar si hay datos guardados
+        if (localStorage.getItem('ultima_actualizacion')) {
+            console.log('Datos encontrados de: ' + localStorage.getItem('ultima_actualizacion'));
+        } else {
+            console.log('No se encontraron datos guardados');
             return;
         }
         
-        // 2. Preparar el contenido limpiando elementos innecesarios
-        const estadoOriginal = prepararContenidoParaPDF(container);
+        // Cargar campos de texto
+        const inputFields = document.querySelectorAll('input[type="text"]');
+        inputFields.forEach(input => {
+            if (input.name) {
+                const valorGuardado = localStorage.getItem(input.name);
+                if (valorGuardado) {
+                    input.value = valorGuardado;
+                    console.log(`Cargado: ${input.name} = ${valorGuardado}`);
+                }
+            }
+        });
         
-        // 3. Generar el PDF con la configuración optimizada
-        setTimeout(() => {
-            generarPDFDesdeContenido(container, estadoOriginal);
-        }, 300); // Pequeño retraso para que los cambios de estilo se apliquen
+        // Cargar radios (estado de cumplimiento)
+        const radioNames = new Set();
+        document.querySelectorAll('input[type="radio"]').forEach(radio => {
+            if (radio.name) {
+                radioNames.add(radio.name);
+            }
+        });
+        
+        radioNames.forEach(name => {
+            const valorGuardado = localStorage.getItem(name);
+            if (valorGuardado) {
+                const radio = document.querySelector(`input[name="${name}"][value="${valorGuardado}"]`);
+                if (radio) {
+                    radio.checked = true;
+                    console.log(`Radio cargado: ${name} = ${valorGuardado}`);
+                }
+            }
+        });
+        
+        // Cargar textareas de observaciones
+        const observaciones = document.querySelectorAll('td.observaciones textarea');
+        observaciones.forEach((textarea, index) => {
+            const valorGuardado = localStorage.getItem('observacion_' + index);
+            if (valorGuardado) {
+                textarea.value = valorGuardado;
+            }
+        });
+        
+        // Cargar descripciones de fotos
+        const fotoDescripciones = document.querySelectorAll('.foto-descripcion');
+        fotoDescripciones.forEach((desc, index) => {
+            const valorGuardado = localStorage.getItem('foto_desc_' + index);
+            if (valorGuardado) {
+                desc.value = valorGuardado;
+            }
+        });
+        
+        // Cargar el plan de acción (editor de texto enriquecido)
+        const planAccion = document.getElementById('plan-accion-editor');
+        if (planAccion) {
+            const valorGuardado = localStorage.getItem('plan_accion');
+            if (valorGuardado) {
+                planAccion.innerHTML = valorGuardado;
+            }
+        }
+        
+        // Actualizar conteo después de cargar todos los datos
+        if (typeof contarCumplimiento === 'function') {
+            contarCumplimiento();
+        } else {
+            console.error('Función contarCumplimiento no encontrada');
+        }
+        
+        console.log('Datos cargados correctamente');
+    } catch (e) {
+        console.error('Error al cargar datos:', e);
     }
+}
+
+// Función para limpiar todos los datos guardados
+function limpiarDatosGuardados() {
+    if (!verificarLocalStorage()) return;
     
-    // Función para preparar el contenido limpiando elementos no deseados
-    function prepararContenidoParaPDF(container) {
-        // Guardar el estado original para restaurar después
-        const estadoOriginal = {
-            estilos: new Map(),
-            ocultos: [],
-            documentBody: {
-                overflow: document.body.style.overflow,
-                height: document.body.style.height
-            },
-            elementosCreados: [] // Para rastrear elementos creados durante la preparación
-        };
+    if (confirm("¿Está seguro que desea eliminar todos los datos guardados? Esta acción no se puede deshacer.")) {
+        localStorage.clear();
         
-        // 1. Eliminar espacios en blanco y elementos vacíos que pueden causar páginas en blanco
-        const espaciosVacios = container.querySelectorAll('[style*="page-break"]');
-        espaciosVacios.forEach(el => {
-            if (!el.textContent.trim() && !el.querySelector('img') && el.clientHeight < 5) {
-                estadoOriginal.ocultos.push({
-                    element: el,
-                    display: el.style.display,
-                    parent: el.parentNode
-                });
-                if (el.parentNode) {
-                    el.parentNode.removeChild(el);
-                }
-            }
-        });
+        if (typeof limpiarFormulario === 'function') {
+            limpiarFormulario();
+        } else {
+            location.reload(); // Si no encuentra la función, recargar la página
+        }
         
-        // 2. Ocultar elementos con clase no-print y botones
-        const elementosOcultar = container.querySelectorAll('.botones, .no-print');
-        elementosOcultar.forEach(el => {
-            estadoOriginal.ocultos.push({
-                element: el,
-                display: el.style.display
-            });
-            el.style.display = 'none';
-        });
-        
-        // 3. Mejorar el manejo de las textareas (observaciones)
-        const textareas = container.querySelectorAll('textarea');
-        textareas.forEach(textarea => {
-            // Guardar estado original
-            estadoOriginal.estilos.set(textarea, {
-                height: textarea.style.height,
-                overflow: textarea.style.overflow,
-                value: textarea.value
-            });
-            
-            // Crear un div con el contenido de la textarea para asegurar que todo se muestre
-            const contenidoTexto = document.createElement('div');
-            contenidoTexto.textContent = textarea.value;
-            contenidoTexto.className = 'textarea-contenido-pdf';
-            Object.assign(contenidoTexto.style, {
-                minHeight: '30px', // Reducido
-                width: '100%',
-                fontFamily: textarea.style.fontFamily || 'inherit',
-                fontSize: '9pt', // Tamaño de fuente reducido
-                lineHeight: '1.2', // Interlineado más compacto
-                paddingLeft: '5px',
-                whiteSpace: 'pre-wrap',
-                wordBreak: 'break-word'
-            });
-            
-            // Insertar el div antes de la textarea y ocultar la textarea original
-            textarea.parentNode.insertBefore(contenidoTexto, textarea);
-            textarea.style.display = 'none';
-            
-            // Registrar este elemento para eliminarlo después
-            estadoOriginal.elementosCreados.push(contenidoTexto);
-        });
-        
-        // 4. Aplicar estilos óptimos para la impresión
-        const elementosEstilizar = [
-            { selector: '.forced-page-break', estilos: {
-                display: 'block',
-                height: '1px',
-                pageBreakBefore: 'always',
-                margin: '0',
-                padding: '0'
-            }},
-            { selector: 'h2', estilos: {
-                pageBreakBefore: 'always',
-                marginTop: '10px', // Reducido
-                paddingTop: '5px' // Reducido
-            }},
-            { selector: 'table', estilos: {
-                pageBreakInside: 'auto',
-                fontSize: '9pt' // Tamaño de fuente reducido
-            }},
-            { selector: 'tr', estilos: {
-                pageBreakInside: 'avoid'
-            }},
-            { selector: '#plan-accion-editor', estilos: {
-                height: 'auto',
-                maxHeight: 'none',
-                overflow: 'visible',
-                fontSize: '9pt' // Tamaño de fuente reducido
-            }}
-        ];
-        
-        // Aplicar los estilos y guardar los originales
-        elementosEstilizar.forEach(config => {
-            const elementos = container.querySelectorAll(config.selector);
-            elementos.forEach(el => {
-                // Guardar estilos originales si aún no se han guardado
-                if (!estadoOriginal.estilos.has(el)) {
-                    const estilosOriginales = {};
-                    Object.keys(config.estilos).forEach(prop => {
-                        estilosOriginales[prop] = el.style[prop];
-                    });
-                    estadoOriginal.estilos.set(el, estilosOriginales);
-                }
-                
-                // Aplicar nuevos estilos
-                Object.keys(config.estilos).forEach(prop => {
-                    el.style[prop] = config.estilos[prop];
-                });
-            });
-        });
-        
-        // 5. Añadir una hoja de estilos temporal con reglas específicas para PDF
-        const estilosTemporales = document.createElement('style');
-        estilosTemporales.id = 'estilos-temporales-pdf';
-        estilosTemporales.textContent = `
-            @page {
-                size: legal portrait;
-                margin: 10mm; /* Márgenes reducidos */
-            }
-            body {
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-                color-adjust: exact !important;
-                font-size: 9pt !important;
-                line-height: 1.2 !important;
-            }
-            .container {
-                font-size: 9pt !important;
-                width: 100% !important;
-                max-width: 100% !important;
-                padding: 0 !important;
-                margin: 0 !important;
-            }
-            h1 { 
-                font-size: 13pt !important; 
-                margin-bottom: 10px !important;
-            }
-            h2 { 
-                font-size: 11pt !important; 
-                margin-top: 15px !important;
-                margin-bottom: 8px !important;
-                page-break-before: always !important;
-                break-before: page !important;
-            }
-            h3 {
-                font-size: 10pt !important;
-                margin-top: 10px !important;
-                margin-bottom: 6px !important;
-                page-break-after: avoid !important;
-                break-after: avoid !important;
-            }
-            table {
-                font-size: 8pt !important;
-                page-break-inside: auto !important;
-                break-inside: auto !important;
-                margin-bottom: 15px !important;
-            }
-            tr {
-                page-break-inside: avoid !important;
-                break-inside: avoid !important;
-            }
-            .forced-page-break {
-                page-break-before: always !important;
-                break-before: page !important;
-                height: 1px !important;
-                visibility: hidden !important;
-            }
-            .textarea-contenido-pdf {
-                font-size: 9pt !important;
-                line-height: 1.2 !important;
-            }
-            .result {
-                font-size: 9pt !important;
-                padding: 10px !important;
-            }
-        `;
-        document.head.appendChild(estilosTemporales);
-        estadoOriginal.elementosCreados.push(estilosTemporales);
-        
-        // 6. Eliminar elementos vacíos que puedan causar páginas en blanco
-        const elementosVacios = Array.from(container.querySelectorAll('div, p, span'))
-            .filter(el => !el.textContent.trim() && !el.querySelector('img') && el.clientHeight < 20 && !el.id);
-            
-        elementosVacios.forEach(el => {
-            // Solo eliminar si no tienen hijos o solo tienen espacios en blanco
-            if (el.children.length === 0 || (el.children.length === 1 && el.children[0].textContent.trim() === '')) {
-                estadoOriginal.ocultos.push({
-                    element: el,
-                    display: el.style.display,
-                    parent: el.parentNode,
-                    nextSibling: el.nextSibling
-                });
-                
-                if (el.parentNode) {
-                    el.parentNode.removeChild(el);
-                }
-            }
-        });
-        
-        // 7. Restringir el flujo del documento para evitar problemas de renderizado
-        document.body.style.overflow = 'visible';
-        document.body.style.height = 'auto';
-        
-        return estadoOriginal;
+        // Mostrar mensaje de confirmación
+        alert("Todos los datos guardados han sido eliminados.");
     }
-    
-    // Función para generar el PDF con texto reducido
-    function generarPDFDesdeContenido(contenido, estadoOriginal) {
-        console.log("Generando PDF con configuración óptima y texto más pequeño...");
-        
-        // Configuración optimizada para tamaño legal/oficio con texto reducido
-        const opciones = {
-            filename: `Fiscalizacion_${new Date().toLocaleDateString().replace(/\//g, '-')}.pdf`,
-            
-            html2canvas: {
-                scale: 1.5,
-                useCORS: true,
-                allowTaint: true,
-                scrollX: 0,
-                scrollY: 0,
-                windowWidth: document.documentElement.offsetWidth,
-                windowHeight: document.documentElement.offsetHeight,
-                logging: false,
-                backgroundColor: '#FFFFFF',
-                imageTimeout: 30000,
-                removeContainer: true,
-                foreignObjectRendering: false,
-                onclone: function(clonedDoc) {
-                    // Reducir tamaño de texto en el clon
-                    const style = clonedDoc.createElement('style');
-                    style.innerHTML = `
-                        * {
-                            font-size: 9pt !important; /* Texto más pequeño */
-                            line-height: 1.2 !important; /* Líneas más compactas */
-                        }
-                        
-                        body, .container {
-                            font-size: 9pt !important;
-                        }
-                        
-                        h1 { 
-                            font-size: 13pt !important; 
-                            margin-bottom: 10px !important;
-                        }
-                        
-                        h2 { 
-                            font-size: 11pt !important; 
-                            margin-top: 15px !important;
-                            margin-bottom: 8px !important;
-                        }
-                        
-                        h3 { 
-                            font-size: 10pt !important; 
-                            margin-top: 10px !important;
-                            margin-bottom: 6px !important;
-                        }
-                        
-                        table {
-                            font-size: 8pt !important;
-                            margin-bottom: 15px !important;
-                        }
-                        
-                        th, td {
-                            padding: 6px !important;
-                        }
-                        
-                        .result {
-                            font-size: 9pt !important;
-                            padding: 10px !important;
-                        }
-                        
-                        textarea, input {
-                            font-size: 8pt !important;
-                        }
-                        
-                        .observaciones {
-                            font-size: 8pt !important;
-                        }
-                        
-                        @page {
-                            size: legal portrait;
-                            margin: 10mm; /* Márgenes más pequeños */
-                        }
-                        
-                        /* Estilos adicionales para compactar */
-                        .info-section {
-                            padding: 10px !important;
-                            margin-bottom: 15px !important;
-                        }
-                        
-                        .summary {
-                            padding: 15px !important;
-                        }
-                        
-                        .firmas-seccion {
-                            margin-top: 15px !important;
-                        }
-                        
-                        .linea-firma {
-                            margin: 10px 0 !important;
-                        }
-                    `;
-                    clonedDoc.head.appendChild(style);
-                }
-            },
-            
-            jsPDF: {
-                unit: 'mm',
-                format: 'legal',
-                orientation: 'portrait',
-                compress: true,
-                precision: 16,
-                putOnlyUsedFonts: true
-            },
-            
-            pagebreak: {
-                mode: ['avoid-all'],
-                before: ['h2'],
-                avoid: ['table', 'img', '.textarea-contenido-pdf']
-            },
-            
-            enableLinks: false,
-            image: { type: 'jpeg', quality: 0.98 },
-            margin: [10, 10, 10, 10], // Márgenes más pequeños
-        };
-        
-        // Generar el PDF con el manejo optimizado
-        html2pdf()
-            .from(contenido)
-            .set(opciones)
-            .toPdf()
-            .get('pdf')
-            .then(function(pdfObject) {
-                // Añadir metadatos y numeración de página
-                try {
-                   // Añadir metadatos
-                    pdfObject.setProperties({
-                        title: 'Cuadro de Fiscalización de Seguridad Privada',
-                        subject: 'Informe de Fiscalización',
-                        author: document.querySelector('input[name="fiscalizador"]')?.value || 'Sistema de Fiscalización',
-                        keywords: 'seguridad, fiscalización, informe',
-                        creator: 'Sistema PDF Optimizado'
-                    });
-                    
-                    // Añadir numeración de páginas
-                    const totalPaginas = pdfObject.internal.getNumberOfPages();
-                    
-                    for (let i = 1; i <= totalPaginas; i++) {
-                        pdfObject.setPage(i);
-                        
-                        // Configuración de texto para el pie de página
-                        pdfObject.setFontSize(8); // Tamaño de fuente reducido
-                        pdfObject.setTextColor(100, 100, 100);
-                        
-                        // Obtener dimensiones de la página
-                        const pageSize = pdfObject.internal.pageSize;
-                        const pageWidth = pageSize.width ? pageSize.width : pageSize.getWidth();
-                        const pageHeight = pageSize.height ? pageSize.height : pageSize.getHeight();
-                        
-                        // Texto de numeración
-                        const texto = `Página ${i} de ${totalPaginas}`;
-                        
-                        // Posicionar en la esquina inferior derecha
-                        const textWidth = pdfObject.getStringUnitWidth(texto) * 8 / pdfObject.internal.scaleFactor;
-                        const x = pageWidth - textWidth - 15;
-                        const y = pageHeight - 10;
-                        
-                        // Añadir el texto
-                        pdfObject.text(texto, x, y);
-                    }
-                } catch (error) {
-                    console.warn("Error al añadir metadatos o numeración:", error);
-                }
-                
-                // Guardar el PDF
-                pdfObject.save(opciones.filename);
-                
-                console.log("PDF generado exitosamente con texto reducido");
-                actualizarIndicadorExito();
-                
-                setTimeout(() => {
-                    restaurarDocumentoOriginal(estadoOriginal);
-                }, 1200);
-            })
-            .catch(function(error) {
-                console.error("Error al generar el PDF:", error);
-                ocultarIndicadorCarga();
-                alert("Ocurrió un error al generar el PDF. Por favor, intente nuevamente.");
-                restaurarDocumentoOriginal(estadoOriginal);
-            });
-    }
-    
-    // Función para restaurar el documento a su estado original
-    function restaurarDocumentoOriginal(estadoOriginal) {
-        console.log("Restaurando documento a su estado original...");
-        
-        // 1. Remover elementos creados durante la preparación
-        if (estadoOriginal.elementosCreados) {
-            estadoOriginal.elementosCreados.forEach(el => {
-                if (el && el.parentNode) {
-                    el.parentNode.removeChild(el);
-                }
-            });
-        }
-        
-        // 2. Restaurar elementos ocultos
-        if (estadoOriginal.ocultos) {
-            estadoOriginal.ocultos.forEach(item => {
-                // Si el elemento fue removido completamente
-                if (item.parent && item.nextSibling) {
-                    item.parent.insertBefore(item.element, item.nextSibling);
-                } else if (item.parent) {
-                    item.parent.appendChild(item.element);
-                }
-                
-                // Restaurar visibilidad
-                if (item.display !== undefined) {
-                    item.element.style.display = item.display;
-                }
-            });
-        }
-        
-        // 3. Restaurar estilos originales
-        if (estadoOriginal.estilos) {
-            estadoOriginal.estilos.forEach((estilos, elemento) => {
-                Object.keys(estilos).forEach(prop => {
-                    // Manejar caso especial para textareas
-                    if (prop === 'value' && elemento.tagName === 'TEXTAREA') {
-                        elemento.value = estilos.value;
-                    } else {
-                        elemento.style[prop] = estilos[prop] || '';
-                    }
-                });
-            });
-        }
-        
-        // 4. Restaurar estilos del body
-        if (estadoOriginal.documentBody) {
-            document.body.style.overflow = estadoOriginal.documentBody.overflow || '';
-            document.body.style.height = estadoOriginal.documentBody.height || '';
-        }
-        
-        // 5. Eliminar hoja de estilos temporal si aún existe
-        const estilosTemporales = document.getElementById('estilos-temporales-pdf');
-        if (estilosTemporales && estilosTemporales.parentNode) {
-            estilosTemporales.parentNode.removeChild(estilosTemporales);
-        }
-        
-        // 6. Ocultar indicador de carga si aún está visible
-        ocultarIndicadorCarga();
-        
-        console.log("Documento restaurado correctamente");
-    }
+}
 
-    // Funciones auxiliares para el manejo de la interfaz de usuario
-    function mostrarIndicadorCarga() {
-        // Eliminar indicador existente si lo hay
-        const indicadorExistente = document.getElementById('indicador-pdf-carga');
-        if (indicadorExistente) {
-            document.body.removeChild(indicadorExistente);
-        }
-        
-        // Crear nuevo indicador
-        const indicador = document.createElement('div');
-        indicador.id = 'indicador-pdf-carga';
-        
-        // Estilos para el contenedor principal
-        Object.assign(indicador.style, {
-            position: 'fixed',
-            top: '0',
-            left: '0',
-            width: '100%',
-            height: '100%',
-            backgroundColor: 'rgba(0, 0, 0, 0.7)',
-            zIndex: '9999',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            fontFamily: "'Poppins', sans-serif",
-            transition: 'opacity 0.3s ease'
-        });
-        
-        // Crear un contenedor para el mensaje
-        const mensajeContainer = document.createElement('div');
-        Object.assign(mensajeContainer.style, {
-            backgroundColor: '#003366',
-            padding: '25px 40px',
-            borderRadius: '12px',
-            boxShadow: '0 5px 25px rgba(0,0,0,0.5)',
-            textAlign: 'center',
-            maxWidth: '80%',
-            color: 'white'
-        });
-        
-        // Añadir título
-        const titulo = document.createElement('h3');
-        titulo.textContent = 'Generando PDF';
-        Object.assign(titulo.style, {
-            margin: '0 0 15px 0',
-            fontSize: '1.5rem',
-            fontWeight: '600',
-            color: 'white'
-        });
-        
-        // Añadir subtítulo con mensaje explicativo
-        const subtitulo = document.createElement('p');
-        subtitulo.textContent = 'Por favor espere mientras se procesa el documento...';
-        Object.assign(subtitulo.style, {
-            margin: '0 0 20px 0',
-            fontSize: '1rem',
-            color: 'rgba(255,255,255,0.9)'
-        });
-        
-        // Crear una barra de progreso animada
-        const barraContenedor = document.createElement('div');
-        Object.assign(barraContenedor.style, {
-            width: '100%',
-            height: '8px',
-            backgroundColor: 'rgba(255,255,255,0.2)',
-            borderRadius: '4px',
-            overflow: 'hidden',
-            margin: '10px 0'
-        });
-        
-        const barraProgreso = document.createElement('div');
-        barraProgreso.id = 'barra-progreso-pdf';
-        Object.assign(barraProgreso.style, {
-            width: '0%',
-            height: '100%',
-            backgroundColor: '#4CAF50',
-            borderRadius: '4px',
-            transition: 'width 0.5s ease'
-        });
-        
-        // Añadir texto de estado que cambiará durante el proceso
-        const textoEstado = document.createElement('p');
-        textoEstado.id = 'texto-estado-pdf';
-        textoEstado.textContent = 'Preparando documento...';
-        Object.assign(textoEstado.style, {
-            margin: '15px 0 0 0',
-            fontSize: '0.9rem',
-            color: 'rgba(255,255,255,0.8)',
-            fontStyle: 'italic'
-        });
-        
-        // Ensamblar todos los elementos
-        barraContenedor.appendChild(barraProgreso);
-        mensajeContainer.appendChild(titulo);
-        mensajeContainer.appendChild(subtitulo);
-        mensajeContainer.appendChild(barraContenedor);
-        mensajeContainer.appendChild(textoEstado);
-        indicador.appendChild(mensajeContainer);
-        
-        // Añadir al body
-        document.body.appendChild(indicador);
-        
-        // Animar la barra de progreso
-        setTimeout(() => {
-            barraProgreso.style.width = '30%';
-            textoEstado.textContent = 'Procesando contenido...';
-        }, 300);
-        
-        setTimeout(() => {
-            barraProgreso.style.width = '60%';
-            textoEstado.textContent = 'Generando PDF...';
-        }, 1500);
-        
-        setTimeout(() => {
-            barraProgreso.style.width = '80%';
-            textoEstado.textContent = 'Aplicando formato final...';
-        }, 3000);
-    }
-
-    function actualizarIndicadorExito() {
-        const barraProgreso = document.getElementById('barra-progreso-pdf');
-        const textoEstado = document.getElementById('texto-estado-pdf');
-        
-        if (barraProgreso && textoEstado) {
-            barraProgreso.style.width = '100%';
-            barraProgreso.style.backgroundColor = '#4CAF50';
-            textoEstado.textContent = '¡PDF generado exitosamente!';
-            
-            // Cambiar estilo para indicar éxito
-            const mensajeContainer = textoEstado.parentNode;
-            if (mensajeContainer) {
-                const titulo = mensajeContainer.querySelector('h3');
-                if (titulo) {
-                    titulo.textContent = '¡Proceso Completado!';
-                }
-            }
-        }
-        
-        // Ocultar después de un tiempo
-        setTimeout(ocultarIndicadorCarga, 1500);
-    }
-
-    function ocultarIndicadorCarga() {
-        const indicador = document.getElementById('indicador-pdf-carga');
-        if (indicador) {
-            // Transición suave de salida
-            indicador.style.opacity = '0';
-            
-            // Remover después de la transición
-            setTimeout(() => {
-                if (indicador.parentNode) {
-                    indicador.parentNode.removeChild(indicador);
-                }
-            }, 300);
-        }
-    }
-
-    // Retornar funciones necesarias para instalación externa
-    return {
-        generarPDFCorregido,
-        mostrarIndicadorCarga,
-        ocultarIndicadorCarga,
-        actualizarIndicadorExito
+// Función para retrasar la ejecución (útil para autoguardado mientras se escribe)
+function debounce(func, delay) {
+    let timeoutId;
+    return function() {
+        const context = this;
+        const args = arguments;
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => {
+            func.apply(context, args);
+        }, delay);
     };
 }
 
-// Función para instalar el botón de PDF en los botones existentes
-function instalarBotonPDFCorregido() {
-    console.log("Instalando botón de PDF corregido...");
+// Añadir un nuevo botón para limpiar sólo los datos guardados
+function añadirBotonLimpiarDatos() {
+    // Seleccionar el último conjunto de botones (que está al final del formulario)
+    const botonesDivs = document.querySelectorAll('.botones');
+    if (botonesDivs.length === 0) {
+        console.error('No se encontraron divs de botones');
+        return;
+    }
     
-    // Buscar todos los botones relacionados con PDF
-    const botonesExistentes = Array.from(document.querySelectorAll('button')).filter(btn => 
-        btn.textContent.toLowerCase().includes('pdf') || 
-        btn.id?.includes('pdf') ||
-        btn.onclick?.toString().includes('PDF')
-    );
+    const ultimoBotonesDiv = botonesDivs[botonesDivs.length - 1];
     
-    // Modificar cada botón encontrado
-    botonesExistentes.forEach(btn => {
-        console.log(`Modificando botón de PDF existente: ${btn.textContent || btn.id}`);
-        
-        // Cambiar el evento onclick
-        btn.onclick = generarPDFCorregido;
-        
-        // Actualizar texto y estilos para distinguirlo
-        if (btn.textContent.toLowerCase().includes('pdf')) {
-            btn.textContent = 'Descargar PDF Optimizado';
+    // Crear el nuevo botón
+    const botonLimpiar = document.createElement('button');
+    botonLimpiar.type = 'button';
+    botonLimpiar.textContent = 'Eliminar Datos Guardados';
+    botonLimpiar.onclick = limpiarDatosGuardados;
+    botonLimpiar.style.backgroundColor = '#d9534f'; // Color rojo para indicar acción destructiva
+    botonLimpiar.className = 'no-print'; // Añadir clase no-print
+    
+    // Añadir el botón al div
+    ultimoBotonesDiv.appendChild(botonLimpiar);
+    
+    // Asegurarse de que todos los botones tengan la clase no-print y estilo actualizado
+    document.querySelectorAll('.botones button').forEach(boton => {
+        if (!boton.classList.contains('no-print')) {
+            boton.classList.add('no-print');
         }
         
-        // Estilos destacados
-        Object.assign(btn.style, {
-            backgroundColor: '#28a745',
-            color: 'white',
-            fontWeight: 'bold',
-            padding: '10px 20px',
-            borderRadius: '5px',
-            border: 'none',
-            cursor: 'pointer',
-            boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
-            transition: 'all 0.3s ease'
+        // Hacer los botones más pequeños
+        boton.style.padding = '12px 24px';
+        boton.style.fontSize = '1.1rem';
+        boton.style.margin = '0 5px';
+    });
+}
+
+// Añadir indicador de último guardado
+function añadirIndicadorGuardado() {
+    // Comprobar si ya existe el indicador
+    if (document.getElementById('indicador-guardado')) {
+        return;
+    }
+    
+    // Crear el elemento indicador
+    const indicador = document.createElement('div');
+    indicador.id = 'indicador-guardado';
+    indicador.style.position = 'fixed';
+    indicador.style.bottom = '10px';
+    indicador.style.right = '10px';
+    indicador.style.padding = '8px 15px';
+    indicador.style.backgroundColor = 'rgba(0, 51, 102, 0.8)';
+    indicador.style.color = 'white';
+    indicador.style.borderRadius = '5px';
+    indicador.style.fontSize = '0.9rem';
+    indicador.style.zIndex = '1000';
+    indicador.style.display = 'none';
+    indicador.style.boxShadow = '0 2px 5px rgba(0,0,0,0.2)';
+    
+    // Añadir al cuerpo del documento
+    document.body.appendChild(indicador);
+}
+
+// Añadir sección de información sobre datos guardados
+function añadirInfoDatosGuardados() {
+    if (!verificarLocalStorage()) return;
+    
+    const ultimaActualizacion = localStorage.getItem('ultima_actualizacion');
+    
+    if (ultimaActualizacion) {
+        // Comprobar si ya existe el elemento
+        if (document.querySelector('.datos-guardados-info')) {
+            return;
+        }
+        
+        // Crear elemento de información
+        const infoDiv = document.createElement('div');
+        infoDiv.className = 'datos-guardados-info';
+        infoDiv.style.margin = '20px 0';
+        infoDiv.style.padding = '10px 15px';
+        infoDiv.style.backgroundColor = '#f8f9fa';
+        infoDiv.style.borderRadius = '5px';
+        infoDiv.style.border = '1px solid #ddd';
+        infoDiv.style.fontSize = '0.9rem';
+        
+        infoDiv.innerHTML = `
+            <p style="margin: 0; color: #003366;">
+                <strong>Información de datos guardados:</strong> Última actualización: ${ultimaActualizacion}
+            </p>
+            <p style="margin: 5px 0 0 0; font-size: 0.8rem; color: #6c757d;">
+                Los datos del formulario se guardan automáticamente en este dispositivo.
+            </p>
+        `;
+        
+        // Insertar antes del primer h2
+        const primerH2 = document.querySelector('h2');
+        if (primerH2) {
+            primerH2.parentNode.insertBefore(infoDiv, primerH2);
+        } else {
+            document.body.insertBefore(infoDiv, document.body.firstChild);
+        }
+    }
+}
+
+// Añadir estilos CSS específicos para impresión
+function añadirEstilosImpresion() {
+    // Comprobar si ya existe el estilo
+    if (document.getElementById('estilos-impresion')) {
+        return;
+    }
+    
+    // Crear elemento de estilo
+    const estiloElement = document.createElement('style');
+    estiloElement.id = 'estilos-impresion';
+    estiloElement.type = 'text/css';
+    
+    // Añadir reglas CSS para ocultar elementos en la impresión
+    estiloElement.innerHTML = `
+        @media print {
+            .no-print, .botones, #indicador-guardado {
+                display: none !important;
+            }
+            
+            /* Asegurar que los botones no se muestran */
+            button {
+                display: none !important;
+            }
+            
+            /* Mejorar el espaciado y márgenes */
+            body {
+                padding: 0;
+                margin: 0;
+            }
+            
+            .container {
+                padding: 10px;
+                box-shadow: none;
+            }
+            
+            /* Asegurar que los botones también se ocultan */
+            .botones.no-print {
+                display: none !important;
+            }
+        }
+    `;
+    
+    // Añadir al head del documento
+    document.head.appendChild(estiloElement);
+}
+
+// Estilos adicionales para los botones y la interfaz
+function aplicarEstilosAdicionales() {
+    // Comprobar si ya existe el estilo
+    if (document.getElementById('estilos-adicionales')) {
+        return;
+    }
+    
+    // Crear hoja de estilos
+    const estilos = document.createElement('style');
+    estilos.id = 'estilos-adicionales';
+    estilos.textContent = `
+        /* Estilo actualizado para los botones */
+        .botones button {
+            padding: 12px 24px !important;
+            font-size: 1.1rem !important;
+            margin: 0 5px !important;
+            transition: all 0.2s ease !important;
+        }
+        
+        .botones button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        /* Mejor espaciado para el contenedor de botones */
+        .botones {
+            gap: 10px;
+            padding: 15px 0;
+        }
+        
+        /* Estilo específico para botón de eliminar datos */
+        .botones button:last-child {
+            padding: 10px 20px !important;
+            font-size: 1rem !important;
+        }
+        
+        /* Estilo específico para botón de descarga PDF */
+        #btn-descargar-pdf {
+            background-color: #28a745 !important;
+            font-weight: bold !important;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1) !important;
+        }
+        
+        #btn-descargar-pdf:hover {
+            background-color: #218838 !important;
+        }
+        
+        /* Indicador de guardado más pequeño */
+        #indicador-guardado {
+            font-size: 0.85rem !important;
+            padding: 6px 12px !important;
+        }
+        
+        /* Info de datos guardados más compacta */
+        .datos-guardados-info {
+            padding: 8px 12px !important;
+        }
+    `;
+    
+    // Añadir al documento
+    document.head.appendChild(estilos);
+}
+
+// Configurar el autoguardado mientras se escribe
+function configurarAutoguardado() {
+    console.log('Configurando eventos de autoguardado...');
+    
+    // Guardar al cambiar inputs de texto
+    document.querySelectorAll('input[type="text"]').forEach(input => {
+        input.addEventListener('change', guardarDatosFormulario);
+        input.addEventListener('blur', guardarDatosFormulario);
+    });
+    
+    // Guardar al cambiar radios
+    document.querySelectorAll('input[type="radio"]').forEach(radio => {
+        radio.addEventListener('change', guardarDatosFormulario);
+        radio.addEventListener('click', guardarDatosFormulario);
+    });
+    
+    // Guardar al cambiar textareas
+    document.querySelectorAll('textarea').forEach(textarea => {
+        textarea.addEventListener('change', guardarDatosFormulario);
+        textarea.addEventListener('blur', guardarDatosFormulario);
+        // También guardar mientras se escribe, pero con un retraso
+        textarea.addEventListener('input', debounce(guardarDatosFormulario, 1000));
+    });
+    
+    // Guardar cuando se edita el plan de acción
+    const planAccion = document.getElementById('plan-accion-editor');
+    if (planAccion) {
+        planAccion.addEventListener('input', debounce(guardarDatosFormulario, 1000));
+        planAccion.addEventListener('blur', guardarDatosFormulario);
+    }
+    
+    // Guardar periódicamente para asegurar que nada se pierda
+    setInterval(guardarDatosFormulario, 30000); // Cada 30 segundos
+    
+    // Guardar antes de cerrar la página
+    window.addEventListener('beforeunload', guardarDatosFormulario);
+    
+    // Modificar la función limpiarFormulario original para que también borre localStorage
+    if (typeof window.limpiarFormulario === 'function') {
+        const limpiarFormularioOriginal = window.limpiarFormulario;
+        window.limpiarFormulario = function() {
+            if (confirm("¿Está seguro que desea limpiar todo el formulario? También se eliminarán los datos guardados.")) {
+                localStorage.clear();
+                limpiarFormularioOriginal();
+            }
+        };
+    }
+}
+
+// Eliminar primer conjunto de botones y mantener solo el último
+function ajustarBotones() {
+    const botonesDivs = document.querySelectorAll('.botones');
+    if (botonesDivs.length > 1) {
+        // Mantener solo el último conjunto de botones (que está al final)
+        for (let i = 0; i < botonesDivs.length - 1; i++) {
+            botonesDivs[i].style.display = 'none';
+        }
+    }
+}
+
+// Función para descargar el formulario como PDF
+function descargarPDF() {
+    // Mostrar indicador de carga
+    const indicadorCarga = document.createElement('div');
+    indicadorCarga.id = 'indicador-pdf';
+    indicadorCarga.style.position = 'fixed';
+    indicadorCarga.style.top = '0';
+    indicadorCarga.style.left = '0';
+    indicadorCarga.style.width = '100%';
+    indicadorCarga.style.height = '100%';
+    indicadorCarga.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
+    indicadorCarga.style.zIndex = '9999';
+    indicadorCarga.style.display = 'flex';
+    indicadorCarga.style.justifyContent = 'center';
+    indicadorCarga.style.alignItems = 'center';
+    indicadorCarga.style.color = 'white';
+    indicadorCarga.style.fontSize = '1.5rem';
+    indicadorCarga.style.fontFamily = "'Poppins', sans-serif";
+    indicadorCarga.innerHTML = '<div style="background-color: #003366; padding: 20px 40px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.3);">Generando PDF, por favor espere...</div>';
+    document.body.appendChild(indicadorCarga);
+    
+    // Ocultar temporalmente los botones para la exportación
+    const botones = document.querySelectorAll('.botones');
+    botones.forEach(div => {
+        div.dataset.displayOriginal = div.style.display;
+        div.style.display = 'none';
+    });
+    
+    // Guardar el estado actual de cualquier elemento que queramos modificar
+    const elementos = document.querySelectorAll('.no-print');
+    elementos.forEach(el => {
+        el.dataset.displayOriginal = el.style.display;
+        el.style.display = 'none';
+    });
+    
+    // Asegurarnos de que el contenido del plan de acción sea visible
+    const planAccion = document.getElementById('plan-accion-editor');
+    if (planAccion) {
+        planAccion.style.height = 'auto';
+        planAccion.style.overflow = 'visible';
+    }
+    
+    // Obtener el contenedor principal
+    const contenido = document.querySelector('.container');
+    if (!contenido) {
+        alert('Error: No se pudo encontrar el contenedor del formulario.');
+        limpiarYRestaurar();
+        return;
+    }
+    
+    // Configuración del PDF
+    const opciones = {
+        margin: [10, 10, 10, 10], // top, left, bottom, right
+        filename: `Fiscalizacion_${new Date().toLocaleDateString().replace(/\//g, '-')}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { 
+            scale: 2, // Mayor escala para mejor calidad
+            useCORS: true, 
+            logging: false,
+            letterRendering: true,
+            allowTaint: true
+        },
+        jsPDF: { 
+    unit: 'mm', 
+    format: [215.9, 355.6], // Formato legal en milímetros (8.5 x 14 pulgadas)
+    orientation: 'portrait',
+    compress: true
+},
+    
+    // Cargar html2pdf.js desde CDN si no está ya cargado
+    if (typeof html2pdf === 'undefined') {
+        const script = document.createElement('script');
+        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
+        script.onload = function() {
+            generarPDF();
+        };
+        script.onerror = function() {
+            alert('Error al cargar la librería html2pdf. Compruebe su conexión a internet.');
+            limpiarYRestaurar();
+        };
+        document.head.appendChild(script);
+    } else {
+        generarPDF();
+    }
+    
+    // Función para generar el PDF una vez cargada la librería
+    function generarPDF() {
+        html2pdf().from(contenido).set(opciones).save()
+            .then(() => {
+                console.log('PDF generado correctamente');
+                setTimeout(limpiarYRestaurar, 1000); // Dar tiempo a que se complete la descarga
+            })
+            .catch(err => {
+                console.error('Error al generar PDF:', err);
+                alert('Error al generar el PDF: ' + err.message);
+                limpiarYRestaurar();
+            });
+    }
+    
+    // Función para restaurar el estado original de los elementos
+    function limpiarYRestaurar() {
+        // Quitar el indicador de carga
+        const indicador = document.getElementById('indicador-pdf');
+        if (indicador) {
+            document.body.removeChild(indicador);
+        }
+        
+        // Restaurar visibilidad de botones
+        botones.forEach(div => {
+            div.style.display = div.dataset.displayOriginal || '';
+            delete div.dataset.displayOriginal;
         });
         
-        // Añadir evento hover
-        btn.onmouseover = function() {
-            this.style.backgroundColor = '#218838';
-            this.style.transform = 'translateY(-2px)';
-            this.style.boxShadow = '0 6px 8px rgba(0,0,0,0.15)';
-        };
-        
-        btn.onmouseout = function() {
-            this.style.backgroundColor = '#28a745';
-            this.style.transform = 'translateY(0)';
-            this.style.boxShadow = '0 4px 6px rgba(0,0,0,0.1)';
-        };
-    });
-    
-    // Si no se encontró ningún botón, crear uno nuevo
-    if (botonesExistentes.length === 0) {
-        const botonesDivs = document.querySelectorAll('.botones');
-        botonesDivs.forEach(div => {
-            const nuevoBoton = document.createElement('button');
-            nuevoBoton.type = 'button';
-            nuevoBoton.textContent = 'Descargar PDF Optimizado';
-            nuevoBoton.onclick = generarPDFCorregido;
-            nuevoBoton.className = 'no-print';
-            
-            // Aplicar estilos
-            Object.assign(nuevoBoton.style, {
-                backgroundColor: '#28a745',
-                color: 'white',
-                fontWeight: 'bold',
-                padding: '10px 20px',
-                margin: '0 5px',
-                borderRadius: '5px',
-                border: 'none',
-                cursor: 'pointer',
-                boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
-                transition: 'all 0.3s ease'
-            });
-            
-            // Añadir eventos hover
-            nuevoBoton.onmouseover = function() {
-                this.style.backgroundColor = '#218838';
-                this.style.transform = 'translateY(-2px)';
-                this.style.boxShadow = '0 6px 8px rgba(0,0,0,0.15)';
-            };
-            
-            nuevoBoton.onmouseout = function() {
-                this.style.backgroundColor = '#28a745';
-                this.style.boxShadow = '0 4px 6px rgba(0,0,0,0.1)';
-        };
-        
-        // Insertar al inicio
-        div.insertBefore(nuevoBoton, div.firstChild);
-    });
+        // Restaurar elementos ocultos
+        elementos.forEach(el => {
+            el.style.display = el.dataset.displayOriginal || '';
+            delete el.dataset.displayOriginal;
+        });
+    }
 }
 
-// Iniciar cuando el DOM esté completamente cargado
+// Agregar botón de descarga PDF
+function agregarBotonDescargarPDF() {
+    // Seleccionar el último conjunto de botones (que está al final del formulario)
+    const botonesDivs = document.querySelectorAll('.botones');
+    if (botonesDivs.length === 0) {
+        console.error('No se encontraron divs de botones');
+        return;
+    }
+    
+    const ultimoBotonesDiv = botonesDivs[botonesDivs.length - 1];
+    
+    // Buscar si ya existe el botón para no duplicarlo
+    if (ultimoBotonesDiv.querySelector('#btn-descargar-pdf')) {
+        return;
+    }
+    
+    // Crear el nuevo botón con estilo más destacado
+    const botonDescargar = document.createElement('button');
+    botonDescargar.type = 'button';
+    botonDescargar.id = 'btn-descargar-pdf';
+    botonDescargar.textContent = 'Descargar PDF';
+    botonDescargar.onclick = descargarPDF;
+    botonDescargar.className = 'no-print';
+    
+    // Estilo especial para el botón de descarga
+    botonDescargar.style.backgroundColor = '#28a745'; // Verde
+    botonDescargar.style.padding = '12px 24px';
+    botonDescargar.style.fontSize = '1.1rem';
+    botonDescargar.style.margin = '0 5px';
+    botonDescargar.style.fontWeight = 'bold';
+    botonDescargar.style.boxShadow = '0 4px 6px rgba(0,0,0,0.1)';
+    
+    // Añadir el botón al div, como primer elemento (antes de los demás botones)
+    ultimoBotonesDiv.insertBefore(botonDescargar, ultimoBotonesDiv.firstChild);
+}
+
+// Modificar la función guardarPDF existente para usar nuestro nuevo método
+function modificarFuncionGuardarPDF() {
+    if (typeof window.guardarPDF === 'function') {
+        const guardarPDFOriginal = window.guardarPDF;
+        window.guardarPDF = function() {
+            descargarPDF();
+        };
+        console.log('Función guardarPDF sobrescrita para usar html2pdf');
+    }
+}
+
+// Función principal de inicialización
+function inicializarAutoguardado() {
+    console.log('Inicializando sistema de autoguardado...');
+    
+    if (!verificarLocalStorage()) {
+        console.error('No se puede inicializar el autoguardado: localStorage no disponible');
+        return;
+    }
+    
+    // Primero añadir los estilos
+    añadirEstilosImpresion();
+    aplicarEstilosAdicionales();
+    
+    // Ajustar los botones existentes
+    ajustarBotones();
+    
+    // Añadir elementos UI
+    añadirIndicadorGuardado();
+    añadirInfoDatosGuardados();
+    
+    // Añadir nuevo botón para limpiar datos
+    añadirBotonLimpiarDatos();
+    
+    // Añadir botón de descarga PDF
+    agregarBotonDescargarPDF();
+    
+    // Modificar la función existente guardarPDF
+    modificarFuncionGuardarPDF();
+    
+    // Configurar eventos para autoguardado
+    configurarAutoguardado();
+    
+    // Finalmente cargar datos guardados
+    setTimeout(cargarDatosFormulario, 500); // Pequeño retraso para asegurar que todo esté listo
+    
+    console.log('Sistema de autoguardado inicializado correctamente');
+}
+
+// Asegurarse de que el DOM esté completamente cargado antes de inicializar
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-        // Esperar un segundo para asegurar que todos los scripts se han cargado
-        setTimeout(instalarBotonPDFCorregido, 1000);
-    });
+    document.addEventListener('DOMContentLoaded', inicializarAutoguardado);
 } else {
-    // Si el DOM ya está cargado, ejecutar directamente con un pequeño retraso
-    setTimeout(instalarBotonPDFCorregido, 1000);
+    // Si el DOM ya está cargado, inicializar inmediatamente
+    inicializarAutoguardado();
 }
 
-// También asegurar que se ejecute cuando la ventana esté completamente cargada
-window.addEventListener('load', () => {
-    setTimeout(instalarBotonPDFCorregido, 1500);
-});
-
-// Exponer funciones globalmente
-window.generarPDFCorregido = generarPDFCorregido;
-window.instalarBotonPDFCorregido = instalarBotonPDFCorregido;
-
-// ---------- INICIO DE CÓDIGO ADICIONAL ----------
-
-// Función para eliminar botones duplicados de PDF
-function eliminarBotonesDuplicados() {
-  // Obtener todos los botones que contengan "PDF" en su texto
-  const botonesPDF = Array.from(document.querySelectorAll('button'))
-    .filter(btn => btn.textContent.toLowerCase().includes('pdf'));
-  
-  // Si hay más de un botón de PDF, conservar solo el verde
-  if (botonesPDF.length > 1) {
-    console.log(`Se encontraron ${botonesPDF.length} botones de PDF. Eliminando duplicados...`);
-    
-    // Identificar el botón verde para mantenerlo
-    const botonVerde = botonesPDF.find(btn => 
-      btn.id === 'btn-descargar-pdf' || 
-      btn.style.backgroundColor.includes('28a745') ||
-      btn.classList.contains('btn-success') ||
-      window.getComputedStyle(btn).backgroundColor.includes('40, 167')
-    );
-    
-    // Si encontramos el botón verde, eliminar todos los demás botones de PDF
-    if (botonVerde) {
-      console.log('Botón verde encontrado. Manteniendo este botón y eliminando los demás.');
-      
-      botonesPDF.forEach(btn => {
-        if (btn !== botonVerde) {
-          // Ocultar el botón en lugar de eliminarlo para no romper funcionalidades existentes
-          btn.style.display = 'none';
-          console.log(`Botón oculto: ${btn.textContent}`);
-        } else {
-          // Asegurarse de que el botón verde sea más prominente
-          btn.style.backgroundColor = '#28a745';
-          btn.style.fontWeight = 'bold';
-        }
-      });
+// Añadir un evento de carga para asegurarnos de que todas las imágenes y recursos estén cargados
+window.addEventListener('load', function() {
+    // Actualizar el conteo después de que todo esté cargado
+    if (typeof contarCumplimiento === 'function') {
+        setTimeout(contarCumplimiento, 1000);
     }
-  }
-}
-
-// Ejecutar eliminación de botones duplicados
-document.addEventListener('DOMContentLoaded', () => {
-  setTimeout(eliminarBotonesDuplicados, 1500);
 });
 
-// Función para ajustar visualización de botones PDF
-function ajustarBotonesPDF() {
-  const botonesPDF = document.querySelectorAll('button');
-  
-  botonesPDF.forEach(boton => {
-    if (boton.textContent.toLowerCase().includes('pdf')) {
-      // Aplicar estilos consistentes
-      Object.assign(boton.style, {
-        backgroundColor: '#28a745',
-        color: 'white',
-        fontWeight: 'bold',
-        padding: '10px 20px',
-        borderRadius: '5px',
-        border: 'none',
-        cursor: 'pointer',
-        transition: 'all 0.3s ease',
-        boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
-      });
-      
-      // Añadir eventos hover
-      boton.addEventListener('mouseover', function() {
-        this.style.backgroundColor = '#218838';
-        this.style.transform = 'translateY(-2px)';
-        this.style.boxShadow = '0 6px 8px rgba(0,0,0,0.15)';
-      });
-      
-      boton.addEventListener('mouseout', function() {
-        this.style.backgroundColor = '#28a745';
-        this.style.transform = 'translateY(0)';
-        this.style.boxShadow = '0 4px 6px rgba(0,0,0,0.1)';
-      });
-    }
-  });
-}
-
-// Ejecutar ajuste de botones
-document.addEventListener('DOMContentLoaded', () => {
-  setTimeout(ajustarBotonesPDF, 1000);
-});
-
-// Mantener referencias globales de las funciones principales
-window.eliminarBotonesDuplicados = eliminarBotonesDuplicados;
-window.ajustarBotonesPDF = ajustarBotonesPDF;
-        
+// Exponer funciones a window para que puedan ser llamadas desde la consola para depuración
+window.guardarDatosManualmente = guardarDatosFormulario;
+window.cargarDatosManualmente = cargarDatosFormulario;
+window.limpiarDatosGuardados = limpiarDatosGuardados;
+window.descargarPDF = descargarPDF
