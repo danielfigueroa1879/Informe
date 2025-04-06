@@ -1,6 +1,6 @@
 /**
  * Solución optimizada para la generación de PDF sin páginas en blanco intermedias
- * y con observaciones completas
+ * y con observaciones completas, optimizada para texto compacto
  */
 
 // Función principal que configura y genera el PDF
@@ -96,13 +96,13 @@ function generarPDFCorregido() {
             contenidoTexto.textContent = textarea.value;
             contenidoTexto.className = 'textarea-contenido-pdf';
             Object.assign(contenidoTexto.style, {
-                minHeight: '50px',
+                minHeight: '30px', // Reducido
                 width: '100%',
                 fontFamily: textarea.style.fontFamily || 'inherit',
-                fontSize: textarea.style.fontSize || 'inherit',
-                lineHeight: '1.4',
+                fontSize: '9pt', // Tamaño de fuente reducido
+                lineHeight: '1.2', // Interlineado más compacto
                 paddingLeft: '5px',
-                whiteSpace: 'pre-wrap', // Preservar espacios y saltos de línea
+                whiteSpace: 'pre-wrap',
                 wordBreak: 'break-word'
             });
             
@@ -125,11 +125,12 @@ function generarPDFCorregido() {
             }},
             { selector: 'h2', estilos: {
                 pageBreakBefore: 'always',
-                marginTop: '20px',
-                paddingTop: '10px'
+                marginTop: '10px', // Reducido
+                paddingTop: '5px' // Reducido
             }},
             { selector: 'table', estilos: {
-                pageBreakInside: 'auto'
+                pageBreakInside: 'auto',
+                fontSize: '9pt' // Tamaño de fuente reducido
             }},
             { selector: 'tr', estilos: {
                 pageBreakInside: 'avoid'
@@ -137,7 +138,8 @@ function generarPDFCorregido() {
             { selector: '#plan-accion-editor', estilos: {
                 height: 'auto',
                 maxHeight: 'none',
-                overflow: 'visible'
+                overflow: 'visible',
+                fontSize: '9pt' // Tamaño de fuente reducido
             }}
         ];
         
@@ -167,33 +169,45 @@ function generarPDFCorregido() {
         estilosTemporales.textContent = `
             @page {
                 size: legal portrait;
-                margin: 15mm 10mm;
+                margin: 10mm; /* Márgenes reducidos */
             }
             body {
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
                 color-adjust: exact !important;
+                font-size: 9pt !important;
+                line-height: 1.2 !important;
             }
             .container {
-                font-size: 12pt !important;
+                font-size: 9pt !important;
                 width: 100% !important;
                 max-width: 100% !important;
                 padding: 0 !important;
                 margin: 0 !important;
             }
-            h2 {
+            h1 { 
+                font-size: 13pt !important; 
+                margin-bottom: 10px !important;
+            }
+            h2 { 
+                font-size: 11pt !important; 
+                margin-top: 15px !important;
+                margin-bottom: 8px !important;
                 page-break-before: always !important;
                 break-before: page !important;
-                page-break-after: avoid !important;
-                break-after: avoid !important;
             }
             h3 {
+                font-size: 10pt !important;
+                margin-top: 10px !important;
+                margin-bottom: 6px !important;
                 page-break-after: avoid !important;
                 break-after: avoid !important;
             }
             table {
+                font-size: 8pt !important;
                 page-break-inside: auto !important;
                 break-inside: auto !important;
+                margin-bottom: 15px !important;
             }
             tr {
                 page-break-inside: avoid !important;
@@ -205,67 +219,13 @@ function generarPDFCorregido() {
                 height: 1px !important;
                 visibility: hidden !important;
             }
-            
-            /* Eliminar saltos de página no deseados */
-            div:empty {
-                display: none !important;
-            }
-            
-            /* Mejorar visualización de observaciones */
             .textarea-contenido-pdf {
-                min-height: 50px;
-                padding: 5px !important;
-                font-family: inherit !important;
-                font-size: inherit !important;
-                line-height: 1.4 !important;
-                white-space: pre-wrap !important;
-                word-break: break-word !important;
-                margin-bottom: 5px !important;
+                font-size: 9pt !important;
+                line-height: 1.2 !important;
             }
-            
-            /* Estilos para asegurar que los fondos se muestren correctamente */
-            * {
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-                color-adjust: exact !important;
-            }
-            
-            /* Estilos específicos para que los gráficos y colores se muestren correctamente */
-            .header-row, th {
-                background-color: #003366 !important;
-                color: white !important;
-            }
-            
-            tr:nth-child(even) {
-                background-color: #f9f9f9 !important;
-            }
-            
-            .info-section, .summary {
-                background-color: #f9f9f9 !important;
-            }
-            
-            .result.seguro {
-                background-color: #dff0d8 !important;
-                color: #3c763d !important;
-                border: 1px solid #d6e9c6 !important;
-            }
-            
-            .result.riesgo {
-                background-color: #fcf8e3 !important;
-                color: #8a6d3b !important;
-                border: 1px solid #faebcc !important;
-            }
-            
-            .result.inseguro {
-                background-color: #f2dede !important;
-                color: #a94442 !important;
-                border: 1px solid #ebccd1 !important;
-            }
-            
-            /* Asegurar que las imágenes sean visibles */
-            img {
-                display: inline-block !important;
-                max-width: 100% !important;
+            .result {
+                font-size: 9pt !important;
+                padding: 10px !important;
             }
         `;
         document.head.appendChild(estilosTemporales);
@@ -298,17 +258,16 @@ function generarPDFCorregido() {
         return estadoOriginal;
     }
     
-    // Función para generar el PDF con la configuración óptima
+    // Función para generar el PDF con texto reducido
     function generarPDFDesdeContenido(contenido, estadoOriginal) {
-        console.log("Generando PDF con configuración óptima...");
+        console.log("Generando PDF con configuración óptima y texto más pequeño...");
         
-        // Configuración optimizada para tamaño legal/oficio
+        // Configuración optimizada para tamaño legal/oficio con texto reducido
         const opciones = {
             filename: `Fiscalizacion_${new Date().toLocaleDateString().replace(/\//g, '-')}.pdf`,
             
-            // Modo de optimización: 1 = velocidad, 2 = precisión
             html2canvas: {
-                scale: 1.5, // Escala original
+                scale: 1.5,
                 useCORS: true,
                 allowTaint: true,
                 scrollX: 0,
@@ -317,121 +276,106 @@ function generarPDFCorregido() {
                 windowHeight: document.documentElement.offsetHeight,
                 logging: false,
                 backgroundColor: '#FFFFFF',
-                imageTimeout: 30000, // Tiempo extendido para procesar gráficos
+                imageTimeout: 30000,
                 removeContainer: true,
-                foreignObjectRendering: false, // Deshabilitar para mayor compatibilidad
+                foreignObjectRendering: false,
                 onclone: function(clonedDoc) {
-                    // Forzar la visibilidad de los fondos y gráficos
+                    // Reducir tamaño de texto en el clon
                     const style = clonedDoc.createElement('style');
                     style.innerHTML = `
                         * {
-                            -webkit-print-color-adjust: exact !important;
-                            print-color-adjust: exact !important;
-                            color-adjust: exact !important;
+                            font-size: 9pt !important; /* Texto más pequeño */
+                            line-height: 1.2 !important; /* Líneas más compactas */
                         }
                         
-                        /* Evitar páginas en blanco */
-                        div:empty, p:empty, span:empty {
-                            display: none !important;
+                        body, .container {
+                            font-size: 9pt !important;
                         }
                         
-                        /* Estilos específicos para asegurar fondos correctos */
-                        .header-row, th {
-                            background-color: #003366 !important;
-                            color: white !important;
+                        h1 { 
+                            font-size: 13pt !important; 
+                            margin-bottom: 10px !important;
                         }
                         
-                        tr:nth-child(even) {
-                            background-color: #f9f9f9 !important;
+                        h2 { 
+                            font-size: 11pt !important; 
+                            margin-top: 15px !important;
+                            margin-bottom: 8px !important;
                         }
                         
-                        .info-section, .summary {
-                            background-color: #f9f9f9 !important;
+                        h3 { 
+                            font-size: 10pt !important; 
+                            margin-top: 10px !important;
+                            margin-bottom: 6px !important;
                         }
                         
-                        .result.seguro {
-                            background-color: #dff0d8 !important;
-                            color: #3c763d !important;
-                            border: 1px solid #d6e9c6 !important;
+                        table {
+                            font-size: 8pt !important;
+                            margin-bottom: 15px !important;
                         }
                         
-                        .result.riesgo {
-                            background-color: #fcf8e3 !important;
-                            color: #8a6d3b !important;
-                            border: 1px solid #faebcc !important;
+                        th, td {
+                            padding: 6px !important;
                         }
                         
-                        .result.inseguro {
-                            background-color: #f2dede !important;
-                            color: #a94442 !important;
-                            border: 1px solid #ebccd1 !important;
+                        .result {
+                            font-size: 9pt !important;
+                            padding: 10px !important;
                         }
                         
-                        /* Asegurar que las textareas se muestran correctamente */
-                        .textarea-contenido-pdf {
-                            min-height: 50px;
-                            padding: 5px !important;
-                            font-family: inherit !important;
-                            font-size: inherit !important;
-                            line-height: 1.4 !important;
-                            white-space: pre-wrap !important;
-                            word-break: break-word !important;
+                        textarea, input {
+                            font-size: 8pt !important;
+                        }
+                        
+                        .observaciones {
+                            font-size: 8pt !important;
+                        }
+                        
+                        @page {
+                            size: legal portrait;
+                            margin: 10mm; /* Márgenes más pequeños */
+                        }
+                        
+                        /* Estilos adicionales para compactar */
+                        .info-section {
+                            padding: 10px !important;
+                            margin-bottom: 15px !important;
+                        }
+                        
+                        .summary {
+                            padding: 15px !important;
+                        }
+                        
+                        .firmas-seccion {
+                            margin-top: 15px !important;
+                        }
+                        
+                        .linea-firma {
+                            margin: 10px 0 !important;
                         }
                     `;
                     clonedDoc.head.appendChild(style);
-                    
-                    // Asegurar que las imágenes se muestran correctamente
-                    Array.from(clonedDoc.querySelectorAll('img')).forEach(img => {
-                        img.style.display = 'block';
-                        img.style.maxWidth = '100%';
-                    });
-                    
-                    // Eliminar elementos vacíos en el clon que podrían causar páginas en blanco
-                    const divs = Array.from(clonedDoc.querySelectorAll('div, p, span'));
-                    divs.forEach(div => {
-                        if (!div.textContent.trim() && !div.querySelector('img') && div.clientHeight < 20 && !div.classList.contains('textarea-contenido-pdf')) {
-                            if (div.parentNode) {
-                                div.parentNode.removeChild(div);
-                            }
-                        }
-                    });
                 }
             },
             
             jsPDF: {
                 unit: 'mm',
-                format: 'legal', // Formato oficio/legal
+                format: 'legal',
                 orientation: 'portrait',
                 compress: true,
                 precision: 16,
                 putOnlyUsedFonts: true
             },
             
-            // Configuración de saltos de página - Modificada para evitar páginas en blanco
             pagebreak: {
-                mode: ['avoid-all'], // Simplificar el algoritmo
-                before: ['h2'], // Solo saltos explícitos en h2
+                mode: ['avoid-all'],
+                before: ['h2'],
                 avoid: ['table', 'img', '.textarea-contenido-pdf']
             },
             
-            // Usar el nuevo modo para división de contenido
             enableLinks: false,
-            image: { type: 'jpeg', quality: 0.98 }, // Mayor calidad para gráficos
-            margin: [15, 10, 15, 10], // top, right, bottom, left
-            
-            // Importante: Esta opción optimiza el proceso y evita páginas en blanco
-            html2canvas: { 
-                scale: 1.5, // Escala original
-                scrollY: 0, 
-                scrollX: 0,
-                backgroundColor: '#FFFFFF',
-                removeContainer: true,
-                allowTaint: true,
-                useCORS: true,
-                letterRendering: true,
-                imageSmoothingEnabled: true,
-                imageTimeout: 30000
-            }
+            image: { type: 'jpeg', quality: 0.98 },
+            margin: [10, 10, 10, 10], // Márgenes más pequeños
         };
         
         // Generar el PDF con el manejo optimizado
@@ -441,16 +385,53 @@ function generarPDFCorregido() {
             .toPdf()
             .get('pdf')
             .then(function(pdfObject) {
-                // Añadir metadatos y numeración
-                agregarMetadatosYNumeracion(pdfObject);
+                // Añadir metadatos y numeración de página
+                try {
+                   // Añadir metadatos
+                    pdfObject.setProperties({
+                        title: 'Cuadro de Fiscalización de Seguridad Privada',
+                        subject: 'Informe de Fiscalización',
+                        author: document.querySelector('input[name="fiscalizador"]')?.value || 'Sistema de Fiscalización',
+                        keywords: 'seguridad, fiscalización, informe',
+                        creator: 'Sistema PDF Optimizado'
+                    });
+                    
+                    // Añadir numeración de páginas
+                    const totalPaginas = pdfObject.internal.getNumberOfPages();
+                    
+                    for (let i = 1; i <= totalPaginas; i++) {
+                        pdfObject.setPage(i);
+                        
+                        // Configuración de texto para el pie de página
+                        pdfObject.setFontSize(8); // Tamaño de fuente reducido
+                        pdfObject.setTextColor(100, 100, 100);
+                        
+                        // Obtener dimensiones de la página
+                        const pageSize = pdfObject.internal.pageSize;
+                        const pageWidth = pageSize.width ? pageSize.width : pageSize.getWidth();
+                        const pageHeight = pageSize.height ? pageSize.height : pageSize.getHeight();
+                        
+                        // Texto de numeración
+                        const texto = `Página ${i} de ${totalPaginas}`;
+                        
+                        // Posicionar en la esquina inferior derecha
+                        const textWidth = pdfObject.getStringUnitWidth(texto) * 8 / pdfObject.internal.scaleFactor;
+                        const x = pageWidth - textWidth - 15;
+                        const y = pageHeight - 10;
+                        
+                        // Añadir el texto
+                        pdfObject.text(texto, x, y);
+                    }
+                } catch (error) {
+                    console.warn("Error al añadir metadatos o numeración:", error);
+                }
                 
                 // Guardar el PDF
                 pdfObject.save(opciones.filename);
                 
-                console.log("PDF generado exitosamente");
+                console.log("PDF generado exitosamente con texto reducido");
                 actualizarIndicadorExito();
                 
-                // Restaurar el documento original después de un momento
                 setTimeout(() => {
                     restaurarDocumentoOriginal(estadoOriginal);
                 }, 1200);
@@ -461,49 +442,6 @@ function generarPDFCorregido() {
                 alert("Ocurrió un error al generar el PDF. Por favor, intente nuevamente.");
                 restaurarDocumentoOriginal(estadoOriginal);
             });
-    }
-    
-    // Función para agregar metadatos y numeración al PDF
-    function agregarMetadatosYNumeracion(pdf) {
-        try {
-            // Añadir metadatos
-            pdf.setProperties({
-                title: 'Cuadro de Fiscalización de Seguridad Privada',
-                subject: 'Informe de Fiscalización',
-                author: document.querySelector('input[name="fiscalizador"]')?.value || 'Sistema de Fiscalización',
-                keywords: 'seguridad, fiscalización, informe',
-                creator: 'Sistema PDF Optimizado'
-            });
-            
-            // Añadir numeración de páginas
-            const totalPaginas = pdf.internal.getNumberOfPages();
-            
-            for (let i = 1; i <= totalPaginas; i++) {
-                pdf.setPage(i);
-                
-                // Configuración de texto para el pie de página
-                pdf.setFontSize(9);
-                pdf.setTextColor(100, 100, 100);
-                
-                // Obtener dimensiones de la página
-                const pageSize = pdf.internal.pageSize;
-                const pageWidth = pageSize.width ? pageSize.width : pageSize.getWidth();
-                const pageHeight = pageSize.height ? pageSize.height : pageSize.getHeight();
-                
-                // Texto de numeración
-                const texto = `Página ${i} de ${totalPaginas}`;
-                
-                // Posicionar en la esquina inferior derecha
-                const textWidth = pdf.getStringUnitWidth(texto) * 9 / pdf.internal.scaleFactor;
-                const x = pageWidth - textWidth - 15;
-                const y = pageHeight - 10;
-                
-                // Añadir el texto
-                pdf.text(texto, x, y);
-            }
-        } catch (error) {
-            console.warn("Error al añadir metadatos o numeración:", error);
-        }
     }
     
     // Función para restaurar el documento a su estado original
@@ -567,8 +505,8 @@ function generarPDFCorregido() {
         
         console.log("Documento restaurado correctamente");
     }
-    
-    // Función para mostrar el indicador de carga con un diseño mejorado
+
+    // Funciones auxiliares para el manejo de la interfaz de usuario
     function mostrarIndicadorCarga() {
         // Eliminar indicador existente si lo hay
         const indicadorExistente = document.getElementById('indicador-pdf-carga');
@@ -686,8 +624,7 @@ function generarPDFCorregido() {
             textoEstado.textContent = 'Aplicando formato final...';
         }, 3000);
     }
-    
-    // Función para actualizar el indicador con mensaje de éxito
+
     function actualizarIndicadorExito() {
         const barraProgreso = document.getElementById('barra-progreso-pdf');
         const textoEstado = document.getElementById('texto-estado-pdf');
@@ -710,8 +647,7 @@ function generarPDFCorregido() {
         // Ocultar después de un tiempo
         setTimeout(ocultarIndicadorCarga, 1500);
     }
-    
-    // Función para ocultar el indicador de carga
+
     function ocultarIndicadorCarga() {
         const indicador = document.getElementById('indicador-pdf-carga');
         if (indicador) {
@@ -726,15 +662,23 @@ function generarPDFCorregido() {
             }, 300);
         }
     }
+
+    // Retornar funciones necesarias para instalación externa
+    return {
+        generarPDFCorregido,
+        mostrarIndicadorCarga,
+        ocultarIndicadorCarga,
+        actualizarIndicadorExito
+    };
 }
 
-// Función para reemplazar los botones existentes con la nueva funcionalidad
+// Función para instalar el botón de PDF en los botones existentes
 function instalarBotonPDFCorregido() {
     console.log("Instalando botón de PDF corregido...");
     
     // Buscar todos los botones relacionados con PDF
     const botonesExistentes = Array.from(document.querySelectorAll('button')).filter(btn => 
-        btn.textContent.includes('PDF') || 
+        btn.textContent.toLowerCase().includes('pdf') || 
         btn.id?.includes('pdf') ||
         btn.onclick?.toString().includes('PDF')
     );
@@ -747,8 +691,8 @@ function instalarBotonPDFCorregido() {
         btn.onclick = generarPDFCorregido;
         
         // Actualizar texto y estilos para distinguirlo
-        if (btn.textContent.includes('PDF')) {
-            btn.textContent = 'Descargar PDF Completo';
+        if (btn.textContent.toLowerCase().includes('pdf')) {
+            btn.textContent = 'Descargar PDF Optimizado';
         }
         
         // Estilos destacados
@@ -784,7 +728,7 @@ function instalarBotonPDFCorregido() {
         botonesDivs.forEach(div => {
             const nuevoBoton = document.createElement('button');
             nuevoBoton.type = 'button';
-            nuevoBoton.textContent = 'Descargar PDF Completo';
+            nuevoBoton.textContent = 'Descargar PDF Optimizado';
             nuevoBoton.onclick = generarPDFCorregido;
             nuevoBoton.className = 'no-print';
             
@@ -811,32 +755,12 @@ function instalarBotonPDFCorregido() {
             
             nuevoBoton.onmouseout = function() {
                 this.style.backgroundColor = '#28a745';
-                this.style.transform = 'translateY(0)';
                 this.style.boxShadow = '0 4px 6px rgba(0,0,0,0.1)';
-            };
-            
-            // Insertar al inicio
-            div.insertBefore(nuevoBoton, div.firstChild);
-        });
-    }
-    
-    // Sobrescribir funciones existentes para asegurar que siempre se use la nueva implementación
-    if (typeof window.guardarPDF === 'function') {
-        console.log("Sobrescribiendo función guardarPDF existente");
-        window.guardarPDF = generarPDFCorregido;
-    }
-    
-    if (typeof window.descargarPDF === 'function') {
-        console.log("Sobrescribiendo función descargarPDF existente");
-        window.descargarPDF = generarPDFCorregido;
-    }
-    
-    if (typeof window.generarPDFMejorado === 'function') {
-        console.log("Sobrescribiendo función generarPDFMejorado existente");
-        window.generarPDFMejorado = generarPDFCorregido;
-    }
-    
-    console.log("Instalación de botón PDF corregido completada");
+        };
+        
+        // Insertar al inicio
+        div.insertBefore(nuevoBoton, div.firstChild);
+    });
 }
 
 // Iniciar cuando el DOM esté completamente cargado
@@ -859,10 +783,7 @@ window.addEventListener('load', () => {
 window.generarPDFCorregido = generarPDFCorregido;
 window.instalarBotonPDFCorregido = instalarBotonPDFCorregido;
 
-// Ejecutar inmediatamente para instalar el botón sin esperar eventos
-instalarBotonPDFCorregido();
-
-// ---------- INICIO DE CÓDIGO AGREGADO ----------
+// ---------- INICIO DE CÓDIGO ADICIONAL ----------
 
 // Función para eliminar botones duplicados de PDF
 function eliminarBotonesDuplicados() {
@@ -901,3 +822,52 @@ function eliminarBotonesDuplicados() {
   }
 }
 
+// Ejecutar eliminación de botones duplicados
+document.addEventListener('DOMContentLoaded', () => {
+  setTimeout(eliminarBotonesDuplicados, 1500);
+});
+
+// Función para ajustar visualización de botones PDF
+function ajustarBotonesPDF() {
+  const botonesPDF = document.querySelectorAll('button');
+  
+  botonesPDF.forEach(boton => {
+    if (boton.textContent.toLowerCase().includes('pdf')) {
+      // Aplicar estilos consistentes
+      Object.assign(boton.style, {
+        backgroundColor: '#28a745',
+        color: 'white',
+        fontWeight: 'bold',
+        padding: '10px 20px',
+        borderRadius: '5px',
+        border: 'none',
+        cursor: 'pointer',
+        transition: 'all 0.3s ease',
+        boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
+      });
+      
+      // Añadir eventos hover
+      boton.addEventListener('mouseover', function() {
+        this.style.backgroundColor = '#218838';
+        this.style.transform = 'translateY(-2px)';
+        this.style.boxShadow = '0 6px 8px rgba(0,0,0,0.15)';
+      });
+      
+      boton.addEventListener('mouseout', function() {
+        this.style.backgroundColor = '#28a745';
+        this.style.transform = 'translateY(0)';
+        this.style.boxShadow = '0 4px 6px rgba(0,0,0,0.1)';
+      });
+    }
+  });
+}
+
+// Ejecutar ajuste de botones
+document.addEventListener('DOMContentLoaded', () => {
+  setTimeout(ajustarBotonesPDF, 1000);
+});
+
+// Mantener referencias globales de las funciones principales
+window.eliminarBotonesDuplicados = eliminarBotonesDuplicados;
+window.ajustarBotonesPDF = ajustarBotonesPDF;
+        
