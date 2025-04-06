@@ -1,6 +1,6 @@
- /**
+/**
  * Solución optimizada para la generación de PDF sin páginas en blanco intermedias
- * y con observaciones completas - Con texto ultramicroscópico
+ * y con observaciones completas
  */
 
 // Función principal que configura y genera el PDF
@@ -96,15 +96,15 @@ function generarPDFCorregido() {
             contenidoTexto.textContent = textarea.value;
             contenidoTexto.className = 'textarea-contenido-pdf';
             Object.assign(contenidoTexto.style, {
-    minHeight: '10px',
-    width: '100%',
-    fontFamily: textarea.style.fontFamily || 'inherit',
-    fontSize: '0.32pt', // 60% más grande que 0.2pt
-    lineHeight: '0.6',
-    paddingLeft: '1px',
-    whiteSpace: 'pre-wrap',
-    wordBreak: 'break-word'
-});
+                minHeight: '50px',
+                width: '100%',
+                fontFamily: textarea.style.fontFamily || 'inherit',
+                fontSize: textarea.style.fontSize || 'inherit',
+                lineHeight: '1.4',
+                paddingLeft: '5px',
+                whiteSpace: 'pre-wrap', // Preservar espacios y saltos de línea
+                wordBreak: 'break-word'
+            });
             
             // Insertar el div antes de la textarea y ocultar la textarea original
             textarea.parentNode.insertBefore(contenidoTexto, textarea);
@@ -115,49 +115,31 @@ function generarPDFCorregido() {
         });
         
         // 4. Aplicar estilos óptimos para la impresión
-     const elementosEstilizar = [
-    { selector: '.forced-page-break', estilos: {
-        display: 'block',
-        height: '1px',
-        pageBreakBefore: 'always',
-        margin: '0',
-        padding: '0'
-    }},
-    { selector: 'h2', estilos: {
-        pageBreakBefore: 'always',
-        marginTop: '1px',
-        paddingTop: '1px',
-        fontSize: '0.64pt' // 60% más grande que 0.4pt
-    }},
-    { selector: 'h1', estilos: {
-        fontSize: '0.8pt', // 60% más grande que 0.5pt
-        marginBottom: '1px'
-    }},
-    { selector: 'h3', estilos: {
-        fontSize: '0.48pt', // 60% más grande que 0.3pt
-        marginTop: '1px',
-        marginBottom: '0.5px'
-    }},
-    { selector: 'table', estilos: {
-        pageBreakInside: 'auto',
-        fontSize: '0.32pt' // 60% más grande que 0.2pt
-    }},
-    { selector: 'tr', estilos: {
-        pageBreakInside: 'avoid',
-        height: 'auto',
-        lineHeight: '0.6'
-    }},
-    { selector: 'th, td', estilos: {
-        fontSize: '0.32pt', // 60% más grande que 0.2pt
-        padding: '0.5px'
-    }},
-    { selector: '#plan-accion-editor', estilos: {
-        height: 'auto',
-        maxHeight: 'none',
-        overflow: 'visible',
-        fontSize: '0.32pt' // 60% más grande que 0.2pt
-    }}
-];
+        const elementosEstilizar = [
+            { selector: '.forced-page-break', estilos: {
+                display: 'block',
+                height: '1px',
+                pageBreakBefore: 'always',
+                margin: '0',
+                padding: '0'
+            }},
+            { selector: 'h2', estilos: {
+                pageBreakBefore: 'always',
+                marginTop: '20px',
+                paddingTop: '10px'
+            }},
+            { selector: 'table', estilos: {
+                pageBreakInside: 'auto'
+            }},
+            { selector: 'tr', estilos: {
+                pageBreakInside: 'avoid'
+            }},
+            { selector: '#plan-accion-editor', estilos: {
+                height: 'auto',
+                maxHeight: 'none',
+                overflow: 'visible'
+            }}
+        ];
         
         // Aplicar los estilos y guardar los originales
         elementosEstilizar.forEach(config => {
@@ -179,206 +161,113 @@ function generarPDFCorregido() {
             });
         });
         
-        // 5. Añadir una hoja de estilos temporal con reglas extremas para PDF
+        // 5. Añadir una hoja de estilos temporal con reglas específicas para PDF
         const estilosTemporales = document.createElement('style');
         estilosTemporales.id = 'estilos-temporales-pdf';
         estilosTemporales.textContent = `
-       estilosTemporales.textContent = `
-    @page {
-        size: legal portrait;
-        margin: 1mm !important;
-    }
-    body {
-        -webkit-print-color-adjust: exact !important;
-        print-color-adjust: exact !important;
-        color-adjust: exact !important;
-        font-size: 0.32pt !important; /* 60% más grande que 0.2pt */
-    }
-    .container {
-        font-size: 0.32pt !important; /* 60% más grande que 0.2pt */
-        width: 100% !important;
-        max-width: 100% !important;
-        padding: 0 !important;
-        margin: 0 !important;
-        transform: scale(0.85) !important; /* Ajustado para no comprimir tanto */
-        transform-origin: top left !important;
-    }
-    * {
-        font-size: 0.32pt !important; /* 60% más grande que 0.2pt */
-        line-height: 0.6 !important; /* Ligeramente más grande */
-        margin: 0 !important;
-        padding: 0 !important;
-    }
-    h1 {
-        font-size: 0.8pt !important; /* 60% más grande que 0.5pt */
-        margin-bottom: 1pt !important;
-        margin-top: 1pt !important;
-    }
-    h2 {
-        font-size: 0.64pt !important; /* 60% más grande que 0.4pt */
-        page-break-before: always !important;
-        break-before: page !important;
-        page-break-after: avoid !important;
-        break-after: avoid !important;
-        margin-top: 1pt !important;
-        margin-bottom: 0.5pt !important;
-    }
-    h3 {
-        font-size: 0.48pt !important; /* 60% más grande que 0.3pt */
-        page-break-after: avoid !important;
-        break-after: avoid !important;
-        margin-top: 0.8pt !important;
-        margin-bottom: 0.3pt !important;
-    }
-    table {
-        page-break-inside: auto !important;
-        break-inside: auto !important;
-        font-size: 0.32pt !important; /* 60% más grande que 0.2pt */
-        border-collapse: collapse !important;
-        margin-bottom: 1pt !important;
-    }
-    th, td {
-        padding: 0.2pt !important;
-        font-size: 0.32pt !important; /* 60% más grande que 0.2pt */
-        border-width: 0.1pt !important;
-    }
-    tr {
-        page-break-inside: avoid !important;
-        break-inside: avoid !important;
-        line-height: 0.6 !important; /* Ligeramente más grande */
-    }
-    p, span, div, li {
-        font-size: 0.32pt !important; /* 60% más grande que 0.2pt */
-        line-height: 0.6 !important; /* Ligeramente más grande */
-        margin: 0.2pt 0 !important;
-    }
-    .forced-page-break {
-        page-break-before: always !important;
-        break-before: page !important;
-        height: 1px !important;
-        visibility: hidden !important;
-    }
-    
-    /* Eliminar saltos de página no deseados */
-    div:empty {
-        display: none !important;
-    }
-    
-    /* Mejorar visualización de observaciones */
-    .textarea-contenido-pdf {
-        min-height: 5pt !important;
-        padding: 0.2pt !important;
-        font-family: inherit !important;
-        font-size: 0.32pt !important; /* 60% más grande que 0.2pt */
-        line-height: 0.6 !important; /* Ligeramente más grande */
-        white-space: pre-wrap !important;
-        word-break: break-word !important;
-        margin-bottom: 0.5pt !important;
-    }
-    
-    /* Estilos para asegurar que los fondos se muestren correctamente */
-    * {
-        -webkit-print-color-adjust: exact !important;
-        print-color-adjust: exact !important;
-        color-adjust: exact !important;
-    }
-    
-    /* Estilos específicos para que los gráficos y colores se muestren correctamente */
-    .header-row, th {
-        background-color: #003366 !important;
-        color: white !important;
-        font-size: 0.32pt !important; /* 60% más grande que 0.2pt */
-        padding: 0.2pt !important;
-    }
-    
-    tr:nth-child(even) {
-        background-color: #f9f9f9 !important;
-    }
-    
-    .info-section, .summary {
-        background-color: #f9f9f9 !important;
-        padding: 0.5pt !important;
-        margin-bottom: 1pt !important;
-    }
-    
-    .info-section p {
-        font-size: 0.32pt !important; /* 60% más grande que 0.2pt */
-        margin: 0.2pt 0 !important;
-    }
-    
-    .result.seguro, .result.riesgo, .result.inseguro {
-        padding: 0.5pt !important;
-        margin: 1pt 0 !important;
-        font-size: 0.64pt !important; /* 60% más grande que 0.4pt */
-    }
-    
-    .result.seguro {
-        background-color: #dff0d8 !important;
-        color: #3c763d !important;
-        border: 0.1pt solid #d6e9c6 !important;
-    }
-    
-    .result.riesgo {
-        background-color: #fcf8e3 !important;
-        color: #8a6d3b !important;
-        border: 0.1pt solid #faebcc !important;
-    }
-    
-    .result.inseguro {
-        background-color: #f2dede !important;
-        color: #a94442 !important;
-        border: 0.1pt solid #ebccd1 !important;
-    }
-    
-    /* Asegurar que las imágenes sean visibles */
-    img {
-        display: inline-block !important;
-        max-width: 100% !important;
-        max-height: 50pt !important;
-    }
-    
-    /* Reducir espaciado en elementos específicos */
-    #resumen-automatico, .resumen-seccion {
-        font-size: 0.32pt !important; /* 60% más grande que 0.2pt */
-        padding: 0.5pt !important;
-        margin: 0.5pt 0 !important;
-    }
-    
-    #resumen-automatico strong, .resumen-seccion strong {
-        font-size: 0.32pt !important; /* 60% más grande que 0.2pt */
-    }
-    
-    #resumen-automatico ul, 
-    #resumen-automatico ul li, 
-    #resumen-automatico ul ul li {
-        font-size: 0.32pt !important; /* 60% más grande que 0.2pt */
-        margin: 0.1pt 0 !important;
-        line-height: 0.6 !important; /* Ligeramente más grande */
-        padding-left: 2pt !important;
-    }
-    
-    .no-cumple-tag {
-        font-size: 0.32pt !important; /* 60% más grande que 0.2pt */
-    }
-    
-    #plan-accion-editor, .rich-text-editor {
-        font-size: 0.32pt !important; /* 60% más grande que 0.2pt */
-        line-height: 0.6 !important; /* Ligeramente más grande */
-        min-height: 5pt !important;
-    }
-    
-    /* Ajustar columnas de tabla */
-    .check-column {
-        width: 10px !important;
-    }
-    
-    /* Eliminar todos los márgenes y padding posibles */
-    * {
-        margin: 0 !important;
-        padding: 0 !important;
-    }
-`;
-
+            @page {
+                size: legal portrait;
+                margin: 15mm 10mm;
+            }
+            body {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                color-adjust: exact !important;
+            }
+            .container {
+                font-size: 12pt !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+            h2 {
+                page-break-before: always !important;
+                break-before: page !important;
+                page-break-after: avoid !important;
+                break-after: avoid !important;
+            }
+            h3 {
+                page-break-after: avoid !important;
+                break-after: avoid !important;
+            }
+            table {
+                page-break-inside: auto !important;
+                break-inside: auto !important;
+            }
+            tr {
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+            }
+            .forced-page-break {
+                page-break-before: always !important;
+                break-before: page !important;
+                height: 1px !important;
+                visibility: hidden !important;
+            }
+            
+            /* Eliminar saltos de página no deseados */
+            div:empty {
+                display: none !important;
+            }
+            
+            /* Mejorar visualización de observaciones */
+            .textarea-contenido-pdf {
+                min-height: 50px;
+                padding: 5px !important;
+                font-family: inherit !important;
+                font-size: inherit !important;
+                line-height: 1.4 !important;
+                white-space: pre-wrap !important;
+                word-break: break-word !important;
+                margin-bottom: 5px !important;
+            }
+            
+            /* Estilos para asegurar que los fondos se muestren correctamente */
+            * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                color-adjust: exact !important;
+            }
+            
+            /* Estilos específicos para que los gráficos y colores se muestren correctamente */
+            .header-row, th {
+                background-color: #003366 !important;
+                color: white !important;
+            }
+            
+            tr:nth-child(even) {
+                background-color: #f9f9f9 !important;
+            }
+            
+            .info-section, .summary {
+                background-color: #f9f9f9 !important;
+            }
+            
+            .result.seguro {
+                background-color: #dff0d8 !important;
+                color: #3c763d !important;
+                border: 1px solid #d6e9c6 !important;
+            }
+            
+            .result.riesgo {
+                background-color: #fcf8e3 !important;
+                color: #8a6d3b !important;
+                border: 1px solid #faebcc !important;
+            }
+            
+            .result.inseguro {
+                background-color: #f2dede !important;
+                color: #a94442 !important;
+                border: 1px solid #ebccd1 !important;
+            }
+            
+            /* Asegurar que las imágenes sean visibles */
+            img {
+                display: inline-block !important;
+                max-width: 100% !important;
+            }
+        `;
         document.head.appendChild(estilosTemporales);
         estadoOriginal.elementosCreados.push(estilosTemporales);
         
@@ -406,151 +295,95 @@ function generarPDFCorregido() {
         document.body.style.overflow = 'visible';
         document.body.style.height = 'auto';
         
-        // 8. NUEVO: Aplicar directamente tamaño microscópico a todos los elementos
-        container.querySelectorAll('*').forEach(el => {
-            // Guardar estilo original si aún no está guardado
-            if (!estadoOriginal.estilos.has(el)) {
-                estadoOriginal.estilos.set(el, {
-                    fontSize: el.style.fontSize,
-                    lineHeight: el.style.lineHeight,
-                    margin: el.style.margin,
-                    padding: el.style.padding
-                });
-            }
+        return estadoOriginal;
+    }
+    
+    // Función para generar el PDF con la configuración óptima
+    function generarPDFDesdeContenido(contenido, estadoOriginal) {
+        console.log("Generando PDF con configuración óptima...");
+        
+        // Configuración optimizada para tamaño legal/oficio
+        const opciones = {
+            filename: `Fiscalizacion_${new Date().toLocaleDateString().replace(/\//g, '-')}.pdf`,
             
-            // Aplicar estilo microscópico
-            el.style.fontSize = '0.2pt';
-            el.style.lineHeight = '0.5';
-            el.style.margin = '0';
-            el.style.padding = '0';
-        });
-        
-        // 9. NUEVO: Añadir script para aplicar estilos inline después de clonar
-const scriptInline = document.createElement('script');
-scriptInline.textContent = `
-    function aplicarEstilosMicroscopicos(doc) {
-        doc.querySelectorAll('*').forEach(el => {
-            el.style.fontSize = '0.32pt'; /* 60% más grande que 0.2pt */
-            el.style.lineHeight = '0.6';
-            el.style.margin = '0';
-            el.style.padding = '0';
-        });
-        
-        doc.querySelectorAll('h1').forEach(el => {
-            el.style.fontSize = '0.8pt'; /* 60% más grande que 0.5pt */
-        });
-        
-        doc.querySelectorAll('h2').forEach(el => {
-            el.style.fontSize = '0.64pt'; /* 60% más grande que 0.4pt */
-        });
-        
-        doc.querySelectorAll('h3').forEach(el => {
-            el.style.fontSize = '0.48pt'; /* 60% más grande que 0.3pt */
-        });
-        
-        doc.querySelectorAll('table').forEach(el => {
-            el.style.borderCollapse = 'collapse';
-            el.style.fontSize = '0.32pt'; /* 60% más grande que 0.2pt */
-        });
-        
-        doc.querySelectorAll('th, td').forEach(el => {
-            el.style.padding = '0.2pt';
-            el.style.fontSize = '0.32pt'; /* 60% más grande que 0.2pt */
-        });
-        
-        const container = doc.querySelector('.container');
-        if (container) {
-            container.style.transform = 'scale(0.85)'; /* Ajustado para no comprimir tanto */
-            container.style.transformOrigin = 'top left';
-        }
-    }
-    window.aplicarEstilosMicroscopicos = aplicarEstilosMicroscopicos;
-`;
-
-// 5. Modificar el estilo en onclone (línea ~559)
-style.innerHTML = `
-    * {
-        -webkit-print-color-adjust: exact !important;
-        print-color-adjust: exact !important;
-        color-adjust: exact !important;
-        font-size: 0.32pt !important; /* 60% más grande que 0.2pt */
-        line-height: 0.6 !important; /* Ligeramente más grande */
-        margin: 0 !important;
-        padding: 0 !important;
-    }
-    
-    h1 { font-size: 0.8pt !important; } /* 60% más grande que 0.5pt */
-    h2 { font-size: 0.64pt !important; } /* 60% más grande que 0.4pt */
-    h3 { font-size: 0.48pt !important; } /* 60% más grande que 0.3pt */
-    
-    /* Evitar páginas en blanco */
-    div:empty, p:empty, span:empty {
-        display: none !important;
-    }
-    
-    /* Estilos específicos para asegurar fondos correctos */
-    .header-row, th {
-        background-color: #003366 !important;
-        color: white !important;
-        font-size: 0.32pt !important; /* 60% más grande que 0.2pt */
-        padding: 0.2pt !important;
-    }
-    
-    tr:nth-child(even) {
-        background-color: #f9f9f9 !important;
-    }
-    
-    .info-section, .summary {
-        background-color: #f9f9f9 !important;
-        padding: 0.5pt !important;
-    }
-    
-    .result.seguro {
-        background-color: #dff0d8 !important;
-        color: #3c763d !important;
-        border: 0.1pt solid #d6e9c6 !important;
-        font-size: 0.64pt !important; /* 60% más grande que 0.4pt */
-    }
-    
-    .result.riesgo {
-        background-color: #fcf8e3 !important;
-        color: #8a6d3b !important;
-        border: 0.1pt solid #faebcc !important;
-        font-size: 0.64pt !important; /* 60% más grande que 0.4pt */
-    }
-    
-    .result.inseguro {
-        background-color: #f2dede !important;
-        color: #a94442 !important;
-        border: 0.1pt solid #ebccd1 !important;
-        font-size: 0.64pt !important; /* 60% más grande que 0.4pt */
-    }
-    
-    /* Asegurar que las textareas se muestran correctamente */
-    .textarea-contenido-pdf {
-        min-height: 5pt !important;
-        padding: 0.2pt !important;
-        font-family: inherit !important;
-        font-size: 0.32pt !important; /* 60% más grande que 0.2pt */
-        line-height: 0.6 !important; /* Ligeramente más grande */
-        white-space: pre-wrap !important;
-        word-break: break-word !important;
-    }
-    
-    /* Compresión extrema del documento */
-    .container {
-        transform: scale(0.85) !important; /* Ajustado para no comprimir tanto */
-        transform-origin: top left !important;
-    }
-`;
-
+            // Modo de optimización: 1 = velocidad, 2 = precisión
+            html2canvas: {
+                scale: 1.5, // Escala original
+                useCORS: true,
+                allowTaint: true,
+                scrollX: 0,
+                scrollY: 0,
+                windowWidth: document.documentElement.offsetWidth,
+                windowHeight: document.documentElement.offsetHeight,
+                logging: false,
+                backgroundColor: '#FFFFFF',
+                imageTimeout: 30000, // Tiempo extendido para procesar gráficos
+                removeContainer: true,
+                foreignObjectRendering: false, // Deshabilitar para mayor compatibilidad
+                onclone: function(clonedDoc) {
+                    // Forzar la visibilidad de los fondos y gráficos
+                    const style = clonedDoc.createElement('style');
+                    style.innerHTML = `
+                        * {
+                            -webkit-print-color-adjust: exact !important;
+                            print-color-adjust: exact !important;
+                            color-adjust: exact !important;
+                        }
+                        
+                        /* Evitar páginas en blanco */
+                        div:empty, p:empty, span:empty {
+                            display: none !important;
+                        }
+                        
+                        /* Estilos específicos para asegurar fondos correctos */
+                        .header-row, th {
+                            background-color: #003366 !important;
+                            color: white !important;
+                        }
+                        
+                        tr:nth-child(even) {
+                            background-color: #f9f9f9 !important;
+                        }
+                        
+                        .info-section, .summary {
+                            background-color: #f9f9f9 !important;
+                        }
+                        
+                        .result.seguro {
+                            background-color: #dff0d8 !important;
+                            color: #3c763d !important;
+                            border: 1px solid #d6e9c6 !important;
+                        }
+                        
+                        .result.riesgo {
+                            background-color: #fcf8e3 !important;
+                            color: #8a6d3b !important;
+                            border: 1px solid #faebcc !important;
+                        }
+                        
+                        .result.inseguro {
+                            background-color: #f2dede !important;
+                            color: #a94442 !important;
+                            border: 1px solid #ebccd1 !important;
+                        }
+                        
+                        /* Asegurar que las textareas se muestran correctamente */
+                        .textarea-contenido-pdf {
+                            min-height: 50px;
+                            padding: 5px !important;
+                            font-family: inherit !important;
+                            font-size: inherit !important;
+                            line-height: 1.4 !important;
+                            white-space: pre-wrap !important;
+                            word-break: break-word !important;
+                        }
+                    `;
                     clonedDoc.head.appendChild(style);
                     
                     // Asegurar que las imágenes se muestran correctamente
                     Array.from(clonedDoc.querySelectorAll('img')).forEach(img => {
                         img.style.display = 'block';
                         img.style.maxWidth = '100%';
-                        img.style.maxHeight = '50pt';
                     });
                     
                     // Eliminar elementos vacíos en el clon que podrían causar páginas en blanco
@@ -562,13 +395,6 @@ style.innerHTML = `
                             }
                         }
                     });
-                    
-                    // Aplicar transformación de escala al contenedor principal
-                    const container = clonedDoc.querySelector('.container');
-                    if (container) {
-                        container.style.transform = 'scale(0.8)';
-                        container.style.transformOrigin = 'top left';
-                    }
                 }
             },
             
@@ -578,9 +404,7 @@ style.innerHTML = `
                 orientation: 'portrait',
                 compress: true,
                 precision: 16,
-                putOnlyUsedFonts: true,
-                // Reducir margen al mínimo
-                margin: [1, 1, 1, 1], // top, right, bottom, left en mm
+                putOnlyUsedFonts: true
             },
             
             // Configuración de saltos de página - Modificada para evitar páginas en blanco
@@ -593,24 +417,51 @@ style.innerHTML = `
             // Usar el nuevo modo para división de contenido
             enableLinks: false,
             image: { type: 'jpeg', quality: 0.98 }, // Mayor calidad para gráficos
-            margin: [1, 1, 1, 1], // top, right, bottom, left en mm
-            scale: 0.8, // Escalar todo el documento
+            margin: [15, 10, 15, 10], // top, right, bottom, left
+            
+            // Importante: Esta opción optimiza el proceso y evita páginas en blanco
+            html2canvas: { 
+                scale: 1.5, // Escala original
+                scrollY: 0, 
+                scrollX: 0,
+                backgroundColor: '#FFFFFF',
+                removeContainer: true,
+                allowTaint: true,
+                useCORS: true,
+                letterRendering: true,
+                imageSmoothingEnabled: true,
+                imageTimeout: 30000
+            }
         };
         
         // Generar el PDF con el manejo optimizado
- html2canvas: {
-    scale: 0.85, // Modificado desde 0.8 para hacer el texto un poco más grande
-    useCORS: true,
-    allowTaint: true,
-    scrollX: 0,
-    scrollY: 0,
-    windowWidth: document.documentElement.offsetWidth,
-    windowHeight: document.documentElement.offsetHeight,
-    logging: false,
-    backgroundColor: '#FFFFFF',
-    imageTimeout: 30000,
-    removeContainer: true,
-    foreignObjectRendering: false,
+        html2pdf()
+            .from(contenido)
+            .set(opciones)
+            .toPdf()
+            .get('pdf')
+            .then(function(pdfObject) {
+                // Añadir metadatos y numeración
+                agregarMetadatosYNumeracion(pdfObject);
+                
+                // Guardar el PDF
+                pdfObject.save(opciones.filename);
+                
+                console.log("PDF generado exitosamente");
+                actualizarIndicadorExito();
+                
+                // Restaurar el documento original después de un momento
+                setTimeout(() => {
+                    restaurarDocumentoOriginal(estadoOriginal);
+                }, 1200);
+            })
+            .catch(function(error) {
+                console.error("Error al generar el PDF:", error);
+                ocultarIndicadorCarga();
+                alert("Ocurrió un error al generar el PDF. Por favor, intente nuevamente.");
+                restaurarDocumentoOriginal(estadoOriginal);
+            });
+    }
     
     // Función para agregar metadatos y numeración al PDF
     function agregarMetadatosYNumeracion(pdf) {
@@ -631,7 +482,7 @@ style.innerHTML = `
                 pdf.setPage(i);
                 
                 // Configuración de texto para el pie de página
-                pdf.setFontSize(4); // Tamaño extremadamente pequeño para numeración
+                pdf.setFontSize(9);
                 pdf.setTextColor(100, 100, 100);
                 
                 // Obtener dimensiones de la página
@@ -643,9 +494,9 @@ style.innerHTML = `
                 const texto = `Página ${i} de ${totalPaginas}`;
                 
                 // Posicionar en la esquina inferior derecha
-                const textWidth = pdf.getStringUnitWidth(texto) * 4 / pdf.internal.scaleFactor;
-                const x = pageWidth - textWidth - 5; // Margen derecho reducido
-                const y = pageHeight - 3; // Margen inferior reducido
+                const textWidth = pdf.getStringUnitWidth(texto) * 9 / pdf.internal.scaleFactor;
+                const x = pageWidth - textWidth - 15;
+                const y = pageHeight - 10;
                 
                 // Añadir el texto
                 pdf.text(texto, x, y);
@@ -694,7 +545,7 @@ style.innerHTML = `
                         elemento.value = estilos.value;
                     } else {
                         elemento.style[prop] = estilos[prop] || '';
-                        }
+                    }
                 });
             });
         }
@@ -1011,6 +862,8 @@ window.instalarBotonPDFCorregido = instalarBotonPDFCorregido;
 // Ejecutar inmediatamente para instalar el botón sin esperar eventos
 instalarBotonPDFCorregido();
 
+// ---------- INICIO DE CÓDIGO AGREGADO ----------
+
 // Función para eliminar botones duplicados de PDF
 function eliminarBotonesDuplicados() {
   // Obtener todos los botones que contengan "PDF" en su texto
@@ -1048,7 +901,3 @@ function eliminarBotonesDuplicados() {
   }
 }
 
-// Ejecutar la eliminación de botones duplicados
-document.addEventListener('DOMContentLoaded', function() {
-  setTimeout(eliminarBotonesDuplicados, 1500);
-});
