@@ -72,8 +72,8 @@ function generarPDFCorregido() {
             }
         });
         
-        // 2. Ocultar elementos con clase no-print y botones
-        const elementosOcultar = container.querySelectorAll('.botones, .no-print, .rich-text-toolbar');
+        // 2. Ocultar elementos con clase no-print, botones y la información de datos guardados
+        const elementosOcultar = container.querySelectorAll('.botones, .no-print, .rich-text-toolbar, .datos-guardados-info');
         elementosOcultar.forEach(el => {
             estadoOriginal.ocultos.push({
                 element: el,
@@ -82,7 +82,49 @@ function generarPDFCorregido() {
             el.style.display = 'none';
         });
         
-        // 3. Mejorar el manejo de las textareas (observaciones)
+        // 3. Forzar saltos de página antes de las secciones específicas
+        const seccionResumen = container.querySelector('#seccion-resumen');
+        const seccionFotos = container.querySelector('#seccion-fotos');
+        
+        // Asegurarse de que la sección de resumen tenga un salto de página forzado
+        if (seccionResumen) {
+            if (!seccionResumen.classList.contains('forced-page-break')) {
+                seccionResumen.classList.add('forced-page-break');
+            }
+            seccionResumen.style.pageBreakBefore = 'always';
+            seccionResumen.style.breakBefore = 'page';
+        }
+        
+        // Asegurarse de que la sección de fotos tenga un salto de página forzado
+        if (seccionFotos) {
+            if (!seccionFotos.classList.contains('forced-page-break')) {
+                seccionFotos.classList.add('forced-page-break');
+            }
+            seccionFotos.style.pageBreakBefore = 'always';
+            seccionFotos.style.breakBefore = 'page';
+        }
+        
+        // Asegurarse de que la sección de recomendaciones esté en una página separada
+        // Buscar el encabezado de recomendaciones dentro del summary
+        const seccionRecomendaciones = container.querySelector('.summary h3:nth-of-type(2)');
+        if (seccionRecomendaciones) {
+            // Crear un div para el salto de página antes de las recomendaciones
+            const divSalto = document.createElement('div');
+            divSalto.className = 'forced-page-break';
+            divSalto.style.pageBreakBefore = 'always';
+            divSalto.style.breakBefore = 'page';
+            divSalto.style.height = '1px';
+            divSalto.style.margin = '0';
+            divSalto.style.padding = '0';
+            
+            // Insertar antes del encabezado de recomendaciones
+            seccionRecomendaciones.parentNode.insertBefore(divSalto, seccionRecomendaciones);
+            
+            // Registrar este elemento para eliminarlo después
+            estadoOriginal.elementosCreados.push(divSalto);
+        }
+        
+        // 4. Mejorar el manejo de las textareas (observaciones)
         const textareas = container.querySelectorAll('textarea');
         textareas.forEach(textarea => {
             // Guardar estado original
