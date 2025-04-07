@@ -1,5 +1,5 @@
 /**
- * autoguardado.js - versión corregida con descarga PDF
+ * autoguardado.js - versión corregida
  * Sistema de persistencia de datos para formulario de fiscalización de seguridad privada
  */
 
@@ -384,17 +384,6 @@ function aplicarEstilosAdicionales() {
             font-size: 1rem !important;
         }
         
-        /* Estilo específico para botón de descarga PDF */
-        #btn-descargar-pdf {
-            background-color: #28a745 !important;
-            font-weight: bold !important;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1) !important;
-        }
-        
-        #btn-descargar-pdf:hover {
-            background-color: #218838 !important;
-        }
-        
         /* Indicador de guardado más pequeño */
         #indicador-guardado {
             font-size: 0.85rem !important;
@@ -471,77 +460,55 @@ function ajustarBotones() {
     }
 }
 
-// Función para descargar el formulario como PDF
-function descargarPDF() {
-    // Mostrar indicador de carga
-    const indicadorCarga = document.createElement('div');
-    indicadorCarga.id = 'indicador-pdf';
-    indicadorCarga.style.position = 'fixed';
-    indicadorCarga.style.top = '0';
-    indicadorCarga.style.left = '0';
-    indicadorCarga.style.width = '100%';
-    indicadorCarga.style.height = '100%';
-    indicadorCarga.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
-    indicadorCarga.style.zIndex = '9999';
-    indicadorCarga.style.display = 'flex';
-    indicadorCarga.style.justifyContent = 'center';
-    indicadorCarga.style.alignItems = 'center';
-    indicadorCarga.style.color = 'white';
-    indicadorCarga.style.fontSize = '1.5rem';
-    indicadorCarga.style.fontFamily = "'Poppins', sans-serif";
-    indicadorCarga.innerHTML = '<div style="background-color: #003366; padding: 20px 40px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.3);">Generando PDF, por favor espere...</div>';
-    document.body.appendChild(indicadorCarga);
+// Función principal de inicialización
+function inicializarAutoguardado() {
+    console.log('Inicializando sistema de autoguardado...');
     
-    // Ocultar temporalmente los botones para la exportación
-    const botones = document.querySelectorAll('.botones');
-    botones.forEach(div => {
-        div.dataset.displayOriginal = div.style.display;
-        div.style.display = 'none';
-    });
-    
-    // Guardar el estado actual de cualquier elemento que queramos modificar
-    const elementos = document.querySelectorAll('.no-print');
-    elementos.forEach(el => {
-        el.dataset.displayOriginal = el.style.display;
-        el.style.display = 'none';
-    });
-    
-    // Asegurarnos de que el contenido del plan de acción sea visible
-    const planAccion = document.getElementById('plan-accion-editor');
-    if (planAccion) {
-        planAccion.style.height = 'auto';
-        planAccion.style.overflow = 'visible';
-    }
-    
-    // Obtener el contenedor principal
-    const contenido = document.querySelector('.container');
-    if (!contenido) {
-        alert('Error: No se pudo encontrar el contenedor del formulario.');
-        limpiarYRestaurar();
+    if (!verificarLocalStorage()) {
+        console.error('No se puede inicializar el autoguardado: localStorage no disponible');
         return;
     }
     
-    // Configuración del PDF
-    const opciones = {
-        margin: [10, 10, 10, 10], // top, left, bottom, right
-        filename: `Fiscalizacion_${new Date().toLocaleDateString().replace(/\//g, '-')}.pdf`,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { 
-            scale: 2, // Mayor escala para mejor calidad
-            useCORS: true, 
-            logging: false,
-            letterRendering: true,
-            allowTaint: true
-        },
-        jsPDF: { 
-            unit: 'mm', 
-            format: [215.9, 355.6], // Formato legal en milímetros (8.5 x 14 pulgadas)
-            orientation: 'portrait',
-            compress: true
-        }
-    };
+    // Primero añadir los estilos
+    añadirEstilosImpresion();
+    aplicarEstilosAdicionales();
     
-    // Cargar html2pdf.js desde CDN si no está ya cargado
-    if (typeof html2pdf === 'undefined') {
-        const script = document.createElement('script');
-        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0
+    // Ajustar los botones existentes
+    ajustarBotones();
+    
+    // Añadir elementos UI
+    añadirIndicadorGuardado();
+    añadirInfoDatosGuardados();
+    
+    // Añadir nuevo botón para limpiar datos
+    añadirBotonLimpiarDatos();
+    
+    // Configurar eventos para autoguardado
+    configurarAutoguardado();
+    
+    // Finalmente cargar datos guardados
+    setTimeout(cargarDatosFormulario, 500); // Pequeño retraso para asegurar que todo esté listo
+    
+    console.log('Sistema de autoguardado inicializado correctamente');
+}
+
+// Asegurarse de que el DOM esté completamente cargado antes de inicializar
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', inicializarAutoguardado);
+} else {
+    // Si el DOM ya está cargado, inicializar inmediatamente
+    inicializarAutoguardado();
+}
+
+// Añadir un evento de carga para asegurarnos de que todas las imágenes y recursos estén cargados
+window.addEventListener('load', function() {
+    // Actualizar el conteo después de que todo esté cargado
+    if (typeof contarCumplimiento === 'function') {
+        setTimeout(contarCumplimiento, 1000);
+    }
+});
+
+// Exponer funciones a window para que puedan ser llamadas desde la consola para depuración
+window.guardarDatosManualmente = guardarDatosFormulario;
+window.cargarDatosManualmente = cargarDatosFormulario;
+window.limpiarDatosGuardados = limpiarDatosGuardados;
