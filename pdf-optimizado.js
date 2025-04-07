@@ -73,7 +73,7 @@ function generarPDFCorregido() {
         });
         
         // 2. Ocultar elementos con clase no-print y botones
-        const elementosOcultar = container.querySelectorAll('.botones, .no-print');
+        const elementosOcultar = container.querySelectorAll('.botones, .no-print, .rich-text-toolbar');
         elementosOcultar.forEach(el => {
             estadoOriginal.ocultos.push({
                 element: el,
@@ -207,7 +207,7 @@ function generarPDFCorregido() {
                 margin: 0 !important;
             }
             h1 {
-                font-size: 18pt !important; /* Reducido */
+                font-size: 16pt !important; /* Reducido */
                 margin-bottom: 20px !important;
             }
             h2 {
@@ -321,10 +321,59 @@ function generarPDFCorregido() {
                 line-height: 1.2 !important; /* Reducido */
             }
             
-            /* Ajustar plan de acción */
+            /* Ajustar plan de acción para formato tipo oficio formal */
             #plan-accion-editor {
                 font-size: 10pt !important; /* Reducido */
-                line-height: 1.3 !important; /* Reducido */
+                line-height: 1.5 !important; /* Mejorado para legibilidad */
+                padding: 20px 25px !important; /* Márgenes internos para simular oficio */
+                background-color: #fff !important; /* Fondo blanco */
+                border: 1px solid #e0e0e0 !important; /* Borde sutil */
+                box-shadow: 0 1px 3px rgba(0,0,0,0.05) !important; /* Sombra sutil */
+                border-radius: 0 !important; /* Sin bordes redondeados para estilo formal */
+                font-family: 'Times New Roman', Times, serif !important; /* Fuente formal */
+                text-align: justify !important; /* Texto justificado para apariencia formal */
+                color: #000 !important; /* Negro sólido para texto formal */
+                margin-top: 15px !important;
+                margin-bottom: 20px !important;
+                min-height: 200px !important; /* Altura mínima para apariencia adecuada */
+            }
+            
+            /* Estilos específicos para párrafos dentro del plan de acción */
+            #plan-accion-editor p {
+                margin-bottom: 8px !important;
+                text-indent: 20px !important; /* Sangría de primera línea para estilo formal */
+            }
+            
+            /* Estilos para listas dentro del plan de acción */
+            #plan-accion-editor ul, 
+            #plan-accion-editor ol {
+                margin: 10px 0 10px 15px !important;
+                padding-left: 15px !important;
+            }
+            
+            #plan-accion-editor li {
+                margin-bottom: 5px !important;
+            }
+            
+            /* Encabezado del plan de acción con estilo más formal */
+            .summary h3:nth-of-type(2) { /* El encabezado "Recomendaciones y Plan de Acción" */
+                font-size: 12pt !important;
+                text-align: center !important;
+                font-weight: bold !important;
+                margin-top: 25px !important;
+                margin-bottom: 15px !important;
+                color: #003366 !important;
+                text-transform: uppercase !important; /* Mayúsculas para apariencia formal */
+                letter-spacing: 1px !important; /* Espaciado entre letras */
+                border-bottom: 1px solid #e0e0e0 !important;
+                padding-bottom: 10px !important;
+            }
+            
+            /* Quitar bordes y fondos del contenedor del editor */
+            .rich-text-container {
+                border: none !important;
+                box-shadow: none !important;
+                background: transparent !important;
             }
             
             /* Estilos para asegurar que los fondos se muestren correctamente */
@@ -540,8 +589,60 @@ function generarPDFCorregido() {
                             font-size: 8.5pt !important;
                         }
                         
+                        /* Ocultar la barra de herramientas del editor de texto */
+                        .rich-text-toolbar {
+                            display: none !important;
+                        }
+                        
+                        /* Estilo formal para el plan de acción */
                         #plan-accion-editor {
                             font-size: 10pt !important;
+                            line-height: 1.5 !important;
+                            padding: 20px 25px !important;
+                            background-color: #fff !important;
+                            border: 1px solid #e0e0e0 !important;
+                            box-shadow: 0 1px 3px rgba(0,0,0,0.05) !important;
+                            border-radius: 0 !important;
+                            font-family: 'Times New Roman', Times, serif !important;
+                            text-align: justify !important;
+                            color: #000 !important;
+                            margin-top: 15px !important;
+                            margin-bottom: 20px !important;
+                            min-height: 200px !important;
+                        }
+                        
+                        #plan-accion-editor p {
+                            margin-bottom: 8px !important;
+                            text-indent: 20px !important;
+                        }
+                        
+                        #plan-accion-editor ul, 
+                        #plan-accion-editor ol {
+                            margin: 10px 0 10px 15px !important;
+                            padding-left: 15px !important;
+                        }
+                        
+                        #plan-accion-editor li {
+                            margin-bottom: 5px !important;
+                        }
+                        
+                        .summary h3:nth-of-type(2) {
+                            font-size: 12pt !important;
+                            text-align: center !important;
+                            font-weight: bold !important;
+                            margin-top: 25px !important;
+                            margin-bottom: 15px !important;
+                            color: #003366 !important;
+                            text-transform: uppercase !important;
+                            letter-spacing: 1px !important;
+                            border-bottom: 1px solid #e0e0e0 !important;
+                            padding-bottom: 10px !important;
+                        }
+                        
+                        .rich-text-container {
+                            border: none !important;
+                            box-shadow: none !important;
+                            background: transparent !important;
                         }
                     `;
                     clonedDoc.head.appendChild(style);
