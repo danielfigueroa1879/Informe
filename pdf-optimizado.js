@@ -365,7 +365,7 @@ function generarPDFCorregido() {
             
             /* Ajustar plan de acción para formato tipo oficio formal */
             #plan-accion-editor {
-                font-size: 10pt !important; /* Reducido */
+                font-size: 11pt !important; /* Reducido */
                 line-height: 1.5 !important; /* Mejorado para legibilidad */
                 padding: 20px 25px !important; /* Márgenes internos para simular oficio */
                 background-color: #fff !important; /* Fondo blanco */
@@ -638,7 +638,7 @@ function generarPDFCorregido() {
                         
                         /* Estilo formal para el plan de acción */
                         #plan-accion-editor {
-                            font-size: 10pt !important;
+                            font-size: 11pt !important;
                             line-height: 1.5 !important;
                             padding: 20px 25px !important;
                             background-color: #fff !important;
