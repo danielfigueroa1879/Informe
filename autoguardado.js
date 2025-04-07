@@ -1,5 +1,5 @@
 /**
- * autoguardado.js - versión completa con descarga PDF
+ * autoguardado.js - versión corregida con descarga PDF
  * Sistema de persistencia de datos para formulario de fiscalización de seguridad privada
  */
 
@@ -534,167 +534,14 @@ function descargarPDF() {
             allowTaint: true
         },
         jsPDF: { 
-    unit: 'mm', 
-    format: [215.9, 355.6], // Formato legal en milímetros (8.5 x 14 pulgadas)
-    orientation: 'portrait',
-    compress: true
-},
+            unit: 'mm', 
+            format: [215.9, 355.6], // Formato legal en milímetros (8.5 x 14 pulgadas)
+            orientation: 'portrait',
+            compress: true
+        }
+    };
     
     // Cargar html2pdf.js desde CDN si no está ya cargado
     if (typeof html2pdf === 'undefined') {
         const script = document.createElement('script');
-        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
-        script.onload = function() {
-            generarPDF();
-        };
-        script.onerror = function() {
-            alert('Error al cargar la librería html2pdf. Compruebe su conexión a internet.');
-            limpiarYRestaurar();
-        };
-        document.head.appendChild(script);
-    } else {
-        generarPDF();
-    }
-    
-    // Función para generar el PDF una vez cargada la librería
-    function generarPDF() {
-        html2pdf().from(contenido).set(opciones).save()
-            .then(() => {
-                console.log('PDF generado correctamente');
-                setTimeout(limpiarYRestaurar, 1000); // Dar tiempo a que se complete la descarga
-            })
-            .catch(err => {
-                console.error('Error al generar PDF:', err);
-                alert('Error al generar el PDF: ' + err.message);
-                limpiarYRestaurar();
-            });
-    }
-    
-    // Función para restaurar el estado original de los elementos
-    function limpiarYRestaurar() {
-        // Quitar el indicador de carga
-        const indicador = document.getElementById('indicador-pdf');
-        if (indicador) {
-            document.body.removeChild(indicador);
-        }
-        
-        // Restaurar visibilidad de botones
-        botones.forEach(div => {
-            div.style.display = div.dataset.displayOriginal || '';
-            delete div.dataset.displayOriginal;
-        });
-        
-        // Restaurar elementos ocultos
-        elementos.forEach(el => {
-            el.style.display = el.dataset.displayOriginal || '';
-            delete el.dataset.displayOriginal;
-        });
-    }
-}
-
-// Agregar botón de descarga PDF
-function agregarBotonDescargarPDF() {
-    // Seleccionar el último conjunto de botones (que está al final del formulario)
-    const botonesDivs = document.querySelectorAll('.botones');
-    if (botonesDivs.length === 0) {
-        console.error('No se encontraron divs de botones');
-        return;
-    }
-    
-    const ultimoBotonesDiv = botonesDivs[botonesDivs.length - 1];
-    
-    // Buscar si ya existe el botón para no duplicarlo
-    if (ultimoBotonesDiv.querySelector('#btn-descargar-pdf')) {
-        return;
-    }
-    
-    // Crear el nuevo botón con estilo más destacado
-    const botonDescargar = document.createElement('button');
-    botonDescargar.type = 'button';
-    botonDescargar.id = 'btn-descargar-pdf';
-    botonDescargar.textContent = 'Descargar PDF';
-    botonDescargar.onclick = descargarPDF;
-    botonDescargar.className = 'no-print';
-    
-    // Estilo especial para el botón de descarga
-    botonDescargar.style.backgroundColor = '#28a745'; // Verde
-    botonDescargar.style.padding = '12px 24px';
-    botonDescargar.style.fontSize = '1.1rem';
-    botonDescargar.style.margin = '0 5px';
-    botonDescargar.style.fontWeight = 'bold';
-    botonDescargar.style.boxShadow = '0 4px 6px rgba(0,0,0,0.1)';
-    
-    // Añadir el botón al div, como primer elemento (antes de los demás botones)
-    ultimoBotonesDiv.insertBefore(botonDescargar, ultimoBotonesDiv.firstChild);
-}
-
-// Modificar la función guardarPDF existente para usar nuestro nuevo método
-function modificarFuncionGuardarPDF() {
-    if (typeof window.guardarPDF === 'function') {
-        const guardarPDFOriginal = window.guardarPDF;
-        window.guardarPDF = function() {
-            descargarPDF();
-        };
-        console.log('Función guardarPDF sobrescrita para usar html2pdf');
-    }
-}
-
-// Función principal de inicialización
-function inicializarAutoguardado() {
-    console.log('Inicializando sistema de autoguardado...');
-    
-    if (!verificarLocalStorage()) {
-        console.error('No se puede inicializar el autoguardado: localStorage no disponible');
-        return;
-    }
-    
-    // Primero añadir los estilos
-    añadirEstilosImpresion();
-    aplicarEstilosAdicionales();
-    
-    // Ajustar los botones existentes
-    ajustarBotones();
-    
-    // Añadir elementos UI
-    añadirIndicadorGuardado();
-    añadirInfoDatosGuardados();
-    
-    // Añadir nuevo botón para limpiar datos
-    añadirBotonLimpiarDatos();
-    
-    // Añadir botón de descarga PDF
-    agregarBotonDescargarPDF();
-    
-    // Modificar la función existente guardarPDF
-    modificarFuncionGuardarPDF();
-    
-    // Configurar eventos para autoguardado
-    configurarAutoguardado();
-    
-    // Finalmente cargar datos guardados
-    setTimeout(cargarDatosFormulario, 500); // Pequeño retraso para asegurar que todo esté listo
-    
-    console.log('Sistema de autoguardado inicializado correctamente');
-}
-
-// Asegurarse de que el DOM esté completamente cargado antes de inicializar
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', inicializarAutoguardado);
-} else {
-    // Si el DOM ya está cargado, inicializar inmediatamente
-    inicializarAutoguardado();
-}
-
-// Añadir un evento de carga para asegurarnos de que todas las imágenes y recursos estén cargados
-window.addEventListener('load', function() {
-    // Actualizar el conteo después de que todo esté cargado
-    if (typeof contarCumplimiento === 'function') {
-        setTimeout(contarCumplimiento, 1000);
-    }
-});
-
-// Exponer funciones a window para que puedan ser llamadas desde la consola para depuración
-window.guardarDatosManualmente = guardarDatosFormulario;
-window.cargarDatosManualmente = cargarDatosFormulario;
-window.limpiarDatosGuardados = limpiarDatosGuardados;
-window.descargarPDF = descargarPDF
+        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0
