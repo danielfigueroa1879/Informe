@@ -249,11 +249,11 @@ function generarPDFCorregido() {
                 margin: 0 !important;
             }
             h1 {
-                font-size: 19pt !important; /* Reducido */
+                font-size: 18pt !important; /* Reducido */
                 margin-bottom: 20px !important;
             }
             h2 {
-                font-size: 14pt !important; /* Reducido */
+                font-size: 13pt !important; /* Reducido */
                 page-break-before: always !important;
                 break-before: page !important;
                 page-break-after: avoid !important;
