@@ -531,7 +531,7 @@ function generarPDFCorregido() {
                         }
                         
                         h1 {
-                            font-size: 16pt !important;
+                            font-size: 18pt !important;
                         }
                         
                         h2 {
