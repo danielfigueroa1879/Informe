@@ -372,7 +372,7 @@ function generarPDFCorregido() {
                 border: 1px solid #e0e0e0 !important; /* Borde sutil */
                 box-shadow: 0 1px 3px rgba(0,0,0,0.05) !important; /* Sombra sutil */
                 border-radius: 0 !important; /* Sin bordes redondeados para estilo formal */
-                font-family: 'Times New Roman', Times, serif !important; /* Fuente formal */
+                font-family: 'Poppins', Times, serif !important; /* Fuente formal */
                 text-align: justify !important; /* Texto justificado para apariencia formal */
                 color: #000 !important; /* Negro sólido para texto formal */
                 margin-top: 15px !important;
@@ -645,7 +645,7 @@ function generarPDFCorregido() {
                             border: 1px solid #e0e0e0 !important;
                             box-shadow: 0 1px 3px rgba(0,0,0,0.05) !important;
                             border-radius: 0 !important;
-                            font-family: 'Times New Roman', Times, serif !important;
+                            font-family: 'Poppins', Times, serif !important;
                             text-align: justify !important;
                             color: #000 !important;
                             margin-top: 15px !important;
