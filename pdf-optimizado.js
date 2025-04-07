@@ -27,21 +27,102 @@ function generarPDFCorregido() {
     function prepararYGenerarPDF() {
         console.log("Iniciando generación de PDF optimizada...");
         
-        // 1. Obtener una copia limpia del contenido que vamos a convertir
-        const container = document.querySelector('.container');
-        if (!container) {
+        try {
+            // 1. Obtener una copia limpia del contenido que vamos a convertir
+            const container = document.querySelector('.container');
+            if (!container) {
+                ocultarIndicadorCarga();
+                alert('Error: No se pudo encontrar el contenedor principal del documento.');
+                return;
+            }
+            
+            // 2. Preparar el contenido limpiando elementos innecesarios
+            const estadoOriginal = prepararContenidoParaPDF(container);
+            
+            // 3. Actualizar el indicador de progreso
+            const barraProgreso = document.getElementById('barra-progreso-pdf');
+            const textoEstado = document.getElementById('texto-estado-pdf');
+            if (barraProgreso && textoEstado) {
+                barraProgreso.style.width = '30%';
+                textoEstado.textContent = 'Procesando contenido...';
+            }
+            
+            // 4. Generar el PDF con una versión simplificada para evitar bloqueos
+            setTimeout(() => {
+                try {
+                    generarPDFSimplificado(container, estadoOriginal);
+                } catch (error) {
+                    console.error("Error al generar PDF simplificado:", error);
+                    // Si falla, intentar con la versión normal
+                    setTimeout(() => {
+                        try {
+                            generarPDFDesdeContenido(container, estadoOriginal);
+                        } catch (error2) {
+                            console.error("Error al generar PDF normal:", error2);
+                            ocultarIndicadorCarga();
+                            alert("Ocurrió un error al generar el PDF. Por favor, intente con la opción de imprimir del navegador.");
+                            restaurarDocumentoOriginal(estadoOriginal);
+                        }
+                    }, 500);
+                }
+            }, 300);
+        } catch (error) {
+            console.error("Error en preparación del PDF:", error);
             ocultarIndicadorCarga();
-            alert('Error: No se pudo encontrar el contenedor principal del documento.');
-            return;
+            alert("Error al preparar el documento para PDF. Por favor, intente nuevamente.");
+        }
+    }
+    
+    // Versión simplificada para casos problemáticos
+    function generarPDFSimplificado(contenido, estadoOriginal) {
+        console.log("Usando versión simplificada de generación PDF...");
+        
+        // Configuración básica para evitar problemas
+        const opciones = {
+            filename: `Fiscalizacion_${new Date().toLocaleDateString().replace(/\//g, '-')}.pdf`,
+            margin: [10, 10, 10, 10],
+            image: { type: 'jpeg', quality: 0.95 },
+            html2canvas: { 
+                scale: 1.2,
+                useCORS: true,
+                allowTaint: true,
+                backgroundColor: '#FFFFFF'
+            },
+            jsPDF: { 
+                unit: 'mm', 
+                format: 'legal',
+                orientation: 'portrait'
+            }
+        };
+        
+        // Actualizar barra de progreso
+        const barraProgreso = document.getElementById('barra-progreso-pdf');
+        const textoEstado = document.getElementById('texto-estado-pdf');
+        if (barraProgreso && textoEstado) {
+            barraProgreso.style.width = '60%';
+            textoEstado.textContent = 'Generando PDF...';
         }
         
-        // 2. Preparar el contenido limpiando elementos innecesarios
-        const estadoOriginal = prepararContenidoParaPDF(container);
-        
-        // 3. Generar el PDF con la configuración optimizada
-        setTimeout(() => {
-            generarPDFDesdeContenido(container, estadoOriginal);
-        }, 300); // Pequeño retraso para que los cambios de estilo se apliquen
+        // Generar el PDF con configuración simplificada
+        html2pdf()
+            .from(contenido)
+            .set(opciones)
+            .save()
+            .then(function() {
+                console.log("PDF generado exitosamente (modo simplificado)");
+                actualizarIndicadorExito();
+                
+                // Restaurar el documento original después de un momento
+                setTimeout(() => {
+                    restaurarDocumentoOriginal(estadoOriginal);
+                }, 1200);
+            })
+            .catch(function(error) {
+                console.error("Error al generar el PDF simplificado:", error);
+                ocultarIndicadorCarga();
+                alert("Ocurrió un error al generar el PDF. Por favor, intente nuevamente con menor contenido.");
+                restaurarDocumentoOriginal(estadoOriginal);
+            });
     }
     
     // Función para preparar el contenido limpiando elementos no deseados
@@ -82,83 +163,45 @@ function generarPDFCorregido() {
             el.style.display = 'none';
         });
         
-        // 3. Insertar elementos explícitos de salto de página para asegurar separación
+        // 3. Insertar marcadores de página más simples para evitar bloqueos
         
-        // A. Forzar salto de página antes del Resumen de Fiscalización
-        const tituloResumen = container.querySelector('h2:contains("RESUMEN DE FISCALIZACIÓN")') || 
-                            container.querySelector('h2[id="seccion-resumen"]');
+        // A. Identificar secciones por ID o título
+        const seccionResumen = document.getElementById('seccion-resumen');
+        const seccionFotos = document.getElementById('seccion-fotos');
         
-        if (tituloResumen) {
-            console.log("Aplicando salto de página para el resumen");
-            // Marcar como elemento de salto de página explícito
-            tituloResumen.style.pageBreakBefore = 'always';
-            tituloResumen.style.breakBefore = 'page';
-            
-            // También insertar un DIV específico para forzar el salto
-            const divResumen = document.createElement('div');
-            divResumen.className = 'page-break-explicit';
-            divResumen.style.display = 'block';
-            divResumen.style.pageBreakBefore = 'always';
-            divResumen.style.breakBefore = 'page';
-            divResumen.style.height = '1px';
-            divResumen.style.border = 'none';
-            divResumen.style.margin = '0';
-            divResumen.style.padding = '0';
-            
-            // Insertar antes del título
-            tituloResumen.parentNode.insertBefore(divResumen, tituloResumen);
-            estadoOriginal.elementosCreados.push(divResumen);
+        // Aplicar clases y estilos a las secciones existentes
+        if (seccionResumen) {
+            seccionResumen.style.pageBreakBefore = 'always';
+            seccionResumen.style.breakBefore = 'page';
         }
         
-        // B. Forzar salto de página antes de Recomendaciones
-        // Buscar el encabezado específico dentro del summary
-        const seccionRecomendaciones = container.querySelector('.summary h3:contains("Recomendaciones y Plan de Acción")');
+        if (seccionFotos) {
+            seccionFotos.style.pageBreakBefore = 'always';
+            seccionFotos.style.breakBefore = 'page';
+        }
+        
+        // B. Identificar sección de recomendaciones
+        // Buscar todos los h3 dentro de summary y el que tenga el texto de recomendaciones
+        const encabezadosH3 = container.querySelectorAll('.summary h3');
+        let seccionRecomendaciones = null;
+        
+        // Buscar el encabezado que contenga la palabra "Recomendaciones"
+        for (let i = 0; i < encabezadosH3.length; i++) {
+            if (encabezadosH3[i].textContent.includes('Recomendaciones')) {
+                seccionRecomendaciones = encabezadosH3[i];
+                break;
+            }
+        }
+        
+        // Si no se encontró por texto, usar el segundo h3 (nth-of-type(2))
+        if (!seccionRecomendaciones && encabezadosH3.length >= 2) {
+            seccionRecomendaciones = encabezadosH3[1]; // El segundo h3
+        }
+        
+        // Aplicar salto de página a la sección de recomendaciones
         if (seccionRecomendaciones) {
-            console.log("Aplicando salto de página para recomendaciones");
-            // Aplicar estilos directamente al encabezado
             seccionRecomendaciones.style.pageBreakBefore = 'always';
             seccionRecomendaciones.style.breakBefore = 'page';
-            
-            // Crear un div explícito para forzar el salto
-            const divRecomendaciones = document.createElement('div');
-            divRecomendaciones.className = 'page-break-explicit';
-            divRecomendaciones.style.display = 'block';
-            divRecomendaciones.style.pageBreakBefore = 'always';
-            divRecomendaciones.style.breakBefore = 'page';
-            divRecomendaciones.style.height = '1px';
-            divRecomendaciones.style.border = 'none';
-            divRecomendaciones.style.margin = '0';
-            divRecomendaciones.style.padding = '0';
-            
-            // Insertar antes del encabezado
-            seccionRecomendaciones.parentNode.insertBefore(divRecomendaciones, seccionRecomendaciones);
-            estadoOriginal.elementosCreados.push(divRecomendaciones);
-        }
-        
-        // C. Forzar salto de página antes del Set Fotográfico
-        const tituloFotos = container.querySelector('h2:contains("SET FOTOGRÁFICO")') || 
-                          container.querySelector('h2[id="seccion-fotos"]');
-        
-        if (tituloFotos) {
-            console.log("Aplicando salto de página para el set fotográfico");
-            // Marcar como elemento de salto de página explícito
-            tituloFotos.style.pageBreakBefore = 'always';
-            tituloFotos.style.breakBefore = 'page';
-            
-            // También insertar un DIV específico para forzar el salto
-            const divFotos = document.createElement('div');
-            divFotos.className = 'page-break-explicit';
-            divFotos.style.display = 'block';
-            divFotos.style.pageBreakBefore = 'always';
-            divFotos.style.breakBefore = 'page';
-            divFotos.style.height = '1px';
-            divFotos.style.border = 'none';
-            divFotos.style.margin = '0';
-            divFotos.style.padding = '0';
-            
-            // Insertar antes del título
-            tituloFotos.parentNode.insertBefore(divFotos, tituloFotos);
-            estadoOriginal.elementosCreados.push(divFotos);
         }
         
         // 4. Mejorar el manejo de las textareas (observaciones)
@@ -753,16 +796,11 @@ function generarPDFCorregido() {
                 putOnlyUsedFonts: true
             },
             
-            // Configuración de saltos de página - Modificada para respetar nuestros saltos forzados
+            // Configuración simplificada de saltos de página para evitar bloqueos
             pagebreak: {
-                mode: ['css', 'legacy'],
-                before: [
-                    'h2#seccion-resumen', 
-                    '.summary h3:nth-of-type(2)', 
-                    'h2#seccion-fotos',
-                    '.page-break-explicit'
-                ],
-                avoid: ['table', 'img', '.textarea-contenido-pdf']
+                mode: 'css',
+                before: ['h2#seccion-resumen', '.summary h3:nth-of-type(2)', 'h2#seccion-fotos'],
+                avoid: ['table', 'img']
             },
             
             // Usar el nuevo modo para división de contenido
