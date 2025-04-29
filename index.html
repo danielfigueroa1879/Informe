@@ -1,13 +1,11 @@
-Contenido pegado
-67.06 KB •1,823 líneas
-•
-El formato puede ser inconsistente con la fuente
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
     <title>Fiscalización de Seguridad Privada</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"">
+                                                                                                  <!-- Incluir íconos de Font Awesome para navegación móvil -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -625,6 +623,134 @@ El formato puede ser inconsistente con la fuente
         font-size: 12px !important;
     }
 }
+      /* NUEVOS ESTILOS RESPONSIVOS MEJORADOS */
+
+/* Menú fijo en móvil para fácil navegación */
+.mobile-nav {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: #003366;
+    z-index: 1000;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.2);
+}
+
+.mobile-nav-content {
+    display: flex;
+    justify-content: space-around;
+    padding: 10px 5px;
+}
+
+.nav-button {
+    color: white;
+    background: none;
+    border: none;
+    font-size: 0.8rem;
+    padding: 8px 5px;
+    margin: 0;
+    flex: 1;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 80px;
+}
+
+.nav-button i {
+    font-size: 1.2rem;
+    margin-bottom: 5px;
+}
+
+/* Botón flotante para guardar/enviar en móvil */
+.mobile-action-button {
+    display: none;
+    position: fixed;
+    bottom: 70px;
+    right: 20px;
+    background-color: #28a745;
+    color: white;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    font-size: 24px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    z-index: 1000;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Panel de control colapsable para acciones rápidas */
+.mobile-control-panel {
+    display: none;
+    margin-bottom: 15px;
+    background-color: #f2f2f2;
+    border-radius: 10px;
+    padding: 15px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.panel-button-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.panel-button {
+    flex: 1;
+    min-width: 120px;
+    padding: 10px;
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+/* Mejoras para tablas en móvil */
+.mobile-table-scroll {
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    position: relative;
+}
+
+/* Optimizar espacios entre elementos */
+.compact-mobile-spacing {
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+/* Estilo especial para indicador de scroll horizontal en tablas */
+.table-scroll-indicator {
+    display: none;
+    text-align: center;
+    color: #666;
+    font-size: 0.8rem;
+    margin-bottom: 5px;
+}
+
+/* Mejoras para entrada de fechas en móvil */
+.mobile-date-input {
+    display: flex;
+    align-items: center;
+    max-width: 100%;
+}
+
+.mobile-date-input input {
+    width: 2.5rem;
+    height: 2.5rem;
+    text-align: center;
+    font-size: 1.2rem;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}                    
+                          
+                          
+                          
+                          
+                          
+                          
         /* Estilos responsivos para dispositivos móviles y pantallas pequeñas */
         @media screen and (max-width: 768px) {
             .container {
@@ -1291,7 +1417,7 @@ El formato puede ser inconsistente con la fuente
                     <td class="observaciones"></td>
                 </tr>
                 <tr>
-                    <td>Copia de certificados de cursos de formación vigentes</td>
+                    <td>Copia de certificados de cursos de formación vigentes (Art. 50, Ley 21.659)</td>
                     <td class="check-column"><div class="check-box"></div></td>
                     <td class="check-column"><div class="check-box"></div></td>
                     <td class="observaciones"></td>
@@ -1302,7 +1428,7 @@ El formato puede ser inconsistente con la fuente
                     <td class="check-column"><div class="check-box"></div></td>
                     <td class="observaciones"></td>
                 </tr>
-            </table><br><br><br><br>
+            </table>
 
             <h3>B. Dotación y Turnos</h3>
                                              <table>
@@ -1426,7 +1552,7 @@ El formato puede ser inconsistente con la fuente
                     <td class="check-column"><div class="check-box"></div></td>
                     <td class="observaciones"></td>
                 </tr>
-            </table><br><br><br><br><br><br><br><br><br><br>
+            </table>
 
             <!-- Salto de página controlado -->
             <div id="seccion-sistemas" class="forced-page-break"></div>
@@ -1821,7 +1947,258 @@ function agregarBotonPDFMejorado() {
 window.addEventListener('load', function() {
     setTimeout(agregarBotonPDFMejorado, 1000);
 });
+                                                                
+// Función para navegar a secciones
+function scrollToSection(sectionId) {
+    var element = document.getElementById(sectionId);
+    if (element) {
+        window.scrollTo({
+            top: element.offsetTop - 15,
+            behavior: 'smooth'
+        });
+    }
+}
+
+// Mostrar opciones de guardado en móvil
+function mostrarOpcionesGuardado() {
+    var modal = document.createElement('div');
+    modal.className = 'mobile-modal';
+    modal.innerHTML = `
+        <div class="mobile-modal-content">
+            <h3 style="margin-top:0; text-align:center; color:#003366;">Opciones de guardado</h3>
+            <div class="mobile-modal-buttons" style="flex-direction:column; gap:15px;">
+                <button class="mobile-option-button" onclick="imprimirFormulario(); document.body.removeChild(this.closest('.mobile-modal'));">
+                    <i class="fas fa-print"></i> Imprimir formulario
+                </button>
+                <button class="mobile-option-button" onclick="guardarPDF(); document.body.removeChild(this.closest('.mobile-modal'));">
+                    <i class="fas fa-file-pdf"></i> Guardar como PDF
+                </button>
+                <button class="mobile-option-button" style="background-color:#f2f2f2; color:#333;" 
+                        onclick="document.body.removeChild(this.closest('.mobile-modal'));">
+                    Cancelar
+                </button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+    
+    // Aplicar estilos
+    modal.style.position = 'fixed';
+    modal.style.top = '0';
+    modal.style.left = '0';
+    modal.style.width = '100%';
+    modal.style.height = '100%';
+    modal.style.backgroundColor = 'rgba(0,0,0,0.7)';
+    modal.style.zIndex = '2000';
+    modal.style.display = 'flex';
+    modal.style.alignItems = 'center';
+    modal.style.justifyContent = 'center';
+    
+    var modalContent = modal.querySelector('.mobile-modal-content');
+    modalContent.style.backgroundColor = 'white';
+    modalContent.style.borderRadius = '10px';
+    modalContent.style.padding = '20px';
+    modalContent.style.width = '85%';
+    modalContent.style.maxWidth = '350px';
+    modalContent.style.boxShadow = '0 4px 15px rgba(0,0,0,0.2)';
+    
+    var buttons = modal.querySelectorAll('.mobile-option-button');
+    buttons.forEach(function(button) {
+        button.style.width = '100%';
+        button.style.padding = '15px';
+        button.style.borderRadius = '8px';
+        button.style.border = 'none';
+        button.style.fontWeight = 'bold';
+        button.style.fontSize = '1rem';
+        button.style.display = 'flex';
+        button.style.alignItems = 'center';
+        button.style.justifyContent = 'center';
+        button.style.gap = '10px';
+        button.style.backgroundColor = '#003366';
+        button.style.color = 'white';
+        button.style.cursor = 'pointer';
+    });
+}
+
+// Mostrar notificación estilo móvil
+function mostrarNotificacionMovil(mensaje, tipo) {
+    var notificacion = document.createElement('div');
+    notificacion.className = 'mobile-notification';
+    notificacion.innerHTML = `
+        <div class="notification-content ${tipo}">
+            <i class="fas ${tipo === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
+            <span>${mensaje}</span>
+        </div>
+    `;
+    document.body.appendChild(notificacion);
+    
+    // Agregar estilos inline para la notificación
+    notificacion.style.position = 'fixed';
+    notificacion.style.bottom = '80px';
+    notificacion.style.left = '50%';
+    notificacion.style.transform = 'translateX(-50%)';
+    notificacion.style.zIndex = '2000';
+    notificacion.style.width = '90%';
+    notificacion.style.maxWidth = '350px';
+    
+    var notifContent = notificacion.querySelector('.notification-content');
+    notifContent.style.borderRadius = '8px';
+    notifContent.style.padding = '12px 15px';
+    notifContent.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+    notifContent.style.display = 'flex';
+    notifContent.style.alignItems = 'center';
+    notifContent.style.gap = '10px';
+    
+    if (tipo === 'success') {
+        notifContent.style.backgroundColor = '#d4edda';
+        notifContent.style.color = '#155724';
+        notifContent.style.border = '1px solid #c3e6cb';
+    } else {
+        notifContent.style.backgroundColor = '#f8d7da';
+        notifContent.style.color = '#721c24';
+        notifContent.style.border = '1px solid #f5c6cb';
+    }
+    
+    // Desaparecer después de 3 segundos
+    setTimeout(function() {
+        notificacion.style.opacity = '0';
+        notificacion.style.transition = 'opacity 0.5s ease';
+        
+        setTimeout(function() {
+            document.body.removeChild(notificacion);
+        }, 500);
+    }, 3000);
+}                                                          
+                                                             
+                                                                
+                                                                
+                                                                
+                                                                
+                                                                                                                 
+                                                                
 </script>
 <script src="pdf-optimizado.js"></script>
+                               <!-- Navegación móvil fija -->
+<div class="mobile-nav no-print">
+    <div class="mobile-nav-content">
+        <button class="nav-button" onclick="scrollToSection('formulario-fiscalizacion')">
+            <i class="fas fa-home"></i>
+            <span>Inicio</span>
+        </button>
+        <button class="nav-button" onclick="scrollToSection('seccion-personal')">
+            <i class="fas fa-user-shield"></i>
+            <span>Personal</span>
+        </button>
+        <button class="nav-button" onclick="scrollToSection('seccion-uniformes')">
+            <i class="fas fa-tshirt"></i>
+            <span>Uniformes</span>
+        </button>
+        <button class="nav-button" onclick="scrollToSection('seccion-sistemas')">
+            <i class="fas fa-video"></i>
+            <span>Sistemas</span>
+        </button>
+        <button class="nav-button" onclick="scrollToSection('seccion-resumen')">
+            <i class="fas fa-clipboard-check"></i>
+            <span>Resumen</span>
+        </button>
+    </div>
+</div>
+
+<!-- Botón flotante para guardar/imprimir -->
+<button class="mobile-action-button no-print" onclick="mostrarOpcionesGuardado()">
+    <i class="fas fa-save"></i>
+</button>
+                               
+<script>
+// Código para mejorar la experiencia móvil
+document.addEventListener('DOMContentLoaded', function() {
+    // Detectar si es dispositivo móvil
+    const esMobile = window.innerWidth <= 768;
+    
+    if (esMobile) {
+        // Añadir panel de control compacto al inicio
+        const panelControl = document.createElement('div');
+        panelControl.className = 'mobile-control-panel no-print';
+        panelControl.innerHTML = `
+            <div class="panel-button-group">
+                <button class="panel-button" onclick="scrollToSection('seccion-resumen')">
+                    <i class="fas fa-chart-pie"></i> Ver Resumen
+                </button>
+                <button class="panel-button" onclick="guardarPDF()">
+                    <i class="fas fa-file-pdf"></i> Guardar PDF
+                </button>
+            </div>
+        `;
+        
+        // Insertar después del div info-section
+        const infoSection = document.querySelector('.info-section');
+        if (infoSection) {
+            infoSection.parentNode.insertBefore(panelControl, infoSection.nextSibling);
+        }
+        
+        // Añadir indicadores visuales a los radios buttons para mejorar UX
+        document.querySelectorAll('input[type="radio"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                // Quitar clases previas
+                const fila = this.closest('tr');
+                fila.classList.remove('fila-cumple', 'fila-no-cumple');
+                
+                // Añadir clase según selección
+                if (this.checked) {
+                    if (this.value === 'cumple') {
+                        fila.classList.add('fila-cumple');
+                    } else {
+                        fila.classList.add('fila-no-cumple');
+                    }
+                }
+            });
+        });
+        
+        // Estilos inline para las filas marcadas
+        const style = document.createElement('style');
+        style.innerHTML = `
+            .fila-cumple {
+                background-color: rgba(223, 240, 216, 0.5) !important;
+            }
+            .fila-no-cumple {
+                background-color: rgba(242, 222, 222, 0.5) !important;
+            }
+            .nav-seguro i {
+                color: #28a745 !important;
+            }
+            .nav-riesgo i {
+                color: #ffc107 !important;
+            }
+            .nav-inseguro i {
+                color: #dc3545 !important;
+            }
+            .mobile-notification {
+                transition: opacity 0.5s ease;
+            }
+        `;
+        document.head.appendChild(style);
+        
+        // Añadir indicadores de scroll horizontal para tablas
+        document.querySelectorAll('table').forEach(tabla => {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'mobile-table-scroll';
+            
+            const indicador = document.createElement('div');
+            indicador.className = 'table-scroll-indicator';
+            indicador.innerHTML = '<i class="fas fa-arrows-left-right"></i> Deslice para ver toda la tabla';
+            
+            tabla.parentNode.insertBefore(indicador, tabla);
+            tabla.parentNode.insertBefore(wrapper, indicador);
+            wrapper.appendChild(tabla);
+            wrapper.appendChild(indicador);
+        });
+    }
+});
+</script>                       
+                               
+                               
+                               
+                               
+                               
 </body>
 </html>
