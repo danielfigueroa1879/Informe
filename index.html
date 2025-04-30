@@ -965,12 +965,12 @@
     line-height: 1.5;
 }
 
-
 .logo-container {
-    position: absolute;
-    top: 20px;
-    left: 20px;
-    z-index: 100;
+    position: relative;
+    float: left;
+    margin-top: 20px;
+    margin-left: 20px;
+    margin-bottom: 10px;
 }
 
 .logo-os10 {
@@ -979,31 +979,26 @@
     max-width: 100%;
 }
 
-/* Ajuste para el título principal para dejar espacio al logo */
+/* Para hacer espacio para el título */
 h1 {
-    margin-left: 130px;
-    margin-right: 130px;
+    clear: both;
+    padding-top: 15px;
 }
 
 /* Ajuste responsivo para dispositivos móviles */
 @media screen and (max-width: 768px) {
     .logo-container {
-        position: relative;
-        top: 10px;
-        left: 10px;
+        width: 100%;
         text-align: center;
-        margin-bottom: 15px;
+        margin: 10px auto;
+        float: none;
     }
     
     .logo-os10 {
         width: 100px;
     }
-    
-    h1 {
-        margin-left: 0;
-        margin-right: 0;
-    }
 }
+
         
     </style>
 </head>
