@@ -964,6 +964,46 @@
     margin-bottom: 12px;
     line-height: 1.5;
 }
+
+
+.logo-container {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    z-index: 100;
+}
+
+.logo-os10 {
+    width: 120px;
+    height: auto;
+    max-width: 100%;
+}
+
+/* Ajuste para el título principal para dejar espacio al logo */
+h1 {
+    margin-left: 130px;
+    margin-right: 130px;
+}
+
+/* Ajuste responsivo para dispositivos móviles */
+@media screen and (max-width: 768px) {
+    .logo-container {
+        position: relative;
+        top: 10px;
+        left: 10px;
+        text-align: center;
+        margin-bottom: 15px;
+    }
+    
+    .logo-os10 {
+        width: 100px;
+    }
+    
+    h1 {
+        margin-left: 0;
+        margin-right: 0;
+    }
+}
         
     </style>
 </head>
@@ -1316,6 +1356,9 @@
 <script src="autoguardado.js"></script>
 <body>
    <div class="container">
+       <div class="logo-container">
+    <img src="https://raw.githubusercontent.com/danielfigueroa1879/Informe/716839bc31f50a5931d586f5a1a482ca2836bb3c/logo-os10.png" alt="Logo OS-10" class="logo-os10">
+</div>
         <form id="formulario-fiscalizacion">
             <h1>FISCALIZACIÓN DE SEGURIDAD PRIVADA</h1>
             
