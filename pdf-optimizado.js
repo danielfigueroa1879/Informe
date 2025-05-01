@@ -243,7 +243,7 @@ function generarPDFCorregido() {
         estilosTemporales.textContent = `
             @page {
                 size: legal portrait;
-                margin: 12mm 8mm; /* Márgenes aún más reducidos */
+                margin: 10mm 6mm; /* Márgenes aún más reducidos */
             }
             body {
                 -webkit-print-color-adjust: exact !important;
@@ -341,6 +341,21 @@ function generarPDFCorregido() {
                 margin-bottom: 4px !important; /* Reducido */
             }
             
+            /* Reducir específicamente el tamaño del texto en los campos de entrada */
+            .info-section input[type="text"] {
+                font-size: 7.5pt !important; /* Tamaño reducido para el texto dentro de los inputs */
+                padding: 2px !important; /* Padding reducido */
+                height: auto !important; /* Altura automática basada en el contenido */
+            }
+            
+            /* Ajustar específicamente los inputs de fecha */
+            .fecha-inputs input[type="text"] {
+                font-size: 7.5pt !important;
+                padding: 1px !important;
+                width: 25px !important; /* Ancho reducido */
+                text-align: center !important;
+            }
+            
             /* Estilos específicos para que los gráficos y colores se muestren correctamente */
             .header-row, th {
                 background-color: #003366 !important;
@@ -429,7 +444,7 @@ function generarPDFCorregido() {
             
             // Modo de optimización: 1 = velocidad, 2 = precisión
             html2canvas: {
-                scale: 0.95, // Reducido significativamente para mejor ajuste
+                scale: 0.85, // Reducido aún más para asegurar que todo el contenido quepa
                 useCORS: true,
                 allowTaint: true,
                 scrollX: 0,
@@ -547,12 +562,39 @@ function generarPDFCorregido() {
                     `;
                     clonedDoc.head.appendChild(style);
                     
+                    // Añadir estilos específicos para entradas de texto e inputs
+                    const inputsStyle = clonedDoc.createElement('style');
+                    inputsStyle.innerHTML = `
+                        /* Reducir específicamente el tamaño del texto en los campos de entrada */
+                        .info-section input[type="text"] {
+                            font-size: 7.5pt !important;
+                            padding: 2px !important;
+                            height: auto !important;
+                        }
+                        
+                        /* Ajustar específicamente los inputs de fecha */
+                        .fecha-inputs input[type="text"] {
+                            font-size: 7.5pt !important;
+                            padding: 1px !important;
+                            width: 25px !important;
+                            text-align: center !important;
+                        }
+                        
+                        /* Ajustar contenedor para que todo quepa */
+                        .container {
+                            width: 94% !important;
+                            max-width: 94% !important;
+                            padding: 2mm !important;
+                            margin: 0 auto !important;
+                        }
+                    `;
+                    clonedDoc.head.appendChild(inputsStyle);
+                    
                     // Asegurar que las imágenes se muestran correctamente
                     Array.from(clonedDoc.querySelectorAll('img')).forEach(img => {
                         img.style.display = 'block';
                         img.style.maxWidth = '100%';
                     });
-                    
                     // Eliminar elementos vacíos en el clon que podrían causar páginas en blanco
                     const divs = Array.from(clonedDoc.querySelectorAll('div, p, span'));
                     divs.forEach(div => {
@@ -562,8 +604,6 @@ function generarPDFCorregido() {
                             }
                         }
                     });
-                }
-            },
             
             jsPDF: {
                 unit: 'mm',
@@ -584,7 +624,7 @@ function generarPDFCorregido() {
             // Usar el nuevo modo para división de contenido
             enableLinks: false,
             image: { type: 'jpeg', quality: 0.98 }, // Mayor calidad para gráficos
-            margin: [8, 6, 8, 6], // top, right, bottom, left (reducidos para maximizar espacio)
+            margin: [6, 5, 6, 5], // top, right, bottom, left (reducidos al mínimo para maximizar espacio)
         };
         
         // Generar el PDF con el manejo optimizado
@@ -659,63 +699,121 @@ function generarPDFCorregido() {
         }
     }
     
-    // Función para restaurar el documento a su estado original
     function restaurarDocumentoOriginal(estadoOriginal) {
         console.log("Restaurando documento a su estado original...");
         
-        // 1. Remover elementos creados durante la preparación
-        if (estadoOriginal.elementosCreados) {
-            estadoOriginal.elementosCreados.forEach(el => {
-                if (el && el.parentNode) {
-                    el.parentNode.removeChild(el);
-                }
-            });
-        }
-        
-        // 2. Restaurar elementos ocultos
-        if (estadoOriginal.ocultos) {
-            estadoOriginal.ocultos.forEach(item => {
-                // Si el elemento fue removido completamente
-                if (item.parent && item.nextSibling) {
-                    item.parent.insertBefore(item.element, item.nextSibling);
-                } else if (item.parent) {
-                    item.parent.appendChild(item.element);
-                }
-                
-                // Restaurar visibilidad
-                if (item.display !== undefined) {
-                    item.element.style.display = item.display;
-                }
-            });
-        }
-        
-        // 3. Restaurar estilos originales
-        if (estadoOriginal.estilos) {
-            estadoOriginal.estilos.forEach((estilos, elemento) => {
-                Object.keys(estilos).forEach(prop => {
-                    // Manejar caso especial para textareas
-                    if (prop === 'value' && elemento.tagName === 'TEXTAREA') {
-                        elemento.value = estilos.value;
-                    } else {
-                        elemento.style[prop] = estilos[prop] || '';
+        try {
+            // 1. Remover elementos creados durante la preparación
+            if (estadoOriginal.elementosCreados) {
+                estadoOriginal.elementosCreados.forEach(el => {
+                    if (el && el.parentNode) {
+                        el.parentNode.removeChild(el);
                     }
                 });
-            });
+            }
+            
+            // 2. Restaurar elementos ocultos
+            if (estadoOriginal.ocultos) {
+                estadoOriginal.ocultos.forEach(item => {
+                    // Si el elemento fue removido completamente
+                    if (item.parent && item.nextSibling) {
+                        try {
+                            item.parent.insertBefore(item.element, item.nextSibling);
+                        } catch (e) {
+                            console.warn("Error al restaurar elemento:", e);
+                            try {
+                                item.parent.appendChild(item.element);
+                            } catch (e2) {
+                                console.warn("No se pudo reintegrar elemento:", e2);
+                            }
+                        }
+                    } else if (item.parent) {
+                        try {
+                            item.parent.appendChild(item.element);
+                        } catch (e) {
+                            console.warn("Error al restaurar elemento:", e);
+                        }
+                    }
+                    
+                    // Restaurar visibilidad
+                    if (item.display !== undefined) {
+                        try {
+                            item.element.style.display = item.display;
+                        } catch (e) {
+                            console.warn("Error al restaurar estilo:", e);
+                        }
+                    }
+                });
+            }
+            
+            // 3. Restaurar estilos originales
+            if (estadoOriginal.estilos) {
+                estadoOriginal.estilos.forEach((estilos, elemento) => {
+                    try {
+                        Object.keys(estilos).forEach(prop => {
+                            // Manejar caso especial para textareas
+                            if (prop === 'value' && elemento.tagName === 'TEXTAREA') {
+                                elemento.value = estilos.value;
+                            } else {
+                                elemento.style[prop] = estilos[prop] || '';
+                            }
+                        });
+                    } catch (e) {
+                        console.warn("Error al restaurar estilos:", e);
+                    }
+                });
+            }
+            
+            // 4. Restaurar estilos del body
+            if (estadoOriginal.documentBody) {
+                document.body.style.overflow = estadoOriginal.documentBody.overflow || '';
+                document.body.style.height = estadoOriginal.documentBody.height || '';
+            }
+            
+            // 5. Eliminar hoja de estilos temporal si aún existe
+            const estilosTemporales = document.getElementById('estilos-temporales-pdf');
+            if (estilosTemporales && estilosTemporales.parentNode) {
+                estilosTemporales.parentNode.removeChild(estilosTemporales);
+            }
+            
+            // 6. Aplicar estilos de limpieza para eliminar cualquier mancha o residuo
+            const estilosLimpieza = document.createElement('style');
+            estilosLimpieza.id = 'estilos-limpieza-temporal';
+            estilosLimpieza.textContent = `
+                /* Limpiar cualquier residuo visual */
+                body, .container, table, tr, td, div {
+                    background-repeat: no-repeat !important;
+                    background-image: none !important;
+                }
+                
+                /* Asegurar que no queden estilos extraños */
+                .container * {
+                    box-shadow: none !important;
+                    text-shadow: none !important;
+                }
+                
+                /* Reset de colores y fondos */
+                body {
+                    background-color: #f5f5f5 !important;
+                }
+                
+                .container {
+                    background-color: #fff !important;
+                }
+            `;
+            document.head.appendChild(estilosLimpieza);
+            
+            // Eliminar estilos de limpieza después de un momento
+            setTimeout(() => {
+                if (estilosLimpieza.parentNode) {
+                    estilosLimpieza.parentNode.removeChild(estilosLimpieza);
+                }
+            }, 500);
+        } catch (e) {
+            console.error("Error en restauración del documento:", e);
         }
         
-        // 4. Restaurar estilos del body
-        if (estadoOriginal.documentBody) {
-            document.body.style.overflow = estadoOriginal.documentBody.overflow || '';
-            document.body.style.height = estadoOriginal.documentBody.height || '';
-        }
-        
-        // 5. Eliminar hoja de estilos temporal si aún existe
-        const estilosTemporales = document.getElementById('estilos-temporales-pdf');
-        if (estilosTemporales && estilosTemporales.parentNode) {
-            estilosTemporales.parentNode.removeChild(estilosTemporales);
-        }
-        
-        // 6. Ocultar indicador de carga si aún está visible
+        // 7. Ocultar indicador de carga si aún está visible
         ocultarIndicadorCarga();
         
         console.log("Documento restaurado correctamente");
