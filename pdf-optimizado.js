@@ -708,13 +708,6 @@ function generarPDFCorregido() {
                         opacity: 0.15 !important;
                         max-width: 80% !important;
                         }
-    
-                        /* Ajustar margen del título para el logo */
-                        h1 {
-                        margin-top: 70px !important;
-                        position: relative !important;
-                        z-index: 1 !important;
-                        }
                         
                     `;
                     clonedDoc.head.appendChild(style);
