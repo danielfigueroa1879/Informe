@@ -961,66 +961,45 @@
 }
 
 .facility-characteristics li {
-    margin-bottom: 5px;
+    margin-bottom: 12px;
     line-height: 1.5;
 }
 
-
-.header-container {
-    position: relative;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-bottom: 30px;
-    width: 100%;
-    min-height: 150px; /* Espacio para asegurar que el logo sea visible */
-}
-
 .logo-container {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1;
+    position: relative;
+    float: left;
+    margin-top: 05px;
+    margin-left: 10px;
+    margin-bottom: 05px;
 }
 
 .logo-os10 {
-    width: 180px;
+    width: 80px;
     height: auto;
-    opacity: 0.2; /* Para que el logo sea visible pero no interfiera con el texto */
+    max-width: 100%;
 }
 
+/* Para hacer espacio para el título */
 h1 {
-    position: relative;
-    z-index: 2; /* Para que el título esté por encima del logo */
-    text-align: center;
-    margin: 0;
-    padding: 15px;
-    background-color: rgba(255, 255, 255, 0.7); /* Fondo semi-transparente para ayudar a leer el título */
-    border-radius: 10px;
-    color: #003366;
+    clear: both;
+    padding-top: 1px;
 }
 
 /* Ajuste responsivo para dispositivos móviles */
 @media screen and (max-width: 768px) {
-    .header-container {
-        min-height: 120px;
+    .logo-container {
+        width:80%;
+        text-align: center;
+        margin: 10px auto;
+        float: none;
     }
     
     .logo-os10 {
-        width: 130px;
-    }
-    
-    h1 {
-        font-size: 1.5rem;
-        padding: 10px;
+        width: 100px;
     }
 }
 
+        
     </style>
 </head>
 <script>
@@ -1371,12 +1350,13 @@ h1 {
 </script>
 <script src="autoguardado.js"></script>
 <body>
-   <div class="header-container">
-    <div class="logo-container">
-        <img src="https://raw.githubusercontent.com/danielfigueroa1879/Informe/716839bc31f50a5931d586f5a1a482ca2836bb3c/logo-os10.png" alt="Logo OS-10" class="logo-os10">
-    </div>
-    <h1>FISCALIZACIÓN DE SEGURIDAD PRIVADA</h1>
+   <div class="container">
+       <div class="logo-container">
+    <img src="https://raw.githubusercontent.com/danielfigueroa1879/Informe/716839bc31f50a5931d586f5a1a482ca2836bb3c/logo-os10.png" alt="Logo OS-10" class="logo-os10">
 </div>
+        <form id="formulario-fiscalizacion">
+            <h1>FISCALIZACIÓN DE SEGURIDAD PRIVADA</h1>
+            
             <div class="info-section">
                 <p><strong>Nombre Entidad:</strong> <input type="text" name="nombre_entidad" /></p>
                 <p><strong>Dirección:</strong> <input type="text" name="direccion" /></p>
