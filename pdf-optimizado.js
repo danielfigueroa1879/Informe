@@ -84,7 +84,7 @@ if (logoContainer && logoImg) {
     logoContainer.style.width = 'auto';
     logoContainer.style.height = 'auto';
     
-    logoImg.style.width = '100px';
+    logoImg.style.width = '60px';
     logoImg.style.height = 'auto';
     logoImg.style.opacity = '1';
     logoImg.style.display = 'block';
