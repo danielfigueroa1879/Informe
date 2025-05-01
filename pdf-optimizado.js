@@ -243,7 +243,7 @@ function generarPDFCorregido() {
         estilosTemporales.textContent = `
             @page {
                 size: legal portrait;
-                margin: 10mm 6mm; /* Márgenes aún más reducidos */
+                margin: 12mm 8mm; /* Márgenes aún más reducidos */
             }
             body {
                 -webkit-print-color-adjust: exact !important;
@@ -341,21 +341,6 @@ function generarPDFCorregido() {
                 margin-bottom: 4px !important; /* Reducido */
             }
             
-            /* Reducir específicamente el tamaño del texto en los campos de entrada */
-            .info-section input[type="text"] {
-                font-size: 7.5pt !important; /* Tamaño reducido para el texto dentro de los inputs */
-                padding: 2px !important; /* Padding reducido */
-                height: auto !important; /* Altura automática basada en el contenido */
-            }
-            
-            /* Ajustar específicamente los inputs de fecha */
-            .fecha-inputs input[type="text"] {
-                font-size: 7.5pt !important;
-                padding: 1px !important;
-                width: 25px !important; /* Ancho reducido */
-                text-align: center !important;
-            }
-            
             /* Estilos específicos para que los gráficos y colores se muestren correctamente */
             .header-row, th {
                 background-color: #003366 !important;
@@ -444,7 +429,7 @@ function generarPDFCorregido() {
             
             // Modo de optimización: 1 = velocidad, 2 = precisión
             html2canvas: {
-                scale: 0.85, // Reducido aún más para asegurar que todo el contenido quepa
+                scale: 0.95, // Reducido significativamente para mejor ajuste
                 useCORS: true,
                 allowTaint: true,
                 scrollX: 0,
@@ -562,39 +547,12 @@ function generarPDFCorregido() {
                     `;
                     clonedDoc.head.appendChild(style);
                     
-                    // Añadir estilos específicos para entradas de texto e inputs
-                    const inputsStyle = clonedDoc.createElement('style');
-                    inputsStyle.innerHTML = `
-                        /* Reducir específicamente el tamaño del texto en los campos de entrada */
-                        .info-section input[type="text"] {
-                            font-size: 7.5pt !important;
-                            padding: 2px !important;
-                            height: auto !important;
-                        }
-                        
-                        /* Ajustar específicamente los inputs de fecha */
-                        .fecha-inputs input[type="text"] {
-                            font-size: 7.5pt !important;
-                            padding: 1px !important;
-                            width: 25px !important;
-                            text-align: center !important;
-                        }
-                        
-                        /* Ajustar contenedor para que todo quepa */
-                        .container {
-                            width: 94% !important;
-                            max-width: 94% !important;
-                            padding: 2mm !important;
-                            margin: 0 auto !important;
-                        }
-                    `;
-                    clonedDoc.head.appendChild(inputsStyle);
-                    
                     // Asegurar que las imágenes se muestran correctamente
                     Array.from(clonedDoc.querySelectorAll('img')).forEach(img => {
                         img.style.display = 'block';
                         img.style.maxWidth = '100%';
                     });
+                    
                     // Eliminar elementos vacíos en el clon que podrían causar páginas en blanco
                     const divs = Array.from(clonedDoc.querySelectorAll('div, p, span'));
                     divs.forEach(div => {
@@ -604,6 +562,8 @@ function generarPDFCorregido() {
                             }
                         }
                     });
+                }
+            },
             
             jsPDF: {
                 unit: 'mm',
@@ -624,7 +584,7 @@ function generarPDFCorregido() {
             // Usar el nuevo modo para división de contenido
             enableLinks: false,
             image: { type: 'jpeg', quality: 0.98 }, // Mayor calidad para gráficos
-            margin: [6, 5, 6, 5], // top, right, bottom, left (reducidos al mínimo para maximizar espacio)
+            margin: [8, 6, 8, 6], // top, right, bottom, left (reducidos para maximizar espacio)
         };
         
         // Generar el PDF con el manejo optimizado
