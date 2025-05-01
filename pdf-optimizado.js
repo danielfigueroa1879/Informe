@@ -70,7 +70,7 @@ function generarPDFCorregido() {
             
             // Forzar posición correcta del logo - más arriba
             logoContainer.style.position = 'absolute';
-            logoContainer.style.top = '-8px';  // Movido más arriba
+            logoContainer.style.top = '-6px';  // Movido más arriba
             logoContainer.style.left = '10px';  // Ligeramente más a la izquierda
             logoContainer.style.zIndex = '1000';
             
@@ -82,7 +82,7 @@ function generarPDFCorregido() {
                     display: logoImage.style.display
                 });
                 
-                logoImage.style.width = '85px'; // Tamaño reducido
+                logoImage.style.width = '75px'; // Tamaño reducido
                 logoImage.style.height = 'auto';
                 logoImage.style.display = 'block';
             }
@@ -99,9 +99,9 @@ function generarPDFCorregido() {
             });
             
             titulo.style.position = 'relative';
-            titulo.style.marginLeft = '40px';  // Reducido para mover a la izquierda
+            titulo.style.marginLeft = '20px';  // Reducido para mover a la izquierda
             titulo.style.marginTop = '15px';
-            titulo.style.fontSize = '18pt';
+            titulo.style.fontSize = '19pt';
         }
         
         // 1. Eliminar espacios en blanco y elementos vacíos que pueden causar páginas en blanco
