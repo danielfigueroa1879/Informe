@@ -56,6 +56,66 @@ function generarPDFCorregido() {
             },
             elementosCreados: [] // Para rastrear elementos creados durante la preparación
         };
+
+// Ajustar específicamente el logo para la generación de PDF
+const logoContainer = container.querySelector('.logo-container');
+const logoImg = container.querySelector('.logo-os10');
+if (logoContainer && logoImg) {
+    // Guardar el estado original del logo
+    estadoOriginal.logo = {
+        containerPosition: logoContainer.style.position,
+        containerTop: logoContainer.style.top,
+        containerLeft: logoContainer.style.left,
+        containerZIndex: logoContainer.style.zIndex,
+        containerDisplay: logoContainer.style.display,
+        imgWidth: logoImg.style.width,
+        imgOpacity: logoImg.style.opacity
+    };
+    
+    // Aplicar estilos optimizados para PDF
+    logoContainer.style.position = 'static'; // Cambio importante: usar static en lugar de absolute
+    logoContainer.style.display = 'inline-block';
+    logoContainer.style.float = 'left';
+    logoContainer.style.marginTop = '15px';
+    logoContainer.style.marginLeft = '20px';
+    logoContainer.style.marginRight = '20px';
+    logoContainer.style.marginBottom = '10px';
+    logoContainer.style.zIndex = '10';
+    logoContainer.style.width = 'auto';
+    logoContainer.style.height = 'auto';
+    
+    logoImg.style.width = '100px';
+    logoImg.style.height = 'auto';
+    logoImg.style.opacity = '1';
+    logoImg.style.display = 'block';
+}
+
+// Ajustar título
+const titulo = container.querySelector('h1');
+if (titulo) {
+    estadoOriginal.titulo = {
+        marginLeft: titulo.style.marginLeft,
+        textAlign: titulo.style.textAlign,
+        marginTop: titulo.style.marginTop
+    };
+    
+    titulo.style.textAlign = 'center';
+    titulo.style.marginLeft = '120px'; // Dejar espacio para el logo
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         
         // 1. Eliminar espacios en blanco y elementos vacíos que pueden causar páginas en blanco
         const espaciosVacios = container.querySelectorAll('[style*="page-break"]');
