@@ -190,7 +190,35 @@ function generarPDFCorregido() {
                 fontSize: '10pt' // Tamaño reducido
             }}
         ];
+        // Preservar las propiedades del logo
+const logoContainer = container.querySelector('.logo-container');
+if (logoContainer) {
+    estadoOriginal.estilos.set(logoContainer, {
+        position: logoContainer.style.position,
+        top: logoContainer.style.top,
+        height: logoContainer.style.height,
+        zIndex: logoContainer.style.zIndex
+    });
+    
+    // Asegurar posición correcta
+    logoContainer.style.position = 'absolute';
+    logoContainer.style.top = '0';
+    logoContainer.style.height = '120px';
+    logoContainer.style.zIndex = '0';
+    
+    // También preservar las propiedades del logo
+    const logoImg = logoContainer.querySelector('.logo-os10');
+    if (logoImg) {
+        estadoOriginal.estilos.set(logoImg, {
+            width: logoImg.style.width,
+            opacity: logoImg.style.opacity
+        });
         
+        // Asegurar tamaño y opacidad correctos
+        logoImg.style.width = '200px';
+        logoImg.style.opacity = '0.15';
+    }
+}
         // Aplicar los estilos y guardar los originales
         elementosEstilizar.forEach(config => {
             const elementos = container.querySelectorAll(config.selector);
