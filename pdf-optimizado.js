@@ -1,7 +1,7 @@
 /**
- * pdf-optimizado.js - Versión con tamaño de letra reducido
+ * pdf-optimizado.js - Versión con logo correctamente posicionado
  * Solución optimizada para la generación de PDF sin páginas en blanco intermedias,
- * con observaciones completas y tamaño de letra reducido
+ * con logo correctamente posicionado y ajuste de contenido completo
  */
 
 // Función principal que configura y genera el PDF
@@ -41,7 +41,7 @@ function generarPDFCorregido() {
         // 3. Generar el PDF con la configuración optimizada
         setTimeout(() => {
             generarPDFDesdeContenido(container, estadoOriginal);
-        }, 300); // Pequeño retraso para que los cambios de estilo se apliquen
+        }, 500); // Retraso para que los cambios de estilo se apliquen
     }
     
     // Función para preparar el contenido limpiando elementos no deseados
@@ -56,6 +56,52 @@ function generarPDFCorregido() {
             },
             elementosCreados: [] // Para rastrear elementos creados durante la preparación
         };
+        
+        // Asegurar que el logo esté correctamente posicionado
+        const logoContainer = container.querySelector('.logo-container');
+        if (logoContainer) {
+            // Guardar estado original
+            estadoOriginal.estilos.set(logoContainer, {
+                position: logoContainer.style.position,
+                top: logoContainer.style.top,
+                left: logoContainer.style.left,
+                zIndex: logoContainer.style.zIndex
+            });
+            
+            // Forzar posición correcta del logo
+            logoContainer.style.position = 'absolute';
+            logoContainer.style.top = '0';
+            logoContainer.style.left = '20px';
+            logoContainer.style.zIndex = '1000';
+            
+            // Asegurarse que la imagen del logo sea visible
+            const logoImage = logoContainer.querySelector('.logo-os10');
+            if (logoImage) {
+                estadoOriginal.estilos.set(logoImage, {
+                    width: logoImage.style.width,
+                    display: logoImage.style.display
+                });
+                
+                logoImage.style.width = '100px';
+                logoImage.style.display = 'block';
+            }
+        }
+        
+        // Asegurar que el título esté correctamente posicionado
+        const titulo = container.querySelector('h1');
+        if (titulo) {
+            estadoOriginal.estilos.set(titulo, {
+                position: titulo.style.position,
+                marginLeft: titulo.style.marginLeft,
+                marginTop: titulo.style.marginTop,
+                fontSize: titulo.style.fontSize
+            });
+            
+            titulo.style.position = 'relative';
+            titulo.style.marginLeft = '110px';
+            titulo.style.marginTop = '15px';
+            titulo.style.fontSize = '18pt';
+        }
         
         // 1. Eliminar espacios en blanco y elementos vacíos que pueden causar páginas en blanco
         const espaciosVacios = container.querySelectorAll('[style*="page-break"]');
@@ -73,7 +119,7 @@ function generarPDFCorregido() {
         });
         
         // 2. Ocultar elementos con clase no-print, botones y la información de datos guardados
-        const elementosOcultar = container.querySelectorAll('.botones, .no-print, .rich-text-toolbar, .datos-guardados-info');
+        const elementosOcultar = container.querySelectorAll('.botones, .no-print, .rich-text-toolbar, .datos-guardados-info, .mobile-nav, .mobile-action-button');
         elementosOcultar.forEach(el => {
             estadoOriginal.ocultos.push({
                 element: el,
@@ -81,48 +127,7 @@ function generarPDFCorregido() {
             });
             el.style.display = 'none';
         });
-
-        // Asegurar que el logo esté correctamente posicionado
-        const logoContainer = container.querySelector('.logo-container');
-        if (logoContainer) {
-    // Guardar estado original
-        estadoOriginal.estilos.set(logoContainer, {
-        position: logoContainer.style.position,
-        top: logoContainer.style.top,
-        left: logoContainer.style.left,
-        zIndex: logoContainer.style.zIndex
-    });
-    
-    // Forzar posición correcta del logo
-        logoContainer.style.position = 'absolute';
-        logoContainer.style.top = '0';
-        logoContainer.style.left = '20px';
-        logoContainer.style.zIndex = '1000';
-    
-    // Asegurarse que la imagen del logo sea visible
-        const logoImage = logoContainer.querySelector('.logo-os10');
-        if (logoImage) {
-        estadoOriginal.estilos.set(logoImage, {
-            width: logoImage.style.width,
-            display: logoImage.style.display
-        });
         
-        logoImage.style.width = '100px';
-        logoImage.style.display = 'block';
-    }
-    
-    // Ajustar el título para que no se solape con el logo
-    const titulo = container.querySelector('h1');
-    if (titulo) {
-        estadoOriginal.estilos.set(titulo, {
-            paddingLeft: titulo.style.paddingLeft,
-            marginTop: titulo.style.marginTop
-        });
-        
-        titulo.style.paddingLeft = '110px';
-        titulo.style.marginTop = '20px';
-    }
-}
         // 3. Forzar saltos de página antes de las secciones específicas
         const seccionResumen = container.querySelector('#seccion-resumen');
         const seccionFotos = container.querySelector('#seccion-fotos');
@@ -143,26 +148,6 @@ function generarPDFCorregido() {
             }
             seccionFotos.style.pageBreakBefore = 'always';
             seccionFotos.style.breakBefore = 'page';
-        }
-        
-        // Asegurarse de que la sección de recomendaciones esté en una página separada
-        // Buscar el encabezado de recomendaciones dentro del summary
-        const seccionRecomendaciones = container.querySelector('.summary h3:nth-of-type(2)');
-        if (seccionRecomendaciones) {
-            // Crear un div para el salto de página antes de las recomendaciones
-            const divSalto = document.createElement('div');
-            divSalto.className = 'forced-page-break';
-            divSalto.style.pageBreakBefore = 'always';
-            divSalto.style.breakBefore = 'page';
-            divSalto.style.height = '1px';
-            divSalto.style.margin = '0';
-            divSalto.style.padding = '0';
-            
-            // Insertar antes del encabezado de recomendaciones
-            seccionRecomendaciones.parentNode.insertBefore(divSalto, seccionRecomendaciones);
-            
-            // Registrar este elemento para eliminarlo después
-            estadoOriginal.elementosCreados.push(divSalto);
         }
         
         // 4. Mejorar el manejo de las textareas (observaciones)
@@ -198,7 +183,7 @@ function generarPDFCorregido() {
             estadoOriginal.elementosCreados.push(contenidoTexto);
         });
         
-        // 4. Aplicar estilos óptimos para la impresión
+        // 5. Aplicar estilos óptimos para la impresión
         const elementosEstilizar = [
             { selector: '.forced-page-break', estilos: {
                 display: 'block',
@@ -252,23 +237,6 @@ function generarPDFCorregido() {
             });
         });
         
-        // 5. Reducir tamaño de texto de todos los párrafos y elementos de texto
-        const elementosTexto = container.querySelectorAll('p, span, td, div:not(.header-row):not(.rich-text-toolbar)');
-        elementosTexto.forEach(el => {
-            if (!estadoOriginal.estilos.has(el)) {
-                estadoOriginal.estilos.set(el, {
-                    fontSize: el.style.fontSize,
-                    lineHeight: el.style.lineHeight
-                });
-            }
-            
-            // No modificar elementos que ya tengan estilos específicos establecidos
-            if (!el.classList.contains('result') && !el.classList.contains('header-row')) {
-                el.style.fontSize = '10pt'; // Tamaño reducido
-                el.style.lineHeight = '1.3'; // Ajustar interlineado
-            }
-        });
-        
         // 6. Añadir una hoja de estilos temporal con reglas específicas para PDF
         const estilosTemporales = document.createElement('style');
         estilosTemporales.id = 'estilos-temporales-pdf';
@@ -281,20 +249,49 @@ function generarPDFCorregido() {
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
                 color-adjust: exact !important;
+                margin: 0 !important;
+                padding: 0 !important;
             }
             .container {
-                font-size: 10pt !important; /* Reducido de 12pt */
+                font-size: 10pt !important;
                 width: 100% !important;
                 max-width: 100% !important;
-                padding: 0 !important;
+                padding: 5mm !important;
                 margin: 0 !important;
             }
             h1 {
-                font-size: 18pt !important; /* Reducido */
+                font-size: 18pt !important;
                 margin-bottom: 20px !important;
+                margin-left: 110px !important;
+                margin-top: 15px !important;
+                position: relative !important;
             }
+            
+            /* Logo posicionamiento específico */
+            .logo-container {
+                position: absolute !important;
+                top: 0 !important;
+                left: 20px !important;
+                z-index: 1000 !important;
+                width: auto !important;
+                height: auto !important;
+            }
+            .logo-os10 {
+                width: 100px !important;
+                height: auto !important;
+                display: block !important;
+            }
+            
+            /* Eliminar elementos vacíos que pueden causar páginas en blanco */
+            div:empty, p:empty, span:empty {
+                display: none !important;
+                height: 0 !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+            
             h2 {
-                font-size: 13pt !important; /* Reducido */
+                font-size: 13pt !important;
                 page-break-before: always !important;
                 break-before: page !important;
                 page-break-after: avoid !important;
@@ -303,7 +300,7 @@ function generarPDFCorregido() {
                 padding-top: 8px !important;
             }
             h3 {
-                font-size: 12pt !important; /* Reducido */
+                font-size: 12pt !important;
                 page-break-after: avoid !important;
                 break-after: avoid !important;
                 margin-top: 12px !important;
@@ -312,14 +309,14 @@ function generarPDFCorregido() {
             table {
                 page-break-inside: auto !important;
                 break-inside: auto !important;
-                font-size: 9pt !important; /* Reducido */
+                font-size: 9pt !important;
             }
             th {
-                font-size: 9.5pt !important; /* Reducido */
+                font-size: 9.5pt !important;
             }
             td {
-                font-size: 9pt !important; /* Reducido */
-                padding: 5px 8px !important; /* Reducido */
+                font-size: 9pt !important;
+                padding: 5px 8px !important;
             }
             tr {
                 page-break-inside: avoid !important;
@@ -332,138 +329,16 @@ function generarPDFCorregido() {
                 visibility: hidden !important;
             }
             
-            /* Eliminar saltos de página no deseados */
-            div:empty {
-                display: none !important;
-            }
-            
             /* Mejorar visualización de observaciones */
             .textarea-contenido-pdf {
-                min-height: 40px !important; /* Reducido */
+                min-height: 40px !important;
                 padding: 5px !important;
                 font-family: inherit !important;
-                font-size: 9pt !important; /* Reducido */
-                line-height: 1.3 !important; /* Reducido */
+                font-size: 9pt !important;
+                line-height: 1.3 !important;
                 white-space: pre-wrap !important;
                 word-break: break-word !important;
                 margin-bottom: 5px !important;
-            }
-            
-            /* Reducir tamaño del texto en información de secciones */
-            .info-section {
-                padding: 15px !important; /* Reducido */
-            }
-            
-            .info-section p {
-                font-size: 10pt !important; /* Reducido */
-                margin: 8px 0 !important; /* Reducido */
-            }
-            
-            /* Reducir específicamente el tamaño del texto en los campos de entrada */
-            .info-section input[type="text"] {
-                font-size: 9pt !important; /* Tamaño reducido para el texto dentro de los inputs */
-                padding: 4px !important; /* Padding reducido */
-                height: auto !important; /* Altura automática basada en el contenido */
-            }
-            
-            /* Ajustar específicamente los inputs de fecha */
-            .fecha-inputs input[type="text"] {
-                font-size: 9pt !important;
-                padding: 2px !important;
-                width: 30px !important; /* Ancho reducido */
-                text-align: center !important;
-            }
-            
-            /* Reducir tamaño para el resumen */
-            .summary {
-                padding: 15px !important; /* Reducido */
-            }
-            
-            .count {
-                font-size: 10pt !important; /* Reducido */
-            }
-            
-            .result {
-                font-size: 12pt !important; /* Reducido */
-                padding: 15px !important; /* Reducido */
-            }
-            
-            /* Ajustar resumen automático */
-            #resumen-automatico {
-                font-size: 9pt !important; /* Reducido */
-                line-height: 1.3 !important; /* Reducido */
-            }
-            
-            #resumen-automatico ul li {
-                font-size: 9pt !important; /* Reducido */
-                margin-bottom: 3px !important; /* Reducido */
-            }
-            
-            #resumen-automatico ul ul li {
-                font-size: 8.5pt !important; /* Reducido */
-                line-height: 1.2 !important; /* Reducido */
-            }
-            
-            /* Ajustar plan de acción para formato tipo oficio formal */
-            #plan-accion-editor {
-                font-size: 11pt !important; /* Reducido */
-                line-height: 1.5 !important; /* Mejorado para legibilidad */
-                padding: 20px 25px !important; /* Márgenes internos para simular oficio */
-                background-color: #fff !important; /* Fondo blanco */
-                border: 1px solid #e0e0e0 !important; /* Borde sutil */
-                box-shadow: 0 1px 3px rgba(0,0,0,0.05) !important; /* Sombra sutil */
-                border-radius: 0 !important; /* Sin bordes redondeados para estilo formal */
-                font-family: 'Poppins', sans-serif !important; /* Usar Poppins como el resto */
-                text-align: justify !important; /* Texto justificado para apariencia formal */
-                color: #000 !important; /* Negro sólido para texto formal */
-                margin-top: 15px !important;
-                margin-bottom: 20px !important;
-                min-height: 200px !important; /* Altura mínima para apariencia adecuada */
-            }
-            
-            /* Estilos específicos para párrafos dentro del plan de acción */
-            #plan-accion-editor p {
-                margin-bottom: 8px !important;
-                text-indent: 20px !important; /* Sangría de primera línea para estilo formal */
-            }
-            
-            /* Estilos para listas dentro del plan de acción */
-            #plan-accion-editor ul, 
-            #plan-accion-editor ol {
-                margin: 10px 0 10px 15px !important;
-                padding-left: 15px !important;
-            }
-            
-            #plan-accion-editor li {
-                margin-bottom: 5px !important;
-            }
-            
-            /* Encabezado del plan de acción con estilo más formal */
-            .summary h3:nth-of-type(2) { /* El encabezado "Recomendaciones y Plan de Acción" */
-                font-size: 12pt !important;
-                text-align: center !important;
-                font-weight: bold !important;
-                margin-top: 25px !important;
-                margin-bottom: 15px !important;
-                color: #003366 !important;
-                text-transform: uppercase !important; /* Mayúsculas para apariencia formal */
-                letter-spacing: 1px !important; /* Espaciado entre letras */
-                border-bottom: 1px solid #e0e0e0 !important;
-                padding-bottom: 10px !important;
-            }
-            
-            /* Quitar bordes y fondos del contenedor del editor */
-            .rich-text-container {
-                border: none !important;
-                box-shadow: none !important;
-                background: transparent !important;
-            }
-            
-            /* Estilos para asegurar que los fondos se muestren correctamente */
-            * {
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-                color-adjust: exact !important;
             }
             
             /* Estilos específicos para que los gráficos y colores se muestren correctamente */
@@ -502,6 +377,16 @@ function generarPDFCorregido() {
             img {
                 display: inline-block !important;
                 max-width: 100% !important;
+            }
+            
+            /* Ocultar navegación móvil y otros elementos no deseados */
+            .mobile-nav, .mobile-action-button, .mobile-control-panel, .botones, .no-print {
+                display: none !important;
+                height: 0 !important;
+                width: 0 !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                visibility: hidden !important;
             }
         `;
         document.head.appendChild(estilosTemporales);
@@ -544,7 +429,7 @@ function generarPDFCorregido() {
             
             // Modo de optimización: 1 = velocidad, 2 = precisión
             html2canvas: {
-                scale: 1.5, // Escala original
+                scale: 1.2, // Reducido para mejor ajuste
                 useCORS: true,
                 allowTaint: true,
                 scrollX: 0,
@@ -557,6 +442,39 @@ function generarPDFCorregido() {
                 removeContainer: true,
                 foreignObjectRendering: false, // Deshabilitar para mayor compatibilidad
                 onclone: function(clonedDoc) {
+                    // Limpiar cualquier página en blanco
+                    const paginasEnBlanco = clonedDoc.querySelectorAll('div:empty, p:empty');
+                    paginasEnBlanco.forEach(el => {
+                        if (el.parentNode) {
+                            el.parentNode.removeChild(el);
+                        }
+                    });
+                    
+                    // Asegurar logo en posición correcta
+                    const logoContainer = clonedDoc.querySelector('.logo-container');
+                    if (logoContainer) {
+                        logoContainer.style.position = 'absolute';
+                        logoContainer.style.top = '0';
+                        logoContainer.style.left = '20px';
+                        logoContainer.style.zIndex = '1000';
+                        
+                        const logoImage = logoContainer.querySelector('.logo-os10');
+                        if (logoImage) {
+                            logoImage.style.width = '100px';
+                            logoImage.style.height = 'auto';
+                            logoImage.style.display = 'block';
+                        }
+                    }
+                    
+                    // Ajustar título
+                    const titulo = clonedDoc.querySelector('h1');
+                    if (titulo) {
+                        titulo.style.position = 'relative';
+                        titulo.style.marginLeft = '110px';
+                        titulo.style.marginTop = '15px';
+                        titulo.style.fontSize = '18pt';
+                    }
+                    
                     // Forzar la visibilidad de los fondos y gráficos
                     const style = clonedDoc.createElement('style');
                     style.innerHTML = `
@@ -566,6 +484,19 @@ function generarPDFCorregido() {
                             color-adjust: exact !important;
                         }
                         
+                        body, html {
+                            margin: 0 !important;
+                            padding: 0 !important;
+                        }
+                        
+                        /* Eliminar elementos vacíos que pueden causar páginas en blanco */
+                        div:empty, p:empty, span:empty {
+                            display: none !important;
+                            height: 0 !important;
+                            margin: 0 !important;
+                            padding: 0 !important;
+                        }
+                        
                         /* Reducir tamaños de fuente */
                         body {
                             font-size: 10pt !important;
@@ -573,6 +504,7 @@ function generarPDFCorregido() {
                         
                         h1 {
                             font-size: 18pt !important;
+                            margin-left: 110px !important;
                         }
                         
                         h2 {
@@ -592,140 +524,25 @@ function generarPDFCorregido() {
                             font-size: 9.5pt !important;
                         }
                         
-                        /* Inputs de texto en la sección de información */
-                        .info-section input[type="text"] {
-                            font-size: 9pt !important;
-                            padding: 4px !important;
+                        /* Controlar posición del logo */
+                        .logo-container {
+                            position: absolute !important;
+                            top: 0 !important;
+                            left: 20px !important;
+                            z-index: 1000 !important;
+                        }
+                        
+                        .logo-os10 {
+                            width: 100px !important;
                             height: auto !important;
                         }
                         
-                        /* Inputs específicos para fecha */
-                        .fecha-inputs input[type="text"] {
-                            font-size: 9pt !important;
-                            padding: 2px !important;
-                            width: 30px !important;
-                            text-align: center !important;
-                        }
-                        
-                        /* Evitar páginas en blanco */
-                        div:empty, p:empty, span:empty {
+                        /* Ocultar elementos no deseados */
+                        .mobile-nav, .mobile-action-button, .botones, .no-print {
                             display: none !important;
-                        }
-                        
-                        /* Estilos específicos para asegurar fondos correctos */
-                        .header-row, th {
-                            background-color: #003366 !important;
-                            color: white !important;
-                            font-size: 9.5pt !important;
-                        }
-                        
-                        tr:nth-child(even) {
-                            background-color: #f9f9f9 !important;
-                        }
-                        
-                        .info-section, .summary {
-                            background-color: #f9f9f9 !important;
-                        }
-                        
-                        .result.seguro {
-                            background-color: #dff0d8 !important;
-                            color: #3c763d !important;
-                            border: 1px solid #d6e9c6 !important;
-                            font-size: 12pt !important;
-                        }
-                        
-                        .result.riesgo {
-                            background-color: #fcf8e3 !important;
-                            color: #8a6d3b !important;
-                            border: 1px solid #faebcc !important;
-                            font-size: 12pt !important;
-                        }
-                        
-                        .result.inseguro {
-                            background-color: #f2dede !important;
-                            color: #a94442 !important;
-                            border: 1px solid #ebccd1 !important;
-                            font-size: 12pt !important;
-                        }
-                        
-                        /* Asegurar que las textareas se muestran correctamente */
-                        .textarea-contenido-pdf {
-                            min-height: 40px;
-                            padding: 5px !important;
-                            font-family: inherit !important;
-                            font-size: 9pt !important;
-                            line-height: 1.3 !important;
-                            white-space: pre-wrap !important;
-                            word-break: break-word !important;
-                        }
-                        
-                        /* Ajustar resumen automático */
-                        #resumen-automatico {
-                            font-size: 9pt !important;
-                        }
-                        
-                        #resumen-automatico ul li {
-                            font-size: 9pt !important;
-                        }
-                        
-                        #resumen-automatico ul ul li {
-                            font-size: 8.5pt !important;
-                        }
-                        
-                        /* Ocultar la barra de herramientas del editor de texto */
-                        .rich-text-toolbar {
-                            display: none !important;
-                        }
-                        
-                        /* Estilo formal para el plan de acción */
-                        #plan-accion-editor {
-                            font-size: 11pt !important;
-                            line-height: 1.5 !important;
-                            padding: 20px 25px !important;
-                            background-color: #fff !important;
-                            border: 1px solid #e0e0e0 !important;
-                            box-shadow: 0 1px 3px rgba(0,0,0,0.05) !important;
-                            border-radius: 0 !important;
-                            font-family: 'Poppins', sans-serif !important;
-                            text-align: justify !important;
-                            color: #000 !important;
-                            margin-top: 15px !important;
-                            margin-bottom: 20px !important;
-                            min-height: 200px !important;
-                        }
-                        
-                        #plan-accion-editor p {
-                            margin-bottom: 8px !important;
-                            text-indent: 20px !important;
-                        }
-                        
-                        #plan-accion-editor ul, 
-                        #plan-accion-editor ol {
-                            margin: 10px 0 10px 15px !important;
-                            padding-left: 15px !important;
-                        }
-                        
-                        #plan-accion-editor li {
-                            margin-bottom: 5px !important;
-                        }
-                        
-                        .summary h3:nth-of-type(2) {
-                            font-size: 12pt !important;
-                            text-align: center !important;
-                            font-weight: bold !important;
-                            margin-top: 25px !important;
-                            margin-bottom: 15px !important;
-                            color: #003366 !important;
-                            text-transform: uppercase !important;
-                            letter-spacing: 1px !important;
-                            border-bottom: 1px solid #e0e0e0 !important;
-                            padding-bottom: 10px !important;
-                        }
-                        
-                        .rich-text-container {
-                            border: none !important;
-                            box-shadow: none !important;
-                            background: transparent !important;
+                            height: 0 !important;
+                            width: 0 !important;
+                            visibility: hidden !important;
                         }
                     `;
                     clonedDoc.head.appendChild(style);
@@ -746,39 +563,6 @@ function generarPDFCorregido() {
                         }
                     });
                 }
-
-// Asegurar que el logo esté bien posicionado en el clon
-        const logoContainer = clonedDoc.querySelector('.logo-container');
-        if (logoContainer) {
-            logoContainer.style.position = 'absolute';
-            logoContainer.style.top = '0';
-            logoContainer.style.left = '20px';
-            logoContainer.style.zIndex = '1000';
-            logoContainer.style.display = 'block';
-            
-            const logoImage = logoContainer.querySelector('.logo-os10');
-            if (logoImage) {
-                logoImage.style.width = '100px';
-                logoImage.style.height = 'auto';
-                logoImage.style.display = 'block';
-            }
-            
-            // Ajustar título
-            const titulo = clonedDoc.querySelector('h1');
-            if (titulo) {
-                titulo.style.paddingLeft = '110px';
-                titulo.style.marginTop = '20px';
-            }
-        }
-
-
-
-
-
-
-
-
-                
             },
             
             jsPDF: {
@@ -792,29 +576,15 @@ function generarPDFCorregido() {
             
             // Configuración de saltos de página - Modificada para evitar páginas en blanco
             pagebreak: {
-                mode: ['avoid-all'], // Simplificar el algoritmo
-                before: ['h2'], // Solo saltos explícitos en h2
-                avoid: ['table', 'img', '.textarea-contenido-pdf']
+                mode: ['css', 'legacy'], // Cambiado para mejor control de páginas
+                before: ['h2.page-title', '.forced-page-break'], // Solo saltos explícitos
+                avoid: ['table', 'img']
             },
             
             // Usar el nuevo modo para división de contenido
             enableLinks: false,
             image: { type: 'jpeg', quality: 0.98 }, // Mayor calidad para gráficos
-            margin: [15, 10, 15, 10], // top, right, bottom, left
-            
-            // Importante: Esta opción optimiza el proceso y evita páginas en blanco
-            html2canvas: { 
-                scale: 1.5, // Escala original
-                scrollY: 0, 
-                scrollX: 0,
-                backgroundColor: '#FFFFFF',
-                removeContainer: true,
-                allowTaint: true,
-                useCORS: true,
-                letterRendering: true,
-                imageSmoothingEnabled: true,
-                imageTimeout: 30000
-            }
+            margin: [10, 10, 10, 10], // top, right, bottom, left (ajustado para maximizar espacio)
         };
         
         // Generar el PDF con el manejo optimizado
