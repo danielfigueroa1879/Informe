@@ -70,7 +70,7 @@ function generarPDFCorregido() {
             
             // Forzar posición correcta del logo - más arriba
             logoContainer.style.position = 'absolute';
-            logoContainer.style.top = '-1px';  // Movido más arriba
+            logoContainer.style.top = '-2px';  // Movido más arriba
             logoContainer.style.left = '10px';  // Ligeramente más a la izquierda
             logoContainer.style.zIndex = '1000';
             
