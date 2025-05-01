@@ -967,38 +967,35 @@
 
 .logo-container {
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 140px; /* Altura para el área del logo */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    pointer-events: none;
-    z-index: 0;
-    overflow: hidden;
+    top: 15px;
+    left: 20px;
+    width: auto;
+    height: auto;
+    display: block;
+    z-index: 1;
 }
 
 .logo-os10 {
-    width:  142px;
+    width: 120px;
     height: auto;
-    opacity: 0.30;
-    max-width: 80%;
+    opacity: 1; /* Logo no transparente */
+    max-width: 100%;
 }
 
-/* Ajuste para bajar el título */
+/* Ajustar título para que esté centrado pero desplazado a la derecha */
 h1 {
     position: relative;
     z-index: 1;
     text-align: center;
     color: #003366;
-    margin-top: 25px; /* Aumentado para bajar el título */
+    margin-top: 25px;
     margin-bottom: 60px;
+    margin-left: 110px; /* Desplazamiento para no tapar el logo */
     font-size: 2.4rem;
     font-weight: 600;
 }
 
-/* Asegura que todo el contenido esté por encima del logo */
+/* Asegura que todo el contenido esté correctamente posicionado */
 form#formulario-fiscalizacion {
     position: relative;
     z-index: 1;
@@ -1007,18 +1004,21 @@ form#formulario-fiscalizacion {
 /* Ajustes para dispositivos móviles */
 @media screen and (max-width: 768px) {
     .logo-container {
-        height: 120px;
+        top: 10px;
+        left: 10px;
     }
     
     .logo-os10 {
-        width: 200px;
+        width: 80px;
     }
     
     h1 {
         font-size: 1.5rem;
-        margin-top: 60px; /* Ajustado para móviles */
+        margin-left: 80px; /* Menor margen para móviles */
+        margin-top: 20px;
+        margin-bottom: 40px;
     }
-}    
+}   
     </style>
 </head>
 <script>
