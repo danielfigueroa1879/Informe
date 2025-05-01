@@ -82,7 +82,7 @@ function generarPDFCorregido() {
                     display: logoImage.style.display
                 });
                 
-                logoImage.style.width = '100px';
+                logoImage.style.width = '85px'; // Tamaño más pequeño
                 logoImage.style.display = 'block';
             }
         }
@@ -168,8 +168,8 @@ function generarPDFCorregido() {
                 minHeight: '50px',
                 width: '100%',
                 fontFamily: textarea.style.fontFamily || 'inherit',
-                fontSize: '10pt', // Reducido de tamaño
-                lineHeight: '1.3', // Reducido
+                fontSize: '9pt', // Más reducido
+                lineHeight: '1.2', // Más compacto
                 paddingLeft: '5px',
                 whiteSpace: 'pre-wrap', // Preservar espacios y saltos de línea
                 wordBreak: 'break-word'
@@ -291,32 +291,32 @@ function generarPDFCorregido() {
             }
             
             h2 {
-                font-size: 13pt !important;
+                font-size: 12pt !important; /* Reducido */
                 page-break-before: always !important;
                 break-before: page !important;
                 page-break-after: avoid !important;
                 break-after: avoid !important;
-                margin-top: 15px !important;
-                padding-top: 8px !important;
+                margin-top: 12px !important; /* Reducido */
+                padding-top: 6px !important; /* Reducido */
             }
             h3 {
-                font-size: 12pt !important;
+                font-size: 11pt !important; /* Reducido */
                 page-break-after: avoid !important;
                 break-after: avoid !important;
-                margin-top: 12px !important;
-                margin-bottom: 5px !important;
+                margin-top: 10px !important; /* Reducido */
+                margin-bottom: 4px !important; /* Reducido */
             }
             table {
                 page-break-inside: auto !important;
                 break-inside: auto !important;
-                font-size: 9pt !important;
+                font-size: 8pt !important; /* Reducido */
             }
             th {
-                font-size: 9.5pt !important;
+                font-size: 8.5pt !important; /* Reducido */
             }
             td {
-                font-size: 9pt !important;
-                padding: 5px 8px !important;
+                font-size: 8pt !important; /* Reducido */
+                padding: 4px 6px !important; /* Reducido */
             }
             tr {
                 page-break-inside: avoid !important;
@@ -331,14 +331,14 @@ function generarPDFCorregido() {
             
             /* Mejorar visualización de observaciones */
             .textarea-contenido-pdf {
-                min-height: 40px !important;
-                padding: 5px !important;
+                min-height: 35px !important; /* Reducido */
+                padding: 4px !important; /* Reducido */
                 font-family: inherit !important;
-                font-size: 9pt !important;
-                line-height: 1.3 !important;
+                font-size: 8pt !important; /* Reducido */
+                line-height: 1.2 !important; /* Reducido */
                 white-space: pre-wrap !important;
                 word-break: break-word !important;
-                margin-bottom: 5px !important;
+                margin-bottom: 4px !important; /* Reducido */
             }
             
             /* Estilos específicos para que los gráficos y colores se muestren correctamente */
@@ -429,7 +429,7 @@ function generarPDFCorregido() {
             
             // Modo de optimización: 1 = velocidad, 2 = precisión
             html2canvas: {
-                scale: 1.2, // Reducido para mejor ajuste
+                scale: 1.1, // Reducido para mejor ajuste
                 useCORS: true,
                 allowTaint: true,
                 scrollX: 0,
@@ -460,7 +460,7 @@ function generarPDFCorregido() {
                         
                         const logoImage = logoContainer.querySelector('.logo-os10');
                         if (logoImage) {
-                            logoImage.style.width = '100px';
+                            logoImage.style.width = '85px'; // Tamaño reducido
                             logoImage.style.height = 'auto';
                             logoImage.style.display = 'block';
                         }
@@ -472,7 +472,7 @@ function generarPDFCorregido() {
                         titulo.style.position = 'relative';
                         titulo.style.marginLeft = '90px';  // Reducido para mover a la izquierda
                         titulo.style.marginTop = '15px';
-                        titulo.style.fontSize = '18pt';
+                        titulo.style.fontSize = '16pt'; // Reducido
                     }
                     
                     // Forzar la visibilidad de los fondos y gráficos
@@ -584,7 +584,7 @@ function generarPDFCorregido() {
             // Usar el nuevo modo para división de contenido
             enableLinks: false,
             image: { type: 'jpeg', quality: 0.98 }, // Mayor calidad para gráficos
-            margin: [10, 10, 10, 10], // top, right, bottom, left (ajustado para maximizar espacio)
+            margin: [10, 8, 10, 8], // top, right, bottom, left (ajustado para maximizar espacio)
         };
         
         // Generar el PDF con el manejo optimizado
