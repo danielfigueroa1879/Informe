@@ -76,7 +76,7 @@ if (logoContainer && logoImg) {
     logoContainer.style.position = 'static'; // Cambio importante: usar static en lugar de absolute
     logoContainer.style.display = 'inline-block';
     logoContainer.style.float = 'left';
-    logoContainer.style.marginTop = '15px';
+    logoContainer.style.marginTop = '30px';
     logoContainer.style.marginLeft = '20px';
     logoContainer.style.marginRight = '20px';
     logoContainer.style.marginBottom = '10px';
@@ -84,7 +84,7 @@ if (logoContainer && logoImg) {
     logoContainer.style.width = 'auto';
     logoContainer.style.height = 'auto';
     
-    logoImg.style.width = '60px';
+    logoImg.style.width = '70px';
     logoImg.style.height = 'auto';
     logoImg.style.opacity = '1';
     logoImg.style.display = 'block';
