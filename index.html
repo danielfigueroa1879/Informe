@@ -627,30 +627,24 @@
 @media print {
     .logo-container {
         position: absolute !important;
-        top: 0 !important;
+        top: 0 !important;  /* Cambiado de 20px a 0 */
         left: 20px !important;
         width: auto !important;
         height: auto !important;
         display: block !important;
-        z-index: 1 !important;
+        z-index: 10 !important;
     }
     
     .logo-os10 {
         width: 100px !important;
         height: auto !important;
-        opacity: 1 !important;
-        max-width: 100% !important;
-        page-break-inside: avoid !important;
     }
     
     h1 {
-        position: relative !important;
-        z-index: 1 !important;
-        text-align: center !important;
-        margin-left: 110px !important; /* Desplazamiento para no tapar el logo */
-        margin-top: 25px !important;
-        font-size: 18pt !important;
+        padding-left: 110px !important;
+        margin-top: 25px !important;  /* Añadido para dar más espacio al título */
     }
+}
     
     /* Asegurar que el contenedor principal tenga suficiente espacio arriba */
     .container {
