@@ -70,7 +70,7 @@ function generarPDFCorregido() {
             
             // Forzar posición correcta del logo - más arriba
             logoContainer.style.position = 'absolute';
-            logoContainer.style.top = '1px';  // Movido más arriba
+            logoContainer.style.top = '-1px';  // Movido más arriba
             logoContainer.style.left = '10px';  // Ligeramente más a la izquierda
             logoContainer.style.zIndex = '1000';
             
@@ -82,7 +82,7 @@ function generarPDFCorregido() {
                     display: logoImage.style.display
                 });
                 
-                logoImage.style.width =  '105px'; // Tamaño reducido
+                logoImage.style.width =  '100px'; // Tamaño reducido
                 logoImage.style.height = 'auto';
                 logoImage.style.display = 'block';
             }
