@@ -169,7 +169,7 @@ function generarPDFCorregido() {
                     display: logoImage.style.display
                 });
                 
-                logoImage.style.width = '85px'; // Tamaño más pequeño
+                                            logoImage.style.width = '80px'; // Tamaño más pequeño
                 logoImage.style.display = 'block';
             }
         }
@@ -378,32 +378,32 @@ function generarPDFCorregido() {
             }
             
             h2 {
-                font-size: 11pt !important; /* Más reducido */
+                font-size: 10pt !important; /* Reducido más */
                 page-break-before: always !important;
                 break-before: page !important;
                 page-break-after: avoid !important;
                 break-after: avoid !important;
-                margin-top: 10px !important; /* Más reducido */
-                padding-top: 5px !important; /* Más reducido */
+                margin-top: 10px !important;
+                padding-top: 5px !important;
             }
             h3 {
-                font-size: 10pt !important; /* Más reducido */
+                font-size: 9pt !important; /* Reducido más */
                 page-break-after: avoid !important;
                 break-after: avoid !important;
-                margin-top: 8px !important; /* Más reducido */
-                margin-bottom: 3px !important; /* Más reducido */
+                margin-top: 8px !important;
+                margin-bottom: 3px !important;
             }
             table {
                 page-break-inside: auto !important;
                 break-inside: auto !important;
-                font-size: 7.5pt !important; /* Más reducido */
+                font-size: 7pt !important; /* Reducido más */
             }
             th {
-                font-size: 8pt !important; /* Más reducido */
+                font-size: 7.5pt !important; /* Reducido más */
             }
             td {
-                font-size: 7.5pt !important; /* Más reducido */
-                padding: 3px 5px !important; /* Más reducido */
+                font-size: 7pt !important; /* Reducido más */
+                padding: 3px 5px !important;
             }
             tr {
                 page-break-inside: avoid !important;
@@ -418,28 +418,28 @@ function generarPDFCorregido() {
             
             /* Mejorar visualización de observaciones */
             .textarea-contenido-pdf {
-                min-height: 35px !important; /* Reducido */
-                padding: 4px !important; /* Reducido */
+                min-height: 30px !important; /* Reducido más */
+                padding: 3px !important; /* Reducido más */
                 font-family: inherit !important;
-                font-size: 8pt !important; /* Reducido */
-                line-height: 1.2 !important; /* Reducido */
+                font-size: 7pt !important; /* Reducido más */
+                line-height: 1.1 !important; /* Reducido más */
                 white-space: pre-wrap !important;
                 word-break: break-word !important;
-                margin-bottom: 4px !important; /* Reducido */
+                margin-bottom: 3px !important; /* Reducido más */
             }
             
             /* Reducir específicamente el tamaño del texto en los campos de entrada */
             .info-section input[type="text"] {
-                font-size: 7.5pt !important; /* Tamaño reducido para el texto dentro de los inputs */
-                padding: 2px !important; /* Padding reducido */
-                height: auto !important; /* Altura automática basada en el contenido */
+                font-size: 7pt !important; /* Tamaño reducido más */
+                padding: 2px !important;
+                height: auto !important;
             }
             
             /* Ajustar específicamente los inputs de fecha */
             .fecha-inputs input[type="text"] {
-                font-size: 7.5pt !important;
+                font-size: 7pt !important; /* Reducido más */
                 padding: 1px !important;
-                width: 25px !important; /* Ancho reducido */
+                width: 22px !important; /* Reducido más */
                 text-align: center !important;
             }
             
@@ -689,16 +689,16 @@ function generarPDFCorregido() {
                     inputsStyle.innerHTML = `
                         /* Reducir específicamente el tamaño del texto en los campos de entrada */
                         .info-section input[type="text"] {
-                            font-size: 7.5pt !important;
+                            font-size: 7pt !important; /* Reducido más */
                             padding: 2px !important;
                             height: auto !important;
                         }
                         
                         /* Ajustar específicamente los inputs de fecha */
                         .fecha-inputs input[type="text"] {
-                            font-size: 7.5pt !important;
+                            font-size: 7pt !important; /* Reducido más */
                             padding: 1px !important;
-                            width: 25px !important;
+                            width: 22px !important; /* Reducido más */
                             text-align: center !important;
                         }
                         
