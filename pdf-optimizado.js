@@ -1,4 +1,60 @@
-/**
+// Crear estilos específicos para evitar páginas en blanco
+        const estiloNoPageBreak = document.createElement('style');
+        estiloNoPageBreak.id = 'estilo-eliminar-page-breaks';
+        estiloNoPageBreak.textContent = `
+            .container * {
+                page-break-before: auto !important;
+                page-break-after: auto !important;
+                page-break-inside: auto !important;
+                break-before: auto !important;
+                break-after: auto !important;
+                break-inside: auto !important;
+            }
+            
+            /* Solo permitir saltos explícitos */
+            h2 {
+                page-break-before: always !important;
+                break-before: page !important;
+            }
+            
+            /* Evitar específicamente elementos que crean páginas en blanco */
+            div:empty, p:empty, span:empty, br {
+                display: none !important;
+                height: 0 !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+        `;
+        document.head.appendChild(estiloNoPageBreak);
+        estadoOriginal.elementosCreados.push(estiloNoPageBreak);        // Asegurar que el logo esté correctamente posicionado
+        const logoContainer = container.querySelector('.logo-container');
+        if (logoContainer) {
+            // Guardar estado original
+            estadoOriginal.estilos.set(logoContainer, {
+                position: logoContainer.style.position,
+                top: logoContainer.style.top,
+                left: logoContainer.style.left,
+                zIndex: logoContainer.style.zIndex
+            });
+            
+            // Forzar posición correcta del logo
+            logoContainer.style.position = 'absolute';
+            logoContainer.style.top = '-8px';  // Movido más arriba
+            logoContainer.style.left = '10px';  // Más a la izquierda
+            logoContainer.style.zIndex = '1000';
+            
+            // Asegurarse que la imagen del logo sea visible
+            const logoImage = logoContainer.querySelector('.logo-os10');
+            if (logoImage) {
+                estadoOriginal.estilos.set(logoImage, {
+                    width: logoImage.style.width,
+                    display: logoImage.style.display
+                });
+                
+                logoImage.style.width = '85px';
+                logoImage.style.display = 'block';
+            }
+        }/**
  * pdf-optimizado.js - Versión con logo correctamente posicionado
  * Solución optimizada para la generación de PDF sin páginas en blanco intermedias,
  * con logo correctamente posicionado y ajuste de contenido completo
@@ -56,6 +112,37 @@ function generarPDFCorregido() {
             },
             elementosCreados: [] // Para rastrear elementos creados durante la preparación
         };
+        
+        // Eliminar agresivamente cualquier elemento que pueda causar páginas en blanco
+        const eliminarElementosVacios = () => {
+            // Eliminar elementos vacíos específicos que puedan causar páginas en blanco
+            const elementosAEliminar = [
+                'div:empty', 'p:empty', 'span:empty', 'br', 
+                'div[style*="page-break"]', 'p[style*="page-break"]', 
+                'div[style*="margin-top"]', 'div[style*="margin-bottom"]'
+            ].join(',');
+            
+            const elementosVacios = Array.from(container.querySelectorAll(elementosAEliminar));
+            elementosVacios.forEach(el => {
+                if ((!el.textContent || !el.textContent.trim()) && !el.querySelector('img') && 
+                    !el.classList.contains('forced-page-break') && 
+                    !el.id?.includes('seccion') && el.clientHeight < 10) {
+                    
+                    if (el.parentNode) {
+                        estadoOriginal.ocultos.push({
+                            element: el,
+                            display: el.style.display,
+                            parent: el.parentNode,
+                            nextSibling: el.nextSibling
+                        });
+                        el.parentNode.removeChild(el);
+                    }
+                }
+            });
+        };
+        
+        // Ejecutar limpieza de elementos vacíos
+        eliminarElementosVacios();
         
         // Asegurar que el logo esté correctamente posicionado
         const logoContainer = container.querySelector('.logo-container');
@@ -457,12 +544,47 @@ function generarPDFCorregido() {
                 removeContainer: true,
                 foreignObjectRendering: false, // Deshabilitar para mayor compatibilidad
                 onclone: function(clonedDoc) {
-                    // Limpiar cualquier página en blanco
-                    const paginasEnBlanco = clonedDoc.querySelectorAll('div:empty, p:empty');
+                    // Eliminar AGRESIVAMENTE cualquier página en blanco
+                    const elementosAEliminar = [
+                        'div:empty', 'p:empty', 'span:empty', 'br', 
+                        'div[style*="page-break"]', 'p[style*="page-break"]',
+                        'div[style*="margin-top"]', 'div[style*="margin-bottom"]'
+                    ].join(',');
+                    
+                    const paginasEnBlanco = clonedDoc.querySelectorAll(elementosAEliminar);
                     paginasEnBlanco.forEach(el => {
-                        if (el.parentNode) {
-                            el.parentNode.removeChild(el);
+                        // Solo eliminar si realmente es un elemento vacío
+                        if ((!el.textContent || !el.textContent.trim()) && 
+                            !el.querySelector('img') && 
+                            !el.classList.contains('forced-page-break') && 
+                            !el.id?.includes('seccion') && 
+                            el.clientHeight < 10) {
+                            
+                            if (el.parentNode) {
+                                el.parentNode.removeChild(el);
+                            }
                         }
+                    });
+                    
+                    // Establecer explícitamente propiedades de salto de página
+                    const todosLosElementos = clonedDoc.querySelectorAll('*');
+                    todosLosElementos.forEach(el => {
+                        if (!el.tagName.toLowerCase().includes('h2') && 
+                            !el.classList.contains('forced-page-break')) {
+                            el.style.pageBreakBefore = 'auto';
+                            el.style.pageBreakAfter = 'auto';
+                            el.style.pageBreakInside = 'auto';
+                            el.style.breakBefore = 'auto';
+                            el.style.breakAfter = 'auto';
+                            el.style.breakInside = 'auto';
+                        }
+                    });
+                    
+                    // Solo permitir saltos explícitos
+                    const titulos = clonedDoc.querySelectorAll('h2');
+                    titulos.forEach(titulo => {
+                        titulo.style.pageBreakBefore = 'always';
+                        titulo.style.breakBefore = 'page';
                     });
                     
                     // Asegurar logo en posición correcta
@@ -616,9 +738,9 @@ function generarPDFCorregido() {
             
             // Configuración de saltos de página - Modificada para evitar páginas en blanco
             pagebreak: {
-                mode: ['css', 'legacy'], // Cambiado para mejor control de páginas
-                before: ['h2.page-title', '.forced-page-break'], // Solo saltos explícitos
-                avoid: ['table', 'img']
+                mode: ['avoid-all'], // Simplificar el algoritmo
+                before: ['h2'], // Solo saltos explícitos en h2
+                avoid: ['table', 'img', '.textarea-contenido-pdf', 'tr']
             },
             
             // Usar el nuevo modo para división de contenido
@@ -634,6 +756,24 @@ function generarPDFCorregido() {
             .toPdf()
             .get('pdf')
             .then(function(pdfObject) {
+                // Verificar si hay páginas en blanco y eliminarlas
+                const totalPaginas = pdfObject.internal.getNumberOfPages();
+                console.log("PDF generado con " + totalPaginas + " páginas");
+                
+                // Intentar detectar y eliminar páginas en blanco
+                for (let i = totalPaginas; i > 1; i--) {
+                    pdfObject.setPage(i);
+                    
+                    // Si la página parece vacía, eliminarla
+                    // Nota: Este método es aproximado y puede no funcionar en todos los casos
+                    const pagina = pdfObject.getPageInfo(i);
+                    if (pagina && pagina.pageContext && 
+                        (!pagina.pageContext.stream || pagina.pageContext.stream.length < 100)) {
+                        console.log("Eliminando página en blanco: " + i);
+                        pdfObject.deletePage(i);
+                    }
+                }
+                
                 // Añadir metadatos y numeración
                 agregarMetadatosYNumeracion(pdfObject);
                 
