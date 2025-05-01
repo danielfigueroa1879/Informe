@@ -703,7 +703,7 @@ function generarPDFCorregido() {
     }
     
     .logo-os10 {
-        width: 200px !important;
+        width: 145px !important;
         height: auto !important;
         opacity: 0.15 !important;
         max-width: 80% !important;
