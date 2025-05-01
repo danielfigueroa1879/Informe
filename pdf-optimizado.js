@@ -76,7 +76,7 @@ if (logoContainer && logoImg) {
     logoContainer.style.position = 'static'; // Cambio importante: usar static en lugar de absolute
     logoContainer.style.display = 'inline-block';
     logoContainer.style.float = 'left';
-    logoContainer.style.marginTop = '30px';
+    logoContainer.style.marginTop = '5px';
     logoContainer.style.marginLeft = '20px';
     logoContainer.style.marginRight = '20px';
     logoContainer.style.marginBottom = '10px';
