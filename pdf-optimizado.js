@@ -1,5 +1,5 @@
 /**
- * pdf-optimizado.js - Versión con posicionamiento mejorado del logo y título
+ * pdf-optimizado.js - Versión con tamaño de letra reducido
  * Solución optimizada para la generación de PDF sin páginas en blanco intermedias,
  * con observaciones completas y tamaño de letra reducido
  */
@@ -56,59 +56,6 @@ function generarPDFCorregido() {
             },
             elementosCreados: [] // Para rastrear elementos creados durante la preparación
         };
-
-        // NUEVA SECCIÓN: Mejora específica para logo y título
-        // Ajustar específicamente el logo para la generación de PDF
-        const logoContainer = container.querySelector('.logo-container');
-        const logoImg = container.querySelector('.logo-os10');
-        const titulo = container.querySelector('h1');
-
-        if (logoContainer && logoImg) {
-            // Guardar el estado original del logo
-            estadoOriginal.logo = {
-                containerPosition: logoContainer.style.position,
-                containerTop: logoContainer.style.top,
-                containerLeft: logoContainer.style.left,
-                containerZIndex: logoContainer.style.zIndex,
-                containerDisplay: logoContainer.style.display,
-                imgWidth: logoImg.style.width,
-                imgOpacity: logoImg.style.opacity
-            };
-            
-            // Posicionamiento mejorado: transformar el logo en un elemento flotante a la izquierda
-            logoContainer.style.position = 'static';
-            logoContainer.style.display = 'block';
-            logoContainer.style.float = 'left';
-            logoContainer.style.marginTop = '10px';
-            logoContainer.style.marginLeft = '20px';
-            logoContainer.style.marginRight = '20px';
-            logoContainer.style.marginBottom = '10px';
-            logoContainer.style.zIndex = '10';
-            logoContainer.style.width = 'auto';
-            logoContainer.style.height = 'auto';
-            
-            logoImg.style.width = '100px';
-            logoImg.style.height = 'auto';
-            logoImg.style.opacity = '1';
-            logoImg.style.display = 'block';
-        }
-
-        // Ajustar título para que no se superponga con el logo
-        if (titulo) {
-            estadoOriginal.titulo = {
-                marginLeft: titulo.style.marginLeft,
-                textAlign: titulo.style.textAlign,
-                marginTop: titulo.style.marginTop,
-                marginBottom: titulo.style.marginBottom
-            };
-            
-            titulo.style.textAlign = 'center';
-            titulo.style.marginLeft = '120px'; // Dejar espacio para el logo
-            titulo.style.marginTop = '20px';
-            titulo.style.marginBottom = '30px';
-            titulo.style.fontSize = '18pt';
-            titulo.style.fontWeight = 'bold';
-        }
         
         // 1. Eliminar espacios en blanco y elementos vacíos que pueden causar páginas en blanco
         const espaciosVacios = container.querySelectorAll('[style*="page-break"]');
@@ -243,7 +190,7 @@ function generarPDFCorregido() {
                 fontSize: '10pt' // Tamaño reducido
             }}
         ];
-
+        
         // Aplicar los estilos y guardar los originales
         elementosEstilizar.forEach(config => {
             const elementos = container.querySelectorAll(config.selector);
@@ -304,9 +251,6 @@ function generarPDFCorregido() {
             h1 {
                 font-size: 18pt !important; /* Reducido */
                 margin-bottom: 20px !important;
-                text-align: center !important;
-                color: #003366 !important;
-                margin-left: 120px !important; /* Espacio para el logo */
             }
             h2 {
                 font-size: 13pt !important; /* Reducido */
@@ -518,27 +462,6 @@ function generarPDFCorregido() {
                 display: inline-block !important;
                 max-width: 100% !important;
             }
-            
-            /* Estilos específicos para el logo */
-            .logo-container {
-                position: static !important;
-                display: block !important;
-                float: left !important;
-                margin-top: 10px !important;
-                margin-left: 20px !important;
-                margin-right: 20px !important;
-                margin-bottom: 10px !important;
-                z-index: 10 !important;
-                width: auto !important;
-                height: auto !important;
-            }
-            
-            .logo-os10 {
-                width: 100px !important;
-                height: auto !important;
-                opacity: 1 !important;
-                display: block !important;
-            }
         `;
         document.head.appendChild(estilosTemporales);
         estadoOriginal.elementosCreados.push(estilosTemporales);
@@ -569,14 +492,392 @@ function generarPDFCorregido() {
         
         return estadoOriginal;
     }
-
-// Función para generar el PDF con la configuración óptima
+    
+    // Función para generar el PDF con la configuración óptima
     function generarPDFDesdeContenido(contenido, estadoOriginal) {
         console.log("Generando PDF con configuración óptima...");
         
         // Configuración optimizada para tamaño legal/oficio
         const opciones = {
-            filename: `Fiscalizacion_${new Date().toLocaleDateString().replace(/\//g, '-')    // Función para mostrar el indicador de carga con un diseño mejorado
+            filename: `Fiscalizacion_${new Date().toLocaleDateString().replace(/\//g, '-')}.pdf`,
+            
+            // Modo de optimización: 1 = velocidad, 2 = precisión
+            html2canvas: {
+                scale: 1.5, // Escala original
+                useCORS: true,
+                allowTaint: true,
+                scrollX: 0,
+                scrollY: 0,
+                windowWidth: document.documentElement.offsetWidth,
+                windowHeight: document.documentElement.offsetHeight,
+                logging: false,
+                backgroundColor: '#FFFFFF',
+                imageTimeout: 30000, // Tiempo extendido para procesar gráficos
+                removeContainer: true,
+                foreignObjectRendering: false, // Deshabilitar para mayor compatibilidad
+                onclone: function(clonedDoc) {
+                    // Forzar la visibilidad de los fondos y gráficos
+                    const style = clonedDoc.createElement('style');
+                    style.innerHTML = `
+                        * {
+                            -webkit-print-color-adjust: exact !important;
+                            print-color-adjust: exact !important;
+                            color-adjust: exact !important;
+                        }
+                        
+                        /* Reducir tamaños de fuente */
+                        body {
+                            font-size: 10pt !important;
+                        }
+                        
+                        h1 {
+                            font-size: 18pt !important;
+                        }
+                        
+                        h2 {
+                            font-size: 14pt !important;
+                        }
+                        
+                        h3 {
+                            font-size: 12pt !important;
+                        }
+                        
+                        p, span, div, td {
+                            font-size: 10pt !important;
+                            line-height: 1.3 !important;
+                        }
+                        
+                        th {
+                            font-size: 9.5pt !important;
+                        }
+                        
+                        /* Inputs de texto en la sección de información */
+                        .info-section input[type="text"] {
+                            font-size: 9pt !important;
+                            padding: 4px !important;
+                            height: auto !important;
+                        }
+                        
+                        /* Inputs específicos para fecha */
+                        .fecha-inputs input[type="text"] {
+                            font-size: 9pt !important;
+                            padding: 2px !important;
+                            width: 30px !important;
+                            text-align: center !important;
+                        }
+                        
+                        /* Evitar páginas en blanco */
+                        div:empty, p:empty, span:empty {
+                            display: none !important;
+                        }
+                        
+                        /* Estilos específicos para asegurar fondos correctos */
+                        .header-row, th {
+                            background-color: #003366 !important;
+                            color: white !important;
+                            font-size: 9.5pt !important;
+                        }
+                        
+                        tr:nth-child(even) {
+                            background-color: #f9f9f9 !important;
+                        }
+                        
+                        .info-section, .summary {
+                            background-color: #f9f9f9 !important;
+                        }
+                        
+                        .result.seguro {
+                            background-color: #dff0d8 !important;
+                            color: #3c763d !important;
+                            border: 1px solid #d6e9c6 !important;
+                            font-size: 12pt !important;
+                        }
+                        
+                        .result.riesgo {
+                            background-color: #fcf8e3 !important;
+                            color: #8a6d3b !important;
+                            border: 1px solid #faebcc !important;
+                            font-size: 12pt !important;
+                        }
+                        
+                        .result.inseguro {
+                            background-color: #f2dede !important;
+                            color: #a94442 !important;
+                            border: 1px solid #ebccd1 !important;
+                            font-size: 12pt !important;
+                        }
+                        
+                        /* Asegurar que las textareas se muestran correctamente */
+                        .textarea-contenido-pdf {
+                            min-height: 40px;
+                            padding: 5px !important;
+                            font-family: inherit !important;
+                            font-size: 9pt !important;
+                            line-height: 1.3 !important;
+                            white-space: pre-wrap !important;
+                            word-break: break-word !important;
+                        }
+                        
+                        /* Ajustar resumen automático */
+                        #resumen-automatico {
+                            font-size: 9pt !important;
+                        }
+                        
+                        #resumen-automatico ul li {
+                            font-size: 9pt !important;
+                        }
+                        
+                        #resumen-automatico ul ul li {
+                            font-size: 8.5pt !important;
+                        }
+                        
+                        /* Ocultar la barra de herramientas del editor de texto */
+                        .rich-text-toolbar {
+                            display: none !important;
+                        }
+                        
+                        /* Estilo formal para el plan de acción */
+                        #plan-accion-editor {
+                            font-size: 11pt !important;
+                            line-height: 1.5 !important;
+                            padding: 20px 25px !important;
+                            background-color: #fff !important;
+                            border: 1px solid #e0e0e0 !important;
+                            box-shadow: 0 1px 3px rgba(0,0,0,0.05) !important;
+                            border-radius: 0 !important;
+                            font-family: 'Poppins', sans-serif !important;
+                            text-align: justify !important;
+                            color: #000 !important;
+                            margin-top: 15px !important;
+                            margin-bottom: 20px !important;
+                            min-height: 200px !important;
+                        }
+                        
+                        #plan-accion-editor p {
+                            margin-bottom: 8px !important;
+                            text-indent: 20px !important;
+                        }
+                        
+                        #plan-accion-editor ul, 
+                        #plan-accion-editor ol {
+                            margin: 10px 0 10px 15px !important;
+                            padding-left: 15px !important;
+                        }
+                        
+                        #plan-accion-editor li {
+                            margin-bottom: 5px !important;
+                        }
+                        
+                        .summary h3:nth-of-type(2) {
+                            font-size: 12pt !important;
+                            text-align: center !important;
+                            font-weight: bold !important;
+                            margin-top: 25px !important;
+                            margin-bottom: 15px !important;
+                            color: #003366 !important;
+                            text-transform: uppercase !important;
+                            letter-spacing: 1px !important;
+                            border-bottom: 1px solid #e0e0e0 !important;
+                            padding-bottom: 10px !important;
+                        }
+                        
+                        .rich-text-container {
+                            border: none !important;
+                            box-shadow: none !important;
+                            background: transparent !important;
+                        }
+                    `;
+                    clonedDoc.head.appendChild(style);
+                    
+                    // Asegurar que las imágenes se muestran correctamente
+                    Array.from(clonedDoc.querySelectorAll('img')).forEach(img => {
+                        img.style.display = 'block';
+                        img.style.maxWidth = '100%';
+                    });
+                    
+                    // Eliminar elementos vacíos en el clon que podrían causar páginas en blanco
+                    const divs = Array.from(clonedDoc.querySelectorAll('div, p, span'));
+                    divs.forEach(div => {
+                        if (!div.textContent.trim() && !div.querySelector('img') && div.clientHeight < 20 && !div.classList.contains('textarea-contenido-pdf')) {
+                            if (div.parentNode) {
+                                div.parentNode.removeChild(div);
+                            }
+                        }
+                    });
+                }
+            },
+            
+            jsPDF: {
+                unit: 'mm',
+                format: 'legal', // Formato oficio/legal
+                orientation: 'portrait',
+                compress: true,
+                precision: 16,
+                putOnlyUsedFonts: true
+            },
+            
+            // Configuración de saltos de página - Modificada para evitar páginas en blanco
+            pagebreak: {
+                mode: ['avoid-all'], // Simplificar el algoritmo
+                before: ['h2'], // Solo saltos explícitos en h2
+                avoid: ['table', 'img', '.textarea-contenido-pdf']
+            },
+            
+            // Usar el nuevo modo para división de contenido
+            enableLinks: false,
+            image: { type: 'jpeg', quality: 0.98 }, // Mayor calidad para gráficos
+            margin: [15, 10, 15, 10], // top, right, bottom, left
+            
+            // Importante: Esta opción optimiza el proceso y evita páginas en blanco
+            html2canvas: { 
+                scale: 1.5, // Escala original
+                scrollY: 0, 
+                scrollX: 0,
+                backgroundColor: '#FFFFFF',
+                removeContainer: true,
+                allowTaint: true,
+                useCORS: true,
+                letterRendering: true,
+                imageSmoothingEnabled: true,
+                imageTimeout: 30000
+            }
+        };
+        
+        // Generar el PDF con el manejo optimizado
+        html2pdf()
+            .from(contenido)
+            .set(opciones)
+            .toPdf()
+            .get('pdf')
+            .then(function(pdfObject) {
+                // Añadir metadatos y numeración
+                agregarMetadatosYNumeracion(pdfObject);
+                
+                // Guardar el PDF
+                pdfObject.save(opciones.filename);
+                
+                console.log("PDF generado exitosamente");
+                actualizarIndicadorExito();
+                
+                // Restaurar el documento original después de un momento
+                setTimeout(() => {
+                    restaurarDocumentoOriginal(estadoOriginal);
+                }, 1200);
+            })
+            .catch(function(error) {
+                console.error("Error al generar el PDF:", error);
+                ocultarIndicadorCarga();
+                alert("Ocurrió un error al generar el PDF. Por favor, intente nuevamente.");
+                restaurarDocumentoOriginal(estadoOriginal);
+            });
+    }
+    
+    // Función para agregar metadatos y numeración al PDF
+    function agregarMetadatosYNumeracion(pdf) {
+        try {
+            // Añadir metadatos
+            pdf.setProperties({
+                title: 'Cuadro de Fiscalización de Seguridad Privada',
+                subject: 'Informe de Fiscalización',
+                author: document.querySelector('input[name="fiscalizador"]')?.value || 'Sistema de Fiscalización',
+                keywords: 'seguridad, fiscalización, informe',
+                creator: 'Sistema PDF Optimizado'
+            });
+            
+            // Añadir numeración de páginas
+            const totalPaginas = pdf.internal.getNumberOfPages();
+            
+            for (let i = 1; i <= totalPaginas; i++) {
+                pdf.setPage(i);
+                
+                // Configuración de texto para el pie de página
+                pdf.setFontSize(8); // Tamaño reducido
+                pdf.setTextColor(100, 100, 100);
+                
+                // Obtener dimensiones de la página
+                const pageSize = pdf.internal.pageSize;
+                const pageWidth = pageSize.width ? pageSize.width : pageSize.getWidth();
+                const pageHeight = pageSize.height ? pageSize.height : pageSize.getHeight();
+                
+                // Texto de numeración
+                const texto = `Página ${i} de ${totalPaginas}`;
+                
+                // Posicionar en la esquina inferior derecha
+                const textWidth = pdf.getStringUnitWidth(texto) * 8 / pdf.internal.scaleFactor;
+                const x = pageWidth - textWidth - 15;
+                const y = pageHeight - 10;
+                
+                // Añadir el texto
+                pdf.text(texto, x, y);
+            }
+        } catch (error) {
+            console.warn("Error al añadir metadatos o numeración:", error);
+        }
+    }
+    
+    // Función para restaurar el documento a su estado original
+    function restaurarDocumentoOriginal(estadoOriginal) {
+        console.log("Restaurando documento a su estado original...");
+        
+        // 1. Remover elementos creados durante la preparación
+        if (estadoOriginal.elementosCreados) {
+            estadoOriginal.elementosCreados.forEach(el => {
+                if (el && el.parentNode) {
+                    el.parentNode.removeChild(el);
+                }
+            });
+        }
+        
+        // 2. Restaurar elementos ocultos
+        if (estadoOriginal.ocultos) {
+            estadoOriginal.ocultos.forEach(item => {
+                // Si el elemento fue removido completamente
+                if (item.parent && item.nextSibling) {
+                    item.parent.insertBefore(item.element, item.nextSibling);
+                } else if (item.parent) {
+                    item.parent.appendChild(item.element);
+                }
+                
+                // Restaurar visibilidad
+                if (item.display !== undefined) {
+                    item.element.style.display = item.display;
+                }
+            });
+        }
+        
+        // 3. Restaurar estilos originales
+        if (estadoOriginal.estilos) {
+            estadoOriginal.estilos.forEach((estilos, elemento) => {
+                Object.keys(estilos).forEach(prop => {
+                    // Manejar caso especial para textareas
+                    if (prop === 'value' && elemento.tagName === 'TEXTAREA') {
+                        elemento.value = estilos.value;
+                    } else {
+                        elemento.style[prop] = estilos[prop] || '';
+                    }
+                });
+            });
+        }
+        
+        // 4. Restaurar estilos del body
+        if (estadoOriginal.documentBody) {
+            document.body.style.overflow = estadoOriginal.documentBody.overflow || '';
+            document.body.style.height = estadoOriginal.documentBody.height || '';
+        }
+        
+        // 5. Eliminar hoja de estilos temporal si aún existe
+        const estilosTemporales = document.getElementById('estilos-temporales-pdf');
+        if (estilosTemporales && estilosTemporales.parentNode) {
+            estilosTemporales.parentNode.removeChild(estilosTemporales);
+        }
+        
+        // 6. Ocultar indicador de carga si aún está visible
+        ocultarIndicadorCarga();
+        
+        console.log("Documento restaurado correctamente");
+    }
+    
+    // Función para mostrar el indicador de carga con un diseño mejorado
     function mostrarIndicadorCarga() {
         // Eliminar indicador existente si lo hay
         const indicadorExistente = document.getElementById('indicador-pdf-carga');
@@ -734,218 +1035,9 @@ function generarPDFCorregido() {
             }, 300);
         }
     }
-}.pdf`,
-            
-            // Modo de optimización: 1 = velocidad, 2 = precisión
-            html2canvas: {
-                scale: 1.5, // Escala original
-                useCORS: true,
-                allowTaint: true,
-                scrollX: 0,
-                scrollY: 0,
-                windowWidth: document.documentElement.offsetWidth,
-                windowHeight: document.documentElement.offsetHeight,
-                logging: false,
-                backgroundColor: '#FFFFFF',
-                imageTimeout: 30000, // Tiempo extendido para procesar gráficos
-                removeContainer: true,
-                foreignObjectRendering: false, // Deshabilitar para mayor compatibilidad
-                onclone: function(clonedDoc) {
-                    // Forzar la visibilidad de los fondos y gráficos
-                    const style = clonedDoc.createElement('style');
-                    style.innerHTML = `
-                        * {
-                            -webkit-print-color-adjust: exact !important;
-                            print-color-adjust: exact !important;
-                            color-adjust: exact !important;
-                        }
-                        
-                        /* Reducir tamaños de fuente */
-                        body {
-                            font-size: 10pt !important;
-                        }
-                        
-                        h1 {
-                            font-size: 18pt !important;
-                            text-align: center !important;
-                            margin-left: 120px !important; /* Espacio para el logo */
-                            margin-bottom: 20px !important;
-                        }
-                        
-                        h2 {
-                            font-size: 14pt !important;
-                        }
-                        
-                        h3 {
-                            font-size: 12pt !important;
-                        }
-                        
-                        p, span, div, td {
-                            font-size: 10pt !important;
-                            line-height: 1.3 !important;
-                        }
-                        
-                        th {
-                            font-size: 9.5pt !important;
-                        }
-                        
-                        /* Inputs de texto en la sección de información */
-                        .info-section input[type="text"] {
-                            font-size: 9pt !important;
-                            padding: 4px !important;
-                            height: auto !important;
-                        }
-                        
-                        /* Inputs específicos para fecha */
-                        .fecha-inputs input[type="text"] {
-                            font-size: 9pt !important;
-                            padding: 2px !important;
-                            width: 30px !important;
-                            text-align: center !important;
-                        }
-                        
-                        /* Evitar páginas en blanco */
-                        div:empty, p:empty, span:empty {
-                            display: none !important;
-                        }
-                        
-                        /* Estilos específicos para asegurar fondos correctos */
-                        .header-row, th {
-                            background-color: #003366 !important;
-                            color: white !important;
-                            font-size: 9.5pt !important;
-                        }
-                        
-                        tr:nth-child(even) {
-                            background-color: #f9f9f9 !important;
-                        }
-                        
-                        .info-section, .summary {
-                            background-color: #f9f9f9 !important;
-                        }
-                        
-                        .result.seguro {
-                            background-color: #dff0d8 !important;
-                            color: #3c763d !important;
-                            border: 1px solid #d6e9c6 !important;
-                            font-size: 12pt !important;
-                        }
-                        
-                        .result.riesgo {
-                            background-color: #fcf8e3 !important;
-                            color: #8a6d3b !important;
-                            border: 1px solid #faebcc !important;
-                            font-size: 12pt !important;
-                        }
-                        
-                        .result.inseguro {
-                            background-color: #f2dede !important;
-                            color: #a94442 !important;
-                            border: 1px solid #ebccd1 !important;
-                            font-size: 12pt !important;
-                        }
-                        
-                        /* Asegurar que las textareas se muestran correctamente */
-                        .textarea-contenido-pdf {
-                            min-height: 40px;
-                            padding: 5px !important;
-                            font-family: inherit !important;
-                            font-size: 9pt !important;
-                            line-height: 1.3 !important;
-                            white-space: pre-wrap !important;
-                            word-break: break-word !important;
-                        }
-                        
-                        /* Ajustar resumen automático */
-                        #resumen-automatico {
-                            font-size: 9pt !important;
-                        }
-                        
-                        #resumen-automatico ul li {
-                            font-size: 9pt !important;
-                        }
-                        
-                        #resumen-automatico ul ul li {
-                            font-size: 8.5pt !important;
-                        }
-                        
-                        /* Ocultar la barra de herramientas del editor de texto */
-                        .rich-text-toolbar {
-                            display: none !important;
-                        }
-                        
-                        /* Estilo formal para el plan de acción */
-                        #plan-accion-editor {
-                            font-size: 11pt !important;
-                            line-height: 1.5 !important;
-                            padding: 20px 25px !important;
-                            background-color: #fff !important;
-                            border: 1px solid #e0e0e0 !important;
-                            box-shadow: 0 1px 3px rgba(0,0,0,0.05) !important;
-                            border-radius: 0 !important;
-                            font-family: 'Poppins', sans-serif !important;
-                            text-align: justify !important;
-                            color: #000 !important;
-                            margin-top: 15px !important;
-                            margin-bottom: 20px !important;
-                            min-height: 200px !important;
-                        }
-                        
-                        #plan-accion-editor p {
-                            margin-bottom: 8px !important;
-                            text-indent: 20px !important;
-                        }
-                        
-                        #plan-accion-editor ul, 
-                        #plan-accion-editor ol {
-                            margin: 10px 0 10px 15px !important;
-                            padding-left: 15px !important;
-                        }
-                        
-                        #plan-accion-editor li {
-                            margin-bottom: 5px !important;
-                        }
-                        
-                        .summary h3:nth-of-type(2) {
-                            font-size: 12pt !important;
-                            text-align: center !important;
-                            font-weight: bold !important;
-                            margin-top: 25px !important;
-                            margin-bottom: 15px !important;
-                            color: #003366 !important;
-                            text-transform: uppercase !important;
-                            letter-spacing: 1px !important;
-                            border-bottom: 1px solid #e0e0e0 !important;
-                            padding-bottom: 10px !important;
-                        }
-                        
-                        .rich-text-container {
-                            border: none !important;
-                            box-shadow: none !important;
-                            background: transparent !important;
-                        }
-                        
-                        /* Estilos específicos para el logo y encabezado */
-                        .logo-container {
-                            position: static !important;
-                            float: left !important;
-                            display: block !important;
-                            margin-top: 10px !important;
-                            margin-left: 20px !important;
-                            margin-right: 20px !important;
-                            margin-bottom: 20px !important;
-                            width: auto !important;
-                            height: auto !important;
-                            z-index: 10 !important;
-                        }
-                        
-                        .logo-os10 {
-                            width: 100px !important;
-                            height: auto !important;
-                            opacity: 1 !important;
-                            display: block !important;
-                        }
-                        // Función para reemplazar los botones existentes con la nueva funcionalidad
+}
+
+// Función para reemplazar los botones existentes con la nueva funcionalidad
 function instalarBotonPDFCorregido() {
     console.log("Instalando botón de PDF corregido...");
     
