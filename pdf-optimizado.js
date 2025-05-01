@@ -68,10 +68,10 @@ function generarPDFCorregido() {
                 zIndex: logoContainer.style.zIndex
             });
             
-            // Forzar posición correcta del logo
+            // Forzar posición correcta del logo - más arriba
             logoContainer.style.position = 'absolute';
-            logoContainer.style.top = '0';
-            logoContainer.style.left = '20px';
+            logoContainer.style.top = '-8px';  // Movido más arriba
+            logoContainer.style.left = '10px';  // Ligeramente más a la izquierda
             logoContainer.style.zIndex = '1000';
             
             // Asegurarse que la imagen del logo sea visible
@@ -98,7 +98,7 @@ function generarPDFCorregido() {
             });
             
             titulo.style.position = 'relative';
-            titulo.style.marginLeft = '110px';
+            titulo.style.marginLeft = '90px';  // Reducido para mover a la izquierda
             titulo.style.marginTop = '15px';
             titulo.style.fontSize = '18pt';
         }
@@ -262,7 +262,7 @@ function generarPDFCorregido() {
             h1 {
                 font-size: 18pt !important;
                 margin-bottom: 20px !important;
-                margin-left: 110px !important;
+                margin-left: 90px !important;  /* Reducido para mover a la izquierda */
                 margin-top: 15px !important;
                 position: relative !important;
             }
@@ -270,8 +270,8 @@ function generarPDFCorregido() {
             /* Logo posicionamiento específico */
             .logo-container {
                 position: absolute !important;
-                top: 0 !important;
-                left: 20px !important;
+                top: -8px !important;  /* Más arriba */
+                left: 10px !important;  /* Más a la izquierda */
                 z-index: 1000 !important;
                 width: auto !important;
                 height: auto !important;
@@ -454,8 +454,8 @@ function generarPDFCorregido() {
                     const logoContainer = clonedDoc.querySelector('.logo-container');
                     if (logoContainer) {
                         logoContainer.style.position = 'absolute';
-                        logoContainer.style.top = '0';
-                        logoContainer.style.left = '20px';
+                        logoContainer.style.top = '-8px';  // Movido más arriba
+                        logoContainer.style.left = '10px';  // Más a la izquierda
                         logoContainer.style.zIndex = '1000';
                         
                         const logoImage = logoContainer.querySelector('.logo-os10');
@@ -470,7 +470,7 @@ function generarPDFCorregido() {
                     const titulo = clonedDoc.querySelector('h1');
                     if (titulo) {
                         titulo.style.position = 'relative';
-                        titulo.style.marginLeft = '110px';
+                        titulo.style.marginLeft = '90px';  // Reducido para mover a la izquierda
                         titulo.style.marginTop = '15px';
                         titulo.style.fontSize = '18pt';
                     }
@@ -504,7 +504,7 @@ function generarPDFCorregido() {
                         
                         h1 {
                             font-size: 18pt !important;
-                            margin-left: 110px !important;
+                            margin-left: 90px !important;  /* Reducido para mover a la izquierda */
                         }
                         
                         h2 {
@@ -527,8 +527,8 @@ function generarPDFCorregido() {
                         /* Controlar posición del logo */
                         .logo-container {
                             position: absolute !important;
-                            top: 0 !important;
-                            left: 20px !important;
+                            top: -8px !important;  /* Más arriba */
+                            left: 10px !important;  /* Más a la izquierda */
                             z-index: 1000 !important;
                         }
                         
