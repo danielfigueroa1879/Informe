@@ -169,7 +169,7 @@ function generarPDFCorregido() {
                     display: logoImage.style.display
                 });
                 
-                                            logoImage.style.width = '80px'; // Tamaño más pequeño
+                                            logoImage.style.width = '70px'; // Tamaño más pequeño
                 logoImage.style.display = 'block';
             }
         }
@@ -378,32 +378,32 @@ function generarPDFCorregido() {
             }
             
             h2 {
-                font-size: 10pt !important; /* Reducido más */
+                font-size: 9pt !important; /* Reducido aún más */
                 page-break-before: always !important;
                 break-before: page !important;
                 page-break-after: avoid !important;
                 break-after: avoid !important;
-                margin-top: 10px !important;
-                padding-top: 5px !important;
+                margin-top: 8px !important; /* Reducido */
+                padding-top: 4px !important; /* Reducido */
             }
             h3 {
-                font-size: 9pt !important; /* Reducido más */
+                font-size: 8pt !important; /* Reducido aún más */
                 page-break-after: avoid !important;
                 break-after: avoid !important;
-                margin-top: 8px !important;
-                margin-bottom: 3px !important;
+                margin-top: 6px !important; /* Reducido */
+                margin-bottom: 2px !important; /* Reducido */
             }
             table {
                 page-break-inside: auto !important;
                 break-inside: auto !important;
-                font-size: 7pt !important; /* Reducido más */
+                font-size: 6pt !important; /* Reducido aún más */
             }
             th {
-                font-size: 7.5pt !important; /* Reducido más */
+                font-size: 6.5pt !important; /* Reducido aún más */
             }
             td {
-                font-size: 7pt !important; /* Reducido más */
-                padding: 3px 5px !important;
+                font-size: 6pt !important; /* Reducido aún más */
+                padding: 2px 4px !important; /* Reducido */
             }
             tr {
                 page-break-inside: avoid !important;
@@ -418,28 +418,28 @@ function generarPDFCorregido() {
             
             /* Mejorar visualización de observaciones */
             .textarea-contenido-pdf {
-                min-height: 30px !important; /* Reducido más */
-                padding: 3px !important; /* Reducido más */
+                min-height: 25px !important; /* Reducido aún más */
+                padding: 2px !important; /* Reducido más */
                 font-family: inherit !important;
-                font-size: 7pt !important; /* Reducido más */
-                line-height: 1.1 !important; /* Reducido más */
+                font-size: 6pt !important; /* Reducido aún más */
+                line-height: 1 !important; /* Reducido más */
                 white-space: pre-wrap !important;
                 word-break: break-word !important;
-                margin-bottom: 3px !important; /* Reducido más */
+                margin-bottom: 2px !important; /* Reducido más */
             }
             
             /* Reducir específicamente el tamaño del texto en los campos de entrada */
             .info-section input[type="text"] {
-                font-size: 7pt !important; /* Tamaño reducido más */
-                padding: 2px !important;
+                font-size: 6pt !important; /* Tamaño reducido aún más */
+                padding: 1px !important; /* Reducido */
                 height: auto !important;
             }
             
             /* Ajustar específicamente los inputs de fecha */
             .fecha-inputs input[type="text"] {
-                font-size: 7pt !important; /* Reducido más */
+                font-size: 6pt !important; /* Reducido aún más */
                 padding: 1px !important;
-                width: 22px !important; /* Reducido más */
+                width: 18px !important; /* Reducido aún más */
                 text-align: center !important;
             }
             
@@ -607,9 +607,9 @@ function generarPDFCorregido() {
                     const titulo = clonedDoc.querySelector('h1');
                     if (titulo) {
                         titulo.style.position = 'relative';
-                        titulo.style.marginLeft = '90px';  // Reducido para mover a la izquierda
+                        titulo.style.marginLeft = '80px'; // Reducido
                         titulo.style.marginTop = '15px';
-                        titulo.style.fontSize = '16pt'; // Reducido
+                        titulo.style.fontSize = '12pt'; // Reducido aún más
                     }
                     
                     // Forzar la visibilidad de los fondos y gráficos
@@ -689,17 +689,25 @@ function generarPDFCorregido() {
                     inputsStyle.innerHTML = `
                         /* Reducir específicamente el tamaño del texto en los campos de entrada */
                         .info-section input[type="text"] {
-                            font-size: 7pt !important; /* Reducido más */
-                            padding: 2px !important;
+                            font-size: 6pt !important; /* Reducido aún más */
+                            padding: 1px !important;
                             height: auto !important;
                         }
                         
                         /* Ajustar específicamente los inputs de fecha */
                         .fecha-inputs input[type="text"] {
-                            font-size: 7pt !important; /* Reducido más */
+                            font-size: 6pt !important; /* Reducido aún más */
                             padding: 1px !important;
-                            width: 22px !important; /* Reducido más */
+                            width: 18px !important; /* Reducido aún más */
                             text-align: center !important;
+                        }
+                        
+                        /* Ajustar contenedor para que todo quepa */
+                        .container {
+                            width: 92% !important; /* Reducido más */
+                            max-width: 92% !important;
+                            padding: 1mm !important; /* Reducido */
+                            margin: 0 auto !important;
                         }
                         
                         /* Ajustar contenedor para que todo quepa */
