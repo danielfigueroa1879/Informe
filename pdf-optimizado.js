@@ -1,6 +1,6 @@
-**
- * pdf-optimizado.js - Versión con letras más grandes
- * Solución optimizada para la generación de PDF con texto más legible
+/**
+ * pdf-optimizado.js - Versión con letras más pequeñas
+ * Solución optimizada para la generación de PDF con texto más compacto
  */
 function generarPDFCorregido() {
     mostrarIndicadorCarga();
@@ -16,6 +16,7 @@ function generarPDFCorregido() {
     } else {
         prepararYGenerarPDF();
     }
+
     function prepararYGenerarPDF() {
         console.log("Iniciando generación de PDF optimizada...");
         const container = document.querySelector('.container');
@@ -29,6 +30,7 @@ function generarPDFCorregido() {
             generarPDFDesdeContenido(container, estadoOriginal);
         }, 500);
     }
+
     function prepararContenidoParaPDF(container) {
         const estadoOriginal = {
             estilos: new Map(),
@@ -39,11 +41,12 @@ function generarPDFCorregido() {
             },
             elementosCreados: []
         };
+
         const elementosTexto = container.querySelectorAll('*');
         elementosTexto.forEach(el => {
             if (el.tagName) {
                 if (!estadoOriginal.estilos.has(el)) {
-                     estadoOriginal.estilos.set(el, {
+                    estadoOriginal.estilos.set(el, {
                         fontSize: el.style.fontSize,
                         lineHeight: el.style.lineHeight,
                         padding: el.style.padding,
@@ -51,74 +54,76 @@ function generarPDFCorregido() {
                     });
                 }
                 const tagName = el.tagName.toLowerCase();
-                 if (tagName === 'h1') {
-                    el.style.fontSize = '20pt';
-                    el.style.marginLeft = '70px';
-                    el.style.marginBottom = '16px';
-                    el.style.marginTop = '16px';
+                if (tagName === 'h1') {
+                    el.style.fontSize = '8pt'; // Reducido de 10pt
+                    el.style.marginLeft = '60px'; // Reducido de 70px
+                    el.style.marginBottom = '6px'; // Reducido de 8px
+                    el.style.marginTop = '6px'; // Reducido de 8px
                 } else if (tagName === 'h2') {
-                    el.style.fontSize = '14pt';
-                    el.style.marginTop = '12px';
-                    el.style.paddingTop = '6px';
+                    el.style.fontSize = '6pt'; // Reducido de 7pt
+                    el.style.marginTop = '4px'; // Reducido de 6px
+                    el.style.paddingTop = '2px'; // Reducido de 3px
                 } else if (tagName === 'h3') {
-                    el.style.fontSize = '12pt';
-                    el.style.marginTop = '8px';
-                    el.style.marginBottom = '2px';
+                    el.style.fontSize = '5pt'; // Reducido de 6pt
+                    el.style.marginTop = '3px'; // Reducido de 4px
+                    el.style.marginBottom = '1px'; // Mantenido
                 } else if (tagName === 'th') {
-                    el.style.fontSize = '11pt';
-                    el.style.padding = '2px 6px';
+                    el.style.fontSize = '4.5pt'; // Reducido de 5.5pt
+                    el.style.padding = '1px 2px'; // Reducido de 1px 3px
                 } else if (tagName === 'td') {
-                    el.style.fontSize = '10pt';
-                    el.style.padding = '2px 6px';
+                    el.style.fontSize = '4pt'; // Reducido de 5pt
+                    el.style.padding = '1px 2px'; // Reducido de 1px 3px
                 } else if (tagName === 'input' || tagName === 'textarea') {
-                    el.style.fontSize = '10pt';
-                    el.style.padding = '0px';   
+                    el.style.fontSize = '4pt'; // Reducido de 5pt
+                    el.style.padding = '0px';
                     if (el.parentNode && el.parentNode.classList.contains('fecha-inputs')) {
-                        el.style.width = '30px';
+                        el.style.width = '12px'; // Reducido de 15px
                     }
-                    if(tagName === 'textarea'){ 
-                         el.style.minHeight = '40px';
-                         el.style.lineHeight = '1.8';
+                    if (tagName === 'textarea') {
+                        el.style.minHeight = '15px'; // Reducido de 20px
+                        el.style.lineHeight = '0.8'; // Reducido de 0.9
                     }
                 } else if (tagName === 'p' || tagName === 'span' || tagName === 'div') {
-                    el.style.fontSize = '10pt';
-                    el.style.lineHeight = '1.8';
-                    el.style.margin = '0';     
-                    el.style.padding = '0';    
+                    el.style.fontSize = '4pt'; // Reducido de 5pt
+                    el.style.lineHeight = '0.8'; // Reducido de 0.9
+                    el.style.margin = '0';
+                    el.style.padding = '0';
                 }
             }
         });
+
         const logoContainer = container.querySelector('.logo-container');
         if (logoContainer) {
-             if (!estadoOriginal.estilos.has(logoContainer)) {
+            if (!estadoOriginal.estilos.has(logoContainer)) {
                 estadoOriginal.estilos.set(logoContainer, {
                     position: logoContainer.style.position,
                     top: logoContainer.style.top,
                     left: logoContainer.style.left,
                     zIndex: logoContainer.style.zIndex
                 });
-             }
+            }
             logoContainer.style.position = 'absolute';
-            logoContainer.style.top = '-16px';
-            logoContainer.style.left = '10px';
+            logoContainer.style.top = '-6px'; // Reducido de -8px
+            logoContainer.style.left = '3px'; // Reducido de 5px
             logoContainer.style.zIndex = '1000';
             const logoImage = logoContainer.querySelector('.logo-os10');
             if (logoImage) {
-                 if (!estadoOriginal.estilos.has(logoImage)) {
+                if (!estadoOriginal.estilos.has(logoImage)) {
                     estadoOriginal.estilos.set(logoImage, {
                         width: logoImage.style.width,
                         display: logoImage.style.display,
                         height: logoImage.style.height
                     });
-                 }
-                logoImage.style.width = '170px';
+                }
+                logoImage.style.width = '70px'; // Reducido de 85px
                 logoImage.style.height = 'auto';
                 logoImage.style.display = 'block';
             }
         }
+
         const titulo = container.querySelector('h1');
         if (titulo) {
-             if (!estadoOriginal.estilos.has(titulo)) {
+            if (!estadoOriginal.estilos.has(titulo)) {
                 estadoOriginal.estilos.set(titulo, {
                     position: titulo.style.position,
                     marginLeft: titulo.style.marginLeft,
@@ -126,13 +131,14 @@ function generarPDFCorregido() {
                     fontSize: titulo.style.fontSize,
                     marginBottom: titulo.style.marginBottom
                 });
-             }
+            }
             titulo.style.position = 'relative';
-            titulo.style.marginLeft = '70px';
-            titulo.style.marginTop = '16px';
-            titulo.style.marginBottom = '16px';
-            titulo.style.fontSize = '20pt';
+            titulo.style.marginLeft = '60px'; // Reducido de 70px
+            titulo.style.marginTop = '6px'; // Reducido de 8px
+            titulo.style.marginBottom = '6px'; // Reducido de 8px
+            titulo.style.fontSize = '8pt'; // Reducido de 10pt
         }
+
         const espaciosVacios = container.querySelectorAll('[style*="page-break"]');
         espaciosVacios.forEach(el => {
             if (!el.textContent.trim() && !el.querySelector('img') && el.clientHeight < 5) {
@@ -146,16 +152,18 @@ function generarPDFCorregido() {
                 }
             }
         });
+
         const elementosOcultar = container.querySelectorAll('.botones, .no-print, .rich-text-toolbar, .datos-guardados-info, .mobile-nav, .mobile-action-button');
         elementosOcultar.forEach(el => {
-             if(!el.classList.contains('logo-container') && !el.classList.contains('logo-os10') && el.tagName !== 'H1') {
+            if (!el.classList.contains('logo-container') && !el.classList.contains('logo-os10') && el.tagName !== 'H1') {
                 estadoOriginal.ocultos.push({
                     element: el,
                     display: el.style.display
                 });
                 el.style.display = 'none';
-             }
+            }
         });
+
         const seccionResumen = container.querySelector('#seccion-resumen');
         const seccionFotos = container.querySelector('#seccion-fotos');
         if (seccionResumen) {
@@ -172,6 +180,7 @@ function generarPDFCorregido() {
             seccionFotos.style.pageBreakBefore = 'always';
             seccionFotos.style.breakBefore = 'page';
         }
+
         const textareas = container.querySelectorAll('textarea');
         textareas.forEach(textarea => {
             if (!estadoOriginal.estilos.has(textarea)) {
@@ -186,12 +195,12 @@ function generarPDFCorregido() {
             contenidoTexto.textContent = textarea.value;
             contenidoTexto.className = 'textarea-contenido-pdf';
             Object.assign(contenidoTexto.style, {
-                minHeight: '40px',
+                minHeight: '15px', // Reducido de 20px
                 width: '100%',
                 fontFamily: textarea.style.fontFamily || 'inherit',
-                fontSize: '10pt',
-                lineHeight: '1.8',
-                padding: '2px',
+                fontSize: '4pt', // Reducido de 5pt
+                lineHeight: '0.8', // Reducido de 0.9
+                padding: '1px', // Mantenido
                 whiteSpace: 'pre-wrap',
                 wordBreak: 'break-word',
                 margin: '0'
@@ -200,59 +209,13 @@ function generarPDFCorregido() {
             textarea.style.display = 'none';
             estadoOriginal.elementosCreados.push(contenidoTexto);
         });
-        const elementosEstilizar = [
-            { selector: '.forced-page-break', estilos: {
-                display: 'block', height: '2px', pageBreakBefore: 'always', margin: '0', padding: '0'
-            }},
-            { selector: 'h2', estilos: {
-                pageBreakBefore: 'always', marginTop: '12px', paddingTop: '6px', fontSize: '14pt'
-            }},
-            { selector: 'h3', estilos: {
-                 fontSize: '12pt', marginTop: '8px', marginBottom: '2px'
-            }},
-            { selector: 'table', estilos: {
-                pageBreakInside: 'auto', fontSize: '10pt', margin: '0', padding: '0'
-            }},
-             { selector: 'th', estilos: {
-                 fontSize: '11pt', padding: '2px 6px'
-             }},
-            { selector: 'td', estilos: {
-                 fontSize: '10pt', padding: '2px 6px'
-            }},
-            { selector: 'tr', estilos: {
-                pageBreakInside: 'avoid', margin: '0', padding: '0'
-            }},
-            { selector: '#plan-accion-editor', estilos: {
-                height: 'auto', maxHeight: 'none', overflow: 'visible', fontSize: '10pt', lineHeight: '1.8'
-            }},
-             { selector: '.info-section input[type="text"]', estilos: {
-                 fontSize: '10pt', padding: '0', height: 'auto'
-             }},
-             { selector: '.fecha-inputs input[type="text"]', estilos: {
-                 fontSize: '10pt', padding: '0', width: '30px', textAlign: 'center'
-             }}
-        ];
-        elementosEstilizar.forEach(config => {
-            const elementos = container.querySelectorAll(config.selector);
-            elementos.forEach(el => {
-                if (!estadoOriginal.estilos.has(el)) {
-                    const estilosOriginales = {};
-                    Object.keys(config.estilos).forEach(prop => {
-                        estilosOriginales[prop] = el.style[prop];
-                    });
-                    estadoOriginal.estilos.set(el, estilosOriginales);
-                }
-                Object.keys(config.estilos).forEach(prop => {
-                    el.style[prop] = config.estilos[prop];
-                });
-            });
-        });
+
         const estilosTemporales = document.createElement('style');
         estilosTemporales.id = 'estilos-temporales-pdf';
         estilosTemporales.textContent = `
             @page {
                 size: legal portrait;
-                margin: 8mm 5mm; 
+                margin: 6mm 4mm; /* Reducido de 8mm 5mm */
             }
             body {
                 -webkit-print-color-adjust: exact !important;
@@ -262,34 +225,34 @@ function generarPDFCorregido() {
                 padding: 0 !important;
             }
             body, .container, div, p, span, td, th, h1, h2, h3, h4, h5, h6, input, textarea {
-                font-size: 10pt !important;
-                line-height: 1.8 !important;
+                font-size: 4pt !important; /* Reducido de 5pt */
+                line-height: 0.8 !important; /* Reducido de 0.9 */
                 margin: 0 !important;
                 padding: 0 !important;
             }
-             .container {
-                width: 90% !important; 
-                max-width: 90% !important; 
-                padding: 2mm !important;
+            .container {
+                width: 85% !important; /* Reducido de 90% */
+                max-width: 85% !important; /* Reducido de 90% */
+                padding: 0.8mm !important; /* Reducido de 1mm */
                 margin: 0 auto !important;
             }
             h1 {
-                font-size: 20pt !important;
-                margin-left: 70px !important;
-                margin-bottom: 16px !important;
-                margin-top: 16px !important;
-                position: relative !important; 
+                font-size: 8pt !important; /* Reducido de 10pt */
+                margin-left: 60px !important; /* Reducido de 70px */
+                margin-bottom: 6px !important; /* Reducido de 8px */
+                margin-top: 6px !important; /* Reducido de 8px */
+                position: relative !important;
             }
             .logo-container {
                 position: absolute !important;
-                top: -16px !important;
-                left: 10px !important;
+                top: -6px !important; /* Reducido de -8px */
+                left: 3px !important; /* Reducido de 5px */
                 z-index: 1000 !important;
-                width: auto !important; 
+                width: auto !important;
                 height: auto !important;
             }
             .logo-os10 {
-                width: 170px !important;
+                width: 70px !important; /* Reducido de 85px */
                 height: auto !important;
                 display: block !important;
             }
@@ -299,38 +262,38 @@ function generarPDFCorregido() {
                 margin: 0 !important;
                 padding: 0 !important;
             }
-             h2 {
-                font-size: 14pt !important;
+            h2 {
+                font-size: 6pt !important; /* Reducido de 7pt */
                 page-break-before: always !important;
                 break-before: page !important;
                 page-break-after: avoid !important;
                 break-after: avoid !important;
-                margin-top: 12px !important;
-                padding-top: 6px !important;
+                margin-top: 4px !important; /* Reducido de 6px */
+                padding-top: 2px !important; /* Reducido de 3px */
             }
             h3 {
-                font-size: 12pt !important;
+                font-size: 5pt !important; /* Reducido de 6pt */
                 page-break-after: avoid !important;
                 break-after: avoid !important;
-                margin-top: 8px !important;
-                margin-bottom: 2px !important;
+                margin-top: 3px !important; /* Reducido de 4px */
+                margin-bottom: 1px !important;
             }
             table {
                 page-break-inside: auto !important;
                 break-inside: auto !important;
-                font-size: 10pt !important;
+                font-size: 4pt !important; /* Reducido de 5pt */
                 margin: 0 !important;
                 padding: 0 !important;
             }
             th {
-                font-size: 11pt !important;
-                padding: 2px 6px !important;
-                background-color: #003366 !important; 
-                color: white !important; 
+                font-size: 4.5pt !important; /* Reducido de 5.5pt */
+                padding: 1px 2px !important; /* Reducido de 1px 3px */
+                background-color: #003366 !important;
+                color: white !important;
             }
             td {
-                font-size: 10pt !important;
-                padding: 2px 6px !important;
+                font-size: 4pt !important; /* Reducido de 5pt */
+                padding: 1px 2px !important; /* Reducido de 1px 3px */
             }
             tr {
                 page-break-inside: avoid !important;
@@ -338,46 +301,46 @@ function generarPDFCorregido() {
                 margin: 0 !important;
                 padding: 0 !important;
             }
-            tr:nth-child(even) { 
+            tr:nth-child(even) {
                 background-color: #f9f9f9 !important;
             }
             .forced-page-break {
                 page-break-before: always !important;
                 break-before: page !important;
-                height: 2px !important;
+                height: 1px !important;
                 visibility: hidden !important;
                 margin: 0 !important;
                 padding: 0 !important;
             }
             .textarea-contenido-pdf {
-                min-height: 40px !important;
-                padding: 2px !important;
+                min-height: 15px !important; /* Reducido de 20px */
+                padding: 1px !important;
                 font-family: inherit !important;
-                font-size: 10pt !important;
-                line-height: 1.8 !important;
+                font-size: 4pt !important; /* Reducido de 5pt */
+                line-height: 0.8 !important; /* Reducido de 0.9 */
                 white-space: pre-wrap !important;
                 word-break: break-word !important;
                 margin: 0 !important;
             }
             .info-section input[type="text"] {
-                font-size: 10pt !important;
+                font-size: 4pt !important; /* Reducido de 5pt */
                 padding: 0 !important;
                 height: auto !important;
             }
             .fecha-inputs input[type="text"] {
-                font-size: 10pt !important;
+                font-size: 4pt !important; /* Reducido de 5pt */
                 padding: 0px !important;
-                width: 30px !important;
+                width: 12px !important; /* Reducido de 15px */
                 text-align: center !important;
             }
-             .result.seguro { background-color: #dff0d8 !important; color: #3c763d !important; border: 1px solid #d6e9c6 !important; font-size: 12pt !important; padding: 2px !important;}
-             .result.riesgo { background-color: #fcf8e3 !important; color: #8a6d3b !important; border: 1px solid #faebcc !important; font-size: 12pt !important; padding: 2px !important;}
-             .result.inseguro { background-color: #f2dede !important; color: #a94442 !important; border: 1px solid #ebccd1 !important; font-size: 12pt !important; padding: 2px !important;}
-            img:not(.logo-os10) { 
+            .result.seguro { background-color: #dff0d8 !important; color: #3c763d !important; border: 1px solid #d6e9c6 !important; font-size: 5pt !important; /* Reducido de 6pt */ padding: 1px !important; }
+            .result.riesgo { background-color: #fcf8e3 !important; color: #8a6d3b !important; border: 1px solid #faebcc !important; font-size: 5pt !important; /* Reducido de 6pt */ padding: 1px !important; }
+            .result.inseguro { background-color: #f2dede !important; color: #a94442 !important; border: 1px solid #ebccd1 !important; font-size: 5pt !important; /* Reducido de 6pt */ padding: 1px !important; }
+            img:not(.logo-os10) {
                 display: inline-block !important;
                 max-width: 100% !important;
             }
-             .mobile-nav, .mobile-action-button, .mobile-control-panel, .botones, .no-print, .rich-text-toolbar {
+            .mobile-nav, .mobile-action-button, .mobile-control-panel, .botones, .no-print, .rich-text-toolbar {
                 display: none !important;
                 height: 0 !important;
                 width: 0 !important;
@@ -388,6 +351,7 @@ function generarPDFCorregido() {
         `;
         document.head.appendChild(estilosTemporales);
         estadoOriginal.elementosCreados.push(estilosTemporales);
+
         const elementosVacios = Array.from(container.querySelectorAll('div, p, span'))
             .filter(el => !el.textContent.trim() && !el.querySelector('img') && el.clientHeight < 20 && !el.id && !el.classList.contains('logo-container'));
         elementosVacios.forEach(el => {
@@ -403,16 +367,18 @@ function generarPDFCorregido() {
                 }
             }
         });
+
         document.body.style.overflow = 'visible';
         document.body.style.height = 'auto';
         return estadoOriginal;
     }
+
     function generarPDFDesdeContenido(contenido, estadoOriginal) {
         console.log("Generando PDF con configuración óptima...");
         const opciones = {
             filename: `Fiscalizacion_${new Date().toLocaleDateString().replace(/\//g, '-')}.pdf`,
             html2canvas: {
-                scale: 0.85, 
+                scale: 0.8, // Reducido de 0.85
                 useCORS: true,
                 allowTaint: true,
                 scrollX: 0,
@@ -428,63 +394,65 @@ function generarPDFCorregido() {
                     const elementosClonados = clonedDoc.querySelectorAll('*');
                     elementosClonados.forEach(el => {
                         const tagName = el.tagName.toLowerCase();
-                         if (tagName === 'h1') {
-                            el.style.fontSize = '20pt';
-                            el.style.marginLeft = '70px';
-                            el.style.marginBottom = '16px';
-                            el.style.marginTop = '16px';
+                        if (tagName === 'h1') {
+                            el.style.fontSize = '8pt'; // Reducido de 10pt
+                            el.style.marginLeft = '60px'; // Reducido de 70px
+                            el.style.marginBottom = '6px'; // Reducido de 8px
+                            el.style.marginTop = '6px'; // Reducido de 8px
                             el.style.position = 'relative';
                         } else if (tagName === 'h2') {
-                            el.style.fontSize = '14pt';
-                            el.style.marginTop = '12px';
-                            el.style.paddingTop = '6px';
+                            el.style.fontSize = '6pt'; // Reducido de 7pt
+                            el.style.marginTop = '4px'; // Reducido de 6px
+                            el.style.paddingTop = '2px'; // Reducido de 3px
                             el.style.pageBreakBefore = 'always';
                             el.style.breakBefore = 'page';
                         } else if (tagName === 'h3') {
-                            el.style.fontSize = '12pt';
-                            el.style.marginTop = '8px';
-                            el.style.marginBottom = '2px';
+                            el.style.fontSize = '5pt'; // Reducido de 6pt
+                            el.style.marginTop = '3px'; // Reducido de 4px
+                            el.style.marginBottom = '1px'; // Mantenido
                         } else if (tagName === 'th') {
-                            el.style.fontSize = '11pt';
-                            el.style.padding = '2px 6px';
+                            el.style.fontSize = '4.5pt'; // Reducido de 5.5pt
+                            el.style.padding = '1px 2px'; // Reducido de 1px 3px
                             el.style.backgroundColor = '#003366';
                             el.style.color = 'white';
                         } else if (tagName === 'td') {
-                            el.style.fontSize = '10pt';
-                            el.style.padding = '2px 6px';
+                            el.style.fontSize = '4pt'; // Reducido de 5pt
+                            el.style.padding = '1px 2px'; // Reducido de 1px 3px
                         } else if (tagName === 'input' || tagName === 'textarea') {
-                            el.style.fontSize = '10pt';
+                            el.style.fontSize = '4pt'; // Reducido de 5pt
                             el.style.padding = '0px';
                             if (el.parentNode && el.parentNode.classList.contains('fecha-inputs')) {
-                                el.style.width = '30px';
+                                el.style.width = '12px'; // Reducido de 15px
                                 el.style.textAlign = 'center';
                             }
-                             if(tagName === 'textarea'){
-                                el.style.minHeight = '40px';
-                                el.style.lineHeight = '1.8';
-                             }
+                            if (tagName === 'textarea') {
+                                el.style.minHeight = '15px'; // Reducido de 20px
+                                el.style.lineHeight = '0.8'; // Reducido de 0.9
+                            }
                         } else if (tagName === 'p' || tagName === 'span' || tagName === 'div') {
-                            if(!el.classList.contains('logo-container')){
-                                el.style.fontSize = '10pt';
-                                el.style.lineHeight = '1.8';
+                            if (!el.classList.contains('logo-container')) {
+                                el.style.fontSize = '4pt'; // Reducido de 5pt
+                                el.style.lineHeight = '0.8'; // Reducido de 0.9
                                 el.style.margin = '0';
                                 el.style.padding = '0';
                             }
                         }
                     });
+
                     const logoContainer = clonedDoc.querySelector('.logo-container');
                     if (logoContainer) {
                         logoContainer.style.position = 'absolute';
-                        logoContainer.style.top = '-16px';
-                        logoContainer.style.left = '10px';
+                        logoContainer.style.top = '-6px'; // Reducido de -8px
+                        logoContainer.style.left = '3px'; // Reducido de 5px
                         logoContainer.style.zIndex = '1000';
                         const logoImage = logoContainer.querySelector('.logo-os10');
                         if (logoImage) {
-                            logoImage.style.width = '170px';
+                            logoImage.style.width = '70px'; // Reducido de 85px
                             logoImage.style.height = 'auto';
                             logoImage.style.display = 'block';
                         }
                     }
+
                     const style = clonedDoc.createElement('style');
                     style.innerHTML = `
                         * {
@@ -494,36 +462,41 @@ function generarPDFCorregido() {
                         }
                         body, html { margin: 0 !important; padding: 0 !important; }
                         body, .container, div, p, span, td, th, h1, h2, h3, h4, h5, h6, input, textarea {
-                            font-size: 10pt !important; line-height: 1.8 !important; margin: 0 !important; padding: 0 !important;
+                            font-size: 4pt !important; /* Reducido de 5pt */
+                            line-height: 0.8 !important; /* Reducido de 0.9 */
+                            margin: 0 !important;
+                            padding: 0 !important;
                         }
-                        .container { width: 90% !important; max-width: 90% !important; padding: 2mm !important; margin: 0 auto !important; }
-                        h1 { font-size: 20pt !important; margin-left: 70px !important; margin-bottom: 16px !important; margin-top: 16px !important; position: relative !important; }
-                        .logo-container { position: absolute !important; top: -16px !important; left: 10px !important; z-index: 1000 !important; width: auto !important; height: auto !important; }
-                        .logo-os10 { width: 170px !important; height: auto !important; display: block !important; }
+                        .container { width: 85% !important; /* Reducido de 90% */ max-width: 85% !important; /* Reducido de 90% */ padding: 0.8mm !important; /* Reducido de 1mm */ margin: 0 auto !important; }
+                        h1 { font-size: 8pt !important; /* Reducido de 10pt */ margin-left: 60px !important; /* Reducido de 70px */ margin-bottom: 6px !important; /* Reducido de 8px */ margin-top: 6px !important; /* Reducido de 8px */ position: relative !important; }
+                        .logo-container { position: absolute !important; top: -6px !important; /* Reducido de -8px */ left: 3px !important; /* Reducido de 5px */ z-index: 1000 !important; width: auto !important; height: auto !important; }
+                        .logo-os10 { width: 70px !important; /* Reducido de 85px */ height: auto !important; display: block !important; }
                         div:empty, p:empty, span:empty { display: none !important; height: 0 !important; margin: 0 !important; padding: 0 !important; }
-                        h2 { font-size: 14pt !important; page-break-before: always !important; break-before: page !important; page-break-after: avoid !important; break-after: avoid !important; margin-top: 12px !important; padding-top: 6px !important; }
-                        h3 { font-size: 12pt !important; page-break-after: avoid !important; break-after: avoid !important; margin-top: 8px !important; margin-bottom: 2px !important; }
-                        table { page-break-inside: auto !important; break-inside: auto !important; font-size: 10pt !important; margin: 0 !important; padding: 0 !important; }
-                        th { font-size: 11pt !important; padding: 2px 6px !important; background-color: #003366 !important; color: white !important; }
-                        td { font-size: 10pt !important; padding: 2px 6px !important; }
+                        h2 { font-size: 6pt !important; /* Reducido de 7pt */ page-break-before: always !important; break-before: page !important; page-break-after: avoid !important; break-after: avoid !important; margin-top: 4px !important; /* Reducido de 6px */ padding-top: 2px !important; /* Reducido de 3px */ }
+                        h3 { font-size: 5pt !important; /* Reducido de 6pt */ page-break-after: avoid !important; break-after: avoid !important; margin-top: 3px !important; /* Reducido de 4px */ margin-bottom: 1px !important; }
+                        table { page-break-inside: auto !important; break-inside: auto !important; font-size: 4pt !important; /* Reducido de 5pt */ margin: 0 !important; padding: 0 !important; }
+                        th { font-size: 4.5pt !important; /* Reducido de 5.5pt */ padding: 1px 2px !important; /* Reducido de 1px 3px */ background-color: #003366 !important; color: white !important; }
+                        td { font-size: 4pt !important; /* Reducido de 5pt */ padding: 1px 2px !important; /* Reducido de 1px 3px */ }
                         tr { page-break-inside: avoid !important; break-inside: avoid !important; margin: 0 !important; padding: 0 !important; }
                         tr:nth-child(even) { background-color: #f9f9f9 !important; }
-                        .forced-page-break { page-break-before: always !important; break-before: page !important; height: 2px !important; visibility: hidden !important; margin: 0 !important; padding: 0 !important; }
-                        .textarea-contenido-pdf { min-height: 40px !important; padding: 2px !important; font-family: inherit !important; font-size: 10pt !important; line-height: 1.8 !important; white-space: pre-wrap !important; word-break: break-word !important; margin: 0 !important; }
-                        .info-section input[type="text"] { font-size: 10pt !important; padding: 0px !important; height: auto !important; }
-                        .fecha-inputs input[type="text"] { font-size: 10pt !important; padding: 0px !important; width: 30px !important; text-align: center !important; }
-                        .result { font-size: 12pt !important; padding: 2px !important; border: 1px solid transparent !important; }
-                        .result.seguro { background-color: #dff0d8 !important; color: #3c763d !important; border-color: #d6e9c6 !important;}
-                        .result.riesgo { background-color: #fcf8e3 !important; color: #8a6d3b !important; border-color: #faebcc !important;}
-                        .result.inseguro { background-color: #f2dede !important; color: #a94442 !important; border-color: #ebccd1 !important;}
+                        .forced-page-break { page-break-before: always !important; break-before: page !important; height: 1px !important; visibility: hidden !important; margin: 0 !important; padding: 0 !important; }
+                        .textarea-contenido-pdf { min-height: 15px !important; /* Reducido de 20px */ padding: 1px !important; font-family: inherit !important; font-size: 4pt !important; /* Reducido de 5pt */ line-height: 0.8 !important; /* Reducido de 0.9 */ white-space: pre-wrap !important; word-break: break-word !important; margin: 0 !important; }
+                        .info-section input[type="text"] { font-size: 4pt !important; /* Reducido de 5pt */ padding: 0px !important; height: auto !important; }
+                        .fecha-inputs input[type="text"] { font-size: 4pt !important; /* Reducido de 5pt */ padding: 0px !important; width: 12px !important; /* Reducido de 15px */ text-align: center !important; }
+                        .result { font-size: 5pt !important; /* Reducido de 6pt */ padding: 1px !important; border: 1px solid transparent !important; }
+                        .result.seguro { background-color: #dff0d8 !important; color: #3c763d !important; border-color: #d6e9c6 !important; }
+                        .result.riesgo { background-color: #fcf8e3 !important; color: #8a6d3b !important; border-color: #faebcc !important; }
+                        .result.inseguro { background-color: #f2dede !important; color: #a94442 !important; border-color: #ebccd1 !important; }
                         img:not(.logo-os10) { display: inline-block !important; max-width: 100% !important; }
-                        .mobile-nav, .mobile-action-button, .botones, .no-print, .rich-text-toolbar, .datos-guardados-info, .mobile-control-panel { display: none !important; height: 0 !important; width: 0 !important; visibility: hidden !important; margin: 0 !important; padding: 0 !important;}
+                        .mobile-nav, .mobile-action-button, .botones, .no-print, .rich-text-toolbar, .datos-guardados-info, .mobile-control-panel { display: none !important; height: 0 !important; width: 0 !important; visibility: hidden !important; margin: 0 !important; padding: 0 !important; }
                     `;
                     clonedDoc.head.appendChild(style);
+
                     Array.from(clonedDoc.querySelectorAll('img')).forEach(img => {
                         img.style.display = 'block';
                         img.style.maxWidth = '100%';
                     });
+
                     const divs = Array.from(clonedDoc.querySelectorAll('div, p, span'));
                     divs.forEach(div => {
                         if (!div.textContent.trim() && !div.querySelector('img') && div.clientHeight < 10 && !div.classList.contains('textarea-contenido-pdf') && !div.classList.contains('logo-container') && !div.id?.includes('seccion')) {
@@ -532,18 +505,19 @@ function generarPDFCorregido() {
                             }
                         }
                     });
-                     const todosLosElementos = clonedDoc.querySelectorAll('*');
-                     todosLosElementos.forEach(el => {
-                         if (!el.tagName.toLowerCase().includes('h2') &&
-                             !el.classList.contains('forced-page-break')) {
-                             el.style.pageBreakBefore = 'auto';
-                             el.style.pageBreakAfter = 'auto';
-                             el.style.pageBreakInside = 'auto';
-                             el.style.breakBefore = 'auto';
-                             el.style.breakAfter = 'auto';
-                             el.style.breakInside = 'auto';
-                         }
-                     });
+
+                    const todosLosElementos = clonedDoc.querySelectorAll('*');
+                    todosLosElementos.forEach(el => {
+                        if (!el.tagName.toLowerCase().includes('h2') &&
+                            !el.classList.contains('forced-page-break')) {
+                            el.style.pageBreakBefore = 'auto';
+                            el.style.pageBreakAfter = 'auto';
+                            el.style.pageBreakInside = 'auto';
+                            el.style.breakBefore = 'auto';
+                            el.style.breakAfter = 'auto';
+                            el.style.breakInside = 'auto';
+                        }
+                    });
                 }
             },
             jsPDF: {
@@ -556,31 +530,32 @@ function generarPDFCorregido() {
             },
             pagebreak: {
                 mode: ['avoid-all'],
-                before: ['h2'], 
+                before: ['h2'],
                 avoid: ['table', 'img', '.textarea-contenido-pdf', 'tr']
             },
             enableLinks: false,
             image: { type: 'jpeg', quality: 0.98 },
-            margin: [5, 4, 5, 4],
+            margin: [4, 3, 4, 3], // Reducido de [5, 4, 5, 4]
         };
+
         html2pdf()
             .from(contenido)
             .set(opciones)
             .toPdf()
             .get('pdf')
             .then(function(pdfObject) {
-                 const totalPaginas = pdfObject.internal.getNumberOfPages();
-                 console.log("PDF generado inicialmente con " + totalPaginas + " páginas");
-                 for (let i = totalPaginas; i > 1; i--) {
-                     pdfObject.setPage(i);
-                     const pagina = pdfObject.getPageInfo(i);
-                     if (pagina && pagina.pageContext &&
-                         (!pagina.pageContext.stream || pagina.pageContext.stream.length < 150) &&
-                         (!pagina.pageContext.annotations || pagina.pageContext.annotations.length === 0)) {
-                         console.log("Eliminando página detectada como vacía: " + i);
-                         pdfObject.deletePage(i);
-                     }
-                 }
+                const totalPaginas = pdfObject.internal.getNumberOfPages();
+                console.log("PDF generado inicialmente con " + totalPaginas + " páginas");
+                for (let i = totalPaginas; i > 1; i--) {
+                    pdfObject.setPage(i);
+                    const pagina = pdfObject.getPageInfo(i);
+                    if (pagina && pagina.pageContext &&
+                        (!pagina.pageContext.stream || pagina.pageContext.stream.length < 150) &&
+                        (!pagina.pageContext.annotations || pagina.pageContext.annotations.length === 0)) {
+                        console.log("Eliminando página detectada como vacía: " + i);
+                        pdfObject.deletePage(i);
+                    }
+                }
                 agregarMetadatosYNumeracion(pdfObject);
                 pdfObject.save(opciones.filename);
                 console.log("PDF generado exitosamente");
@@ -596,6 +571,7 @@ function generarPDFCorregido() {
                 restaurarDocumentoOriginal(estadoOriginal);
             });
     }
+
     function agregarMetadatosYNumeracion(pdf) {
         try {
             pdf.setProperties({
@@ -605,37 +581,44 @@ function generarPDFCorregido() {
                 keywords: 'seguridad, fiscalización, informe',
                 creator: 'Sistema PDF Optimizado'
             });
+
             const totalPaginas = pdf.internal.getNumberOfPages();
             for (let i = 1; i <= totalPaginas; i++) {
                 pdf.setPage(i);
-                pdf.setFontSize(8);
+                pdf.setFontSize(7); // Reducido de 8
                 pdf.setTextColor(100, 100, 100);
                 const pageSize = pdf.internal.pageSize;
                 const pageWidth = pageSize.width ? pageSize.width : pageSize.getWidth();
                 const pageHeight = pageSize.height ? pageSize.height : pageSize.getHeight();
                 const texto = `Página ${i} de ${totalPaginas}`;
-                const textWidth = pdf.getStringUnitWidth(texto) * 8 / pdf.internal.scaleFactor;
-                const x = pageWidth - textWidth - 10;
-                const y = pageHeight - 8;
+                const textWidth = pdf.getStringUnitWidth(texto) * 7 / pdf.internal.scaleFactor; // Ajustado por cambio de tamaño
+                const x = pageWidth - textWidth - 8; // Reducido de 10
+                const y = pageHeight - 7; // Reducido de 8
                 pdf.text(texto, x, y);
             }
         } catch (error) {
             console.warn("Error al añadir metadatos o numeración:", error);
         }
     }
+
     function restaurarDocumentoOriginal(estadoOriginal) {
         console.log("Restaurando documento a su estado original...");
         try {
             if (estadoOriginal.elementosCreados) {
                 estadoOriginal.elementosCreados.forEach(el => {
                     if (el && el.parentNode) {
-                        try { el.parentNode.removeChild(el); } catch(e){ console.warn("Error removiendo elemento creado:", el, e); }
+                        try {
+                            el.parentNode.removeChild(el);
+                        } catch (e) {
+                            console.warn("Error removiendo elemento creado:", el, e);
+                        }
                     }
                 });
             }
+
             if (estadoOriginal.ocultos) {
                 estadoOriginal.ocultos.forEach(item => {
-                     try {
+                    try {
                         if (item.parent && item.nextSibling) {
                             item.parent.insertBefore(item.element, item.nextSibling);
                         } else if (item.parent) {
@@ -644,12 +627,15 @@ function generarPDFCorregido() {
                         if (item.display !== undefined && item.element && item.element.style) {
                             item.element.style.display = item.display;
                         }
-                     } catch(e){ console.warn("Error restaurando elemento oculto:", item.element, e); }
+                    } catch (e) {
+                        console.warn("Error restaurando elemento oculto:", item.element, e);
+                    }
                 });
             }
+
             if (estadoOriginal.estilos) {
                 estadoOriginal.estilos.forEach((estilos, elemento) => {
-                     try {
+                    try {
                         if (elemento && elemento.style) {
                             Object.keys(estilos).forEach(prop => {
                                 if (prop === 'value' && elemento.tagName === 'TEXTAREA') {
@@ -659,25 +645,38 @@ function generarPDFCorregido() {
                                 }
                             });
                         }
-                     } catch(e){ console.warn("Error restaurando estilo:", elemento, e); }
+                    } catch (e) {
+                        console.warn("Error restaurando estilo:", elemento, e);
+                    }
                 });
             }
+
             if (estadoOriginal.documentBody) {
                 document.body.style.overflow = estadoOriginal.documentBody.overflow || '';
                 document.body.style.height = estadoOriginal.documentBody.height || '';
             }
+
             const estilosTemporales = document.getElementById('estilos-temporales-pdf');
             if (estilosTemporales && estilosTemporales.parentNode) {
-                 try { estilosTemporales.parentNode.removeChild(estilosTemporales); } catch(e){}
+                try {
+                    estilosTemporales.parentNode.removeChild(estilosTemporales);
+                } catch (e) {}
             }
-             const estiloTamanioMinimo = document.getElementById('estilo-tamanio-minimo');
-             if (estiloTamanioMinimo && estiloTamanioMinimo.parentNode) {
-                 try { estiloTamanioMinimo.parentNode.removeChild(estiloTamanioMinimo); } catch(e){}
-             }
-              const estiloNoPageBreak = document.getElementById('estilo-eliminar-page-breaks');
-              if (estiloNoPageBreak && estiloNoPageBreak.parentNode) {
-                 try { estiloNoPageBreak.parentNode.removeChild(estiloNoPageBreak); } catch(e){}
-             }
+
+            const estiloTamanioMinimo = document.getElementById('estilo-tamanio-minimo');
+            if (estiloTamanioMinimo && estiloTamanioMinimo.parentNode) {
+                try {
+                    estiloTamanioMinimo.parentNode.removeChild(estiloTamanioMinimo);
+                } catch (e) {}
+            }
+
+            const estiloNoPageBreak = document.getElementById('estilo-eliminar-page-breaks');
+            if (estiloNoPageBreak && estiloNoPageBreak.parentNode) {
+                try {
+                    estiloNoPageBreak.parentNode.removeChild(estiloNoPageBreak);
+                } catch (e) {}
+            }
+
             ocultarIndicadorCarga();
         } catch (e) {
              console.error("Error mayor durante la restauración:", e);
