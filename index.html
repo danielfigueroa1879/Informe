@@ -992,24 +992,54 @@ h1 {
 
 /* Para asegurar que se vea bien en la impresión */
 @media print {
+    /* Asegurar que el contenedor tenga posición relativa para el posicionamiento absoluto */
+    .container {
+        position: relative !important;
+        padding-top: 5mm !important; /* Pequeño padding para evitar cortes */
+    }
+    
+    /* Forzar posicionamiento del logo en extremo superior izquierdo */
     .logo-container {
         position: absolute !important;
-        top: 0 !important;  /* Cambiado de 20px a 0 */
-        left: 20px !important;
+        top: 0 !important;
+        left: 0 !important;
         width: auto !important;
         height: auto !important;
         display: block !important;
-        z-index: 10 !important;
+        z-index: 999 !important; /* Z-index alto para asegurar que esté por encima */
+        margin: 0 !important;
+        padding: 5mm !important; /* Pequeño padding para evitar que toque bordes */
     }
     
     .logo-os10 {
-        width: 100px !important;
+        width: 90px !important; /* Tamaño reducido para impresión */
         height: auto !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        display: block !important;
     }
     
+    /* Ajustar título para no solaparse con logo */
     h1 {
-        padding-left: 110px !important;
-        margin-top: 25px !important;  /* Añadido para dar más espacio al título */
+        position: relative !important;
+        margin-top: 20mm !important; /* Margen superior para bajar el título */
+        padding-left: 95px !important; /* Espacio para el logo */
+        padding-top: 5mm !important;
+        text-align: center !important;
+        font-size: 18pt !important;
+    }
+    
+    /* Controlar el flujo de elementos posteriores */
+    form#formulario-fiscalizacion {
+        margin-top: 20mm !important; /* Dejar espacio para logo y título */
+        position: relative !important;
+    }
+    
+    /* Evitar saltos de página en lugares inapropiados */
+    .logo-container, h1 {
+        page-break-inside: avoid !important;
+        page-break-before: avoid !important;
+        page-break-after: avoid !important;
     }
 }
     </style>
