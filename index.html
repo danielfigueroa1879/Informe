@@ -966,39 +966,59 @@
 }
 
 .logo-container {
-    position: relative;
-    float: left;
-    margin-top: 05px;
-    margin-left: 10px;
-    margin-bottom: 05px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 140px; /* Altura para el área del logo */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
 }
 
 .logo-os10 {
-    width: 80px;
+    width: 145px;
     height: auto;
-    max-width: 100%;
+    opacity: 0.30;
+    max-width: 80%;
 }
 
-/* Para hacer espacio para el título */
+/* Ajuste para bajar el título */
 h1 {
-    clear: both;
-    padding-top: 1px;
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    color: #003366;
+    margin-top: 30px; /* Aumentado para bajar el título */
+    margin-bottom: 30px;
+    font-size: 2.4rem;
+    font-weight: 600;
 }
 
-/* Ajuste responsivo para dispositivos móviles */
+/* Asegura que todo el contenido esté por encima del logo */
+form#formulario-fiscalizacion {
+    position: relative;
+    z-index: 1;
+}
+
+/* Ajustes para dispositivos móviles */
 @media screen and (max-width: 768px) {
     .logo-container {
-        width:80%;
-        text-align: center;
-        margin: 10px auto;
-        float: none;
+        height: 120px;
     }
     
     .logo-os10 {
-        width: 100px;
+        width: 200px;
+    }
+    
+    h1 {
+        font-size: 1.5rem;
+        margin-top: 60px; /* Ajustado para móviles */
     }
 }
-
         
     </style>
 </head>
