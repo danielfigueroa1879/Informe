@@ -81,7 +81,48 @@ function generarPDFCorregido() {
             });
             el.style.display = 'none';
         });
+
+        // Asegurar que el logo esté correctamente posicionado
+        const logoContainer = container.querySelector('.logo-container');
+        if (logoContainer) {
+    // Guardar estado original
+        estadoOriginal.estilos.set(logoContainer, {
+        position: logoContainer.style.position,
+        top: logoContainer.style.top,
+        left: logoContainer.style.left,
+        zIndex: logoContainer.style.zIndex
+    });
+    
+    // Forzar posición correcta del logo
+        logoContainer.style.position = 'absolute';
+        logoContainer.style.top = '0';
+        logoContainer.style.left = '20px';
+        logoContainer.style.zIndex = '1000';
+    
+    // Asegurarse que la imagen del logo sea visible
+        const logoImage = logoContainer.querySelector('.logo-os10');
+        if (logoImage) {
+        estadoOriginal.estilos.set(logoImage, {
+            width: logoImage.style.width,
+            display: logoImage.style.display
+        });
         
+        logoImage.style.width = '100px';
+        logoImage.style.display = 'block';
+    }
+    
+    // Ajustar el título para que no se solape con el logo
+    const titulo = container.querySelector('h1');
+    if (titulo) {
+        estadoOriginal.estilos.set(titulo, {
+            paddingLeft: titulo.style.paddingLeft,
+            marginTop: titulo.style.marginTop
+        });
+        
+        titulo.style.paddingLeft = '110px';
+        titulo.style.marginTop = '20px';
+    }
+}
         // 3. Forzar saltos de página antes de las secciones específicas
         const seccionResumen = container.querySelector('#seccion-resumen');
         const seccionFotos = container.querySelector('#seccion-fotos');
@@ -705,6 +746,39 @@ function generarPDFCorregido() {
                         }
                     });
                 }
+
+// Asegurar que el logo esté bien posicionado en el clon
+        const logoContainer = clonedDoc.querySelector('.logo-container');
+        if (logoContainer) {
+            logoContainer.style.position = 'absolute';
+            logoContainer.style.top = '0';
+            logoContainer.style.left = '20px';
+            logoContainer.style.zIndex = '1000';
+            logoContainer.style.display = 'block';
+            
+            const logoImage = logoContainer.querySelector('.logo-os10');
+            if (logoImage) {
+                logoImage.style.width = '100px';
+                logoImage.style.height = 'auto';
+                logoImage.style.display = 'block';
+            }
+            
+            // Ajustar título
+            const titulo = clonedDoc.querySelector('h1');
+            if (titulo) {
+                titulo.style.paddingLeft = '110px';
+                titulo.style.marginTop = '20px';
+            }
+        }
+
+
+
+
+
+
+
+
+                
             },
             
             jsPDF: {
