@@ -1,4 +1,335 @@
-// Crear estilos específicos para evitar páginas en blanco
+// Añadir estilos de forzado global para asegurar tamaños mínimos
+                    const estiloForzado = clonedDoc.createElement('style');
+                    estiloForzado.innerHTML = `
+                        /* Forzar tamaños extremadamente pequeños para todo */
+                        html, body, div, p, span, td, th, 
+                        h1, h2, h3, h4, h5, h6, input, textarea {
+                            font-size: 5pt !important;
+                            line-height: 0.9 !important;
+                        }
+                        
+                        /* Excepciones específicas */
+                        h1 {
+                            font-size: 10pt !important;
+                            margin-left: 70px !important;
+                        }
+                        
+                        h2 {
+                            font-size: 7pt !important;
+                        }
+                        
+                        h3 {
+                            font-size: 6pt !important;
+                        }
+                        
+                        th {
+                            font-size: 5.5pt !important;
+                        }
+                        
+                        /* Minimizar espacio para máxima compactación */
+                        table, tr, td, th, div, p, span, textarea, input {
+                            margin: 0 !important;
+                            padding: 1px !important;
+                        }
+                        
+                        .container {
+                            width: 90% !important;
+                            max-width: 90% !important;
+                            padding: 1mm !important;
+                            margin: 0 auto !important;
+                            font-size: 5pt !important;
+                        }
+                    `;
+                    clonedDoc.head.appendChild(estiloForzado);                    // Eliminar AGRESIVAMENTE cualquier página en blanco
+                    const elementosAEliminar = [
+                        'div:empty', 'p:empty', 'span:empty', 'br', 
+                        'div[style*="page-break"]', 'p[style*="page-break"]',
+                        'div[style*="margin-top"]', 'div[style*="margin-bottom"]'
+                    ].join(',');
+                    
+                    const paginasEnBlanco = clonedDoc.querySelectorAll(elementosAEliminar);
+                    paginasEnBlanco.forEach(el => {
+                        // Solo eliminar si realmente es un elemento vacío
+                        if ((!el.textContent || !el.textContent.trim()) && 
+                            !el.querySelector('img') && 
+                            !el.classList.contains('forced-page-break') && 
+                            !el.id?.includes('seccion') && 
+                            el.clientHeight < 10) {
+                            
+                            if (el.parentNode) {
+                                el.parentNode.removeChild(el);
+                            }
+                        }
+                    });
+                    
+                    // Establecer explícitamente propiedades de salto de página
+                    const todosLosElementos = clonedDoc.querySelectorAll('*');
+                    todosLosElementos.forEach(el => {
+                        if (!el.tagName.toLowerCase().includes('h2') && 
+                            !el.classList.contains('forced-page-break')) {
+                            el.style.pageBreakBefore = 'auto';
+                            el.style.pageBreakAfter = 'auto';
+                            el.style.pageBreakInside = 'auto';
+                            el.style.breakBefore = 'auto';
+                            el.style.breakAfter = 'auto';
+                            el.style.breakInside = 'auto';
+                        }
+                    });
+                    
+                    // Solo permitir saltos explícitos
+                    const titulos = clonedDoc.querySelectorAll('h2');
+                    titulos.forEach(titulo => {
+                        titulo.style.pageBreakBefore = 'always';
+                        titulo.style.breakBefore = 'page';
+                    });        // 1. Eliminar espacios en blanco y elementos vacíos que pueden causar páginas en blanco
+        const espaciosVacios = container.querySelectorAll('[style*="page-break"], div:empty, p:empty, span:empty, br');
+        espaciosVacios.forEach(el => {
+            if (!el.textContent.trim() && !el.querySelector('img') && el.clientHeight < 5) {
+                estadoOriginal.ocultos.push({
+                    element: el,
+                    display: el.style.display,
+                    parent: el.parentNode
+                });
+                if (el.parentNode) {
+                    el.parentNode.removeChild(el);
+                }
+            }
+        });
+        
+        // 2. Ocultar elementos con clase no-print, botones y la información de datos guardados
+        const elementosOcultar = container.querySelectorAll('.botones, .no-print, .rich-text-toolbar, .datos-guardados-info, .mobile-nav, .mobile-action-button');
+        elementosOcultar.forEach(el => {
+            estadoOriginal.ocultos.push({
+                element: el,
+                display: el.style.display
+            });
+            el.style.display = 'none';
+        });
+        
+        // Forzar la aplicación de estilos forzados sobrescribiendo el estilo en línea
+        const todosElementos = container.querySelectorAll('*');
+        todosElementos.forEach(el => {
+            const tagName = el.tagName.toLowerCase();
+            
+            // Guardar estilos originales
+            if (!estadoOriginal.estilos.has(el)) {
+                estadoOriginal.estilos.set(el, {
+                    fontSize: el.style.fontSize,
+                    lineHeight: el.style.lineHeight,
+                    padding: el.style.padding,
+                    margin: el.style.margin
+                });
+            }
+            
+            // Aplicar tamaños extremadamente pequeños según el tipo de elemento
+            if (tagName === 'h1') {
+                el.style.fontSize = '10pt';
+                el.style.marginLeft = '70px';
+                el.style.marginBottom = '8px';
+                el.style.marginTop = '8px';
+            } else if (tagName === 'h2') {
+                el.style.fontSize = '7pt';
+                el.style.marginTop = '6px';
+                el.style.paddingTop = '3px';
+            } else if (tagName === 'h3') {
+                el.style.fontSize = '6pt';
+                el.style.marginTop = '4px';
+                el.style.marginBottom = '1px';
+            } else if (tagName === 'th') {
+                el.style.fontSize = '5.5pt';
+                el.style.padding = '1px 3px';
+            } else if (tagName === 'td') {
+                el.style.fontSize = '5pt';
+                el.style.padding = '1px 3px';
+            } else if (tagName === 'input' || tagName === 'textarea') {
+                el.style.fontSize = '5pt';
+                el.style.padding = '0px';
+                if (el.parentNode && el.parentNode.classList.contains('fecha-inputs')) {
+                    el.style.width = '15px';
+                }
+            } else if (tagName === 'p' || tagName === 'span' || tagName === 'div') {
+                el.style.fontSize = '5pt';
+                el.style.lineHeight = '0.9';
+                el.style.margin = '0';
+                el.style.padding = '0';
+            }
+        });        // Crear estilos específicos para forzar tamaños mínimos en todos los elementos
+        const estiloForzado = document.createElement('style');
+        estiloForzado.id = 'estilo-tamanio-minimo';
+        estiloForzado.textContent = `
+            /* Forzar tamaños extremadamente pequeños para todo */
+            body, .container, div, p, span, td, th, h1, h2, h3, h4, h5, h6, input, textarea {
+                font-size: 5pt !important;
+                line-height: 0.9 !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+            
+            /* Excepciones específicas */
+            h1 {
+                font-size: 10pt !important;
+                margin-left: 70px !important;
+                margin-bottom: 8px !important;
+                margin-top: 8px !important;
+            }
+            
+            h2 {
+                font-size: 7pt !important;
+                margin-top: 6px !important;
+                padding-top: 3px !important;
+            }
+            
+            h3 {
+                font-size: 6pt !important;
+                margin-top: 4px !important;
+                margin-bottom: 1px !important;
+            }
+            
+            th {
+                font-size: 5.5pt !important;
+                padding: 1px 3px !important;
+            }
+            
+            td {
+                font-size: 5pt !important;
+                padding: 1px 3px !important;
+            }
+            
+            /* Inputs específicos */
+            .info-section input[type="text"] {
+                font-size: 5pt !important;
+                padding: 0 !important;
+                height: auto !important;
+            }
+            
+            .fecha-inputs input[type="text"] {
+                font-size: 5pt !important;
+                padding: 0 !important;
+                width: 15px !important;
+                text-align: center !important;
+            }
+            
+            /* Ajustar contenedor para que todo quepa */
+            .container {
+                width: 90% !important;
+                max-width: 90% !important;
+                padding: 1mm !important;
+                margin: 0 auto !important;
+                font-size: 5pt !important;
+            }
+            
+            /* Logo */
+            .logo-container {
+                position: absolute !important;
+                top: -8px !important;
+                left: 5px !important;
+                z-index: 1000 !important;
+            }
+            
+            .logo-os10 {
+                width: 60px !important;
+                height: auto !important;
+                display: block !important;
+            }
+            
+            /* Minimizar espacio para máxima compactación */
+            table, tr, div, p, span {
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+            
+            textarea {
+                font-size: 5pt !important;
+                padding: 1px !important;
+                min-height: 20px !important;
+                line-height: 0.9 !important;
+            }
+            
+            .textarea-contenido-pdf {
+                font-size: 5pt !important;
+                line-height: 0.9 !important;
+                padding: 1px !important;
+                margin: 0 !important;
+            }
+        `;
+        document.head.appendChild(estiloForzado);
+        estadoOriginal.elementosCreados.push(estiloForzado);        // Asegurar que el logo esté correctamente posicionado
+        const logoContainer = container.querySelector('.logo-container');
+        if (logoContainer) {
+            // Guardar estado original
+            estadoOriginal.estilos.set(logoContainer, {
+                position: logoContainer.style.position,
+                top: logoContainer.style.top,
+                left: logoContainer.style.left,
+                zIndex: logoContainer.style.zIndex
+            });
+            
+            // Forzar posición correcta del logo
+            logoContainer.style.position = 'absolute';
+            logoContainer.style.top = '-8px';
+            logoContainer.style.left = '5px';
+            logoContainer.style.zIndex = '1000';
+            
+            // Asegurarse que la imagen del logo sea visible
+            const logoImage = logoContainer.querySelector('.logo-os10');
+            if (logoImage) {
+                estadoOriginal.estilos.set(logoImage, {
+                    width: logoImage.style.width,
+                    display: logoImage.style.display
+                });
+                
+                logoImage.style.width = '60px';
+                logoImage.style.display = 'block';
+            }
+        }
+        
+        // Forzar estilos específicos para elementos concretos
+        const elementosSelect = {
+            '.container': {
+                fontSize: '5pt',
+                width: '90%',
+                maxWidth: '90%',
+                padding: '1mm',
+                margin: '0 auto'
+            },
+            'table': {
+                fontSize: '5pt',
+                padding: '0',
+                margin: '0'
+            },
+            'td': {
+                fontSize: '5pt',
+                padding: '1px 3px'
+            },
+            'th': {
+                fontSize: '5.5pt',
+                padding: '1px 3px'
+            },
+            '.info-section input[type="text"]': {
+                fontSize: '5pt',
+                padding: '0',
+                height: 'auto'
+            },
+            '.fecha-inputs input[type="text"]': {
+                fontSize: '5pt',
+                padding: '0',
+                width: '15px',
+                textAlign: 'center'
+            }
+        };
+        
+        // Aplicar estilos forzados
+        Object.keys(elementosSelect).forEach(selector => {
+            const elementos = container.querySelectorAll(selector);
+            elementos.forEach(el => {
+                const estilos = elementosSelect[selector];
+                estadoOriginal.estilos.set(el, {});
+                Object.keys(estilos).forEach(prop => {
+                    estadoOriginal.estilos.get(el)[prop] = el.style[prop];
+                    el.style[prop] = estilos[prop];
+                });
+            });
+        });        // Crear estilos específicos para evitar páginas en blanco
         const estiloNoPageBreak = document.createElement('style');
         estiloNoPageBreak.id = 'estilo-eliminar-page-breaks';
         estiloNoPageBreak.textContent = `
@@ -113,36 +444,56 @@ function generarPDFCorregido() {
             elementosCreados: [] // Para rastrear elementos creados durante la preparación
         };
         
-        // Eliminar agresivamente cualquier elemento que pueda causar páginas en blanco
-        const eliminarElementosVacios = () => {
-            // Eliminar elementos vacíos específicos que puedan causar páginas en blanco
-            const elementosAEliminar = [
-                'div:empty', 'p:empty', 'span:empty', 'br', 
-                'div[style*="page-break"]', 'p[style*="page-break"]', 
-                'div[style*="margin-top"]', 'div[style*="margin-bottom"]'
-            ].join(',');
-            
-            const elementosVacios = Array.from(container.querySelectorAll(elementosAEliminar));
-            elementosVacios.forEach(el => {
-                if ((!el.textContent || !el.textContent.trim()) && !el.querySelector('img') && 
-                    !el.classList.contains('forced-page-break') && 
-                    !el.id?.includes('seccion') && el.clientHeight < 10) {
-                    
-                    if (el.parentNode) {
-                        estadoOriginal.ocultos.push({
-                            element: el,
-                            display: el.style.display,
-                            parent: el.parentNode,
-                            nextSibling: el.nextSibling
-                        });
-                        el.parentNode.removeChild(el);
+        // Aplicar directamente estilos de tamaño pequeño a todos los elementos
+        const elementosTexto = container.querySelectorAll('*');
+        elementosTexto.forEach(el => {
+            if (el.tagName) {
+                estadoOriginal.estilos.set(el, {
+                    fontSize: el.style.fontSize,
+                    lineHeight: el.style.lineHeight
+                });
+                
+                // Aplicar tamaños extremadamente pequeños según tipo de elemento
+                if (el.tagName === 'H1') {
+                    el.style.fontSize = '10pt';
+                    el.style.marginLeft = '70px';
+                    el.style.marginBottom = '8px';
+                } else if (el.tagName === 'H2') {
+                    el.style.fontSize = '7pt';
+                    el.style.marginTop = '6px';
+                    el.style.paddingTop = '3px';
+                } else if (el.tagName === 'H3') {
+                    el.style.fontSize = '6pt';
+                    el.style.marginTop = '4px';
+                    el.style.marginBottom = '1px';
+                } else if (el.tagName === 'TH') {
+                    el.style.fontSize = '5.5pt';
+                    el.style.padding = '1px 3px';
+                } else if (el.tagName === 'TD') {
+                    el.style.fontSize = '5pt';
+                    el.style.padding = '1px 3px';
+                } else if (el.tagName === 'INPUT') {
+                    el.style.fontSize = '5pt';
+                    el.style.padding = '0px';
+                    if (el.parentNode && el.parentNode.classList.contains('fecha-inputs')) {
+                        el.style.width = '15px';
                     }
+                } else if (el.tagName === 'TEXTAREA') {
+                    el.style.fontSize = '5pt';
+                    el.style.padding = '1px';
+                    el.style.minHeight = '20px';
+                } else {
+                    // Para todos los demás elementos de texto
+                    el.style.fontSize = '5pt';
+                    el.style.lineHeight = '0.9';
                 }
-            });
-        };
-        
-        // Ejecutar limpieza de elementos vacíos
-        eliminarElementosVacios();
+                
+                // Minimizar márgenes y padding globalmente
+                el.style.margin = '0';
+                el.style.paddingTop = '1px';
+                el.style.paddingBottom = '1px';
+            }
+        });
         
         // Asegurar que el logo esté correctamente posicionado
         const logoContainer = container.querySelector('.logo-container');
@@ -544,47 +895,43 @@ function generarPDFCorregido() {
                 removeContainer: true,
                 foreignObjectRendering: false, // Deshabilitar para mayor compatibilidad
                 onclone: function(clonedDoc) {
-                    // Eliminar AGRESIVAMENTE cualquier página en blanco
-                    const elementosAEliminar = [
-                        'div:empty', 'p:empty', 'span:empty', 'br', 
-                        'div[style*="page-break"]', 'p[style*="page-break"]',
-                        'div[style*="margin-top"]', 'div[style*="margin-bottom"]'
-                    ].join(',');
-                    
-                    const paginasEnBlanco = clonedDoc.querySelectorAll(elementosAEliminar);
-                    paginasEnBlanco.forEach(el => {
-                        // Solo eliminar si realmente es un elemento vacío
-                        if ((!el.textContent || !el.textContent.trim()) && 
-                            !el.querySelector('img') && 
-                            !el.classList.contains('forced-page-break') && 
-                            !el.id?.includes('seccion') && 
-                            el.clientHeight < 10) {
-                            
-                            if (el.parentNode) {
-                                el.parentNode.removeChild(el);
+                    // Aplicar estilos directamente a todos los elementos en el clon
+                    const elementosClonados = clonedDoc.querySelectorAll('*');
+                    elementosClonados.forEach(el => {
+                        const tagName = el.tagName.toLowerCase();
+                        
+                        // Aplicar tamaños extremadamente pequeños según el tipo de elemento
+                        if (tagName === 'h1') {
+                            el.style.fontSize = '10pt';
+                            el.style.marginLeft = '70px';
+                            el.style.marginBottom = '8px';
+                            el.style.marginTop = '8px';
+                        } else if (tagName === 'h2') {
+                            el.style.fontSize = '7pt';
+                            el.style.marginTop = '6px';
+                            el.style.paddingTop = '3px';
+                        } else if (tagName === 'h3') {
+                            el.style.fontSize = '6pt';
+                            el.style.marginTop = '4px';
+                            el.style.marginBottom = '1px';
+                        } else if (tagName === 'th') {
+                            el.style.fontSize = '5.5pt';
+                            el.style.padding = '1px 3px';
+                        } else if (tagName === 'td') {
+                            el.style.fontSize = '5pt';
+                            el.style.padding = '1px 3px';
+                        } else if (tagName === 'input' || tagName === 'textarea') {
+                            el.style.fontSize = '5pt';
+                            el.style.padding = '0px';
+                            if (el.parentNode && el.parentNode.classList.contains('fecha-inputs')) {
+                                el.style.width = '15px';
                             }
+                        } else if (tagName === 'p' || tagName === 'span' || tagName === 'div') {
+                            el.style.fontSize = '5pt';
+                            el.style.lineHeight = '0.9';
+                            el.style.margin = '0';
+                            el.style.padding = '0';
                         }
-                    });
-                    
-                    // Establecer explícitamente propiedades de salto de página
-                    const todosLosElementos = clonedDoc.querySelectorAll('*');
-                    todosLosElementos.forEach(el => {
-                        if (!el.tagName.toLowerCase().includes('h2') && 
-                            !el.classList.contains('forced-page-break')) {
-                            el.style.pageBreakBefore = 'auto';
-                            el.style.pageBreakAfter = 'auto';
-                            el.style.pageBreakInside = 'auto';
-                            el.style.breakBefore = 'auto';
-                            el.style.breakAfter = 'auto';
-                            el.style.breakInside = 'auto';
-                        }
-                    });
-                    
-                    // Solo permitir saltos explícitos
-                    const titulos = clonedDoc.querySelectorAll('h2');
-                    titulos.forEach(titulo => {
-                        titulo.style.pageBreakBefore = 'always';
-                        titulo.style.breakBefore = 'page';
                     });
                     
                     // Asegurar logo en posición correcta
