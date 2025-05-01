@@ -82,7 +82,7 @@ function generarPDFCorregido() {
                     display: logoImage.style.display
                 });
                 
-                logoImage.style.width = '95px'; // Tamaño reducido
+                logoImage.style.width = 105px'; // Tamaño reducido
                 logoImage.style.height = 'auto';
                 logoImage.style.display = 'block';
             }
