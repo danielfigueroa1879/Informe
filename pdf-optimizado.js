@@ -99,7 +99,7 @@ function generarPDFCorregido() {
             });
             
             titulo.style.position = 'relative';
-            titulo.style.marginLeft = '20px';  // Reducido para mover a la izquierda
+            titulo.style.marginLeft = '10px';  // Reducido para mover a la izquierda
             titulo.style.marginTop = '15px';
             titulo.style.fontSize = '19pt';
         }
