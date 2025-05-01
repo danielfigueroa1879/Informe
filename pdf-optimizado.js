@@ -686,6 +686,41 @@ function generarPDFCorregido() {
                             box-shadow: none !important;
                             background: transparent !important;
                         }
+
+ /* Asegurar posición correcta del logo en PDF */
+    .logo-container {
+        position: absolute !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100% !important;
+        height: 120px !important;
+        display: flex !important;
+        justify-content: center !important;
+        align-items: center !important;
+        pointer-events: none !important;
+        z-index: 0 !important;
+        overflow: hidden !important;
+    }
+    
+    .logo-os10 {
+        width: 200px !important;
+        height: auto !important;
+        opacity: 0.15 !important;
+        max-width: 80% !important;
+    }
+    
+    /* Ajustar margen del título para el logo */
+    h1 {
+        margin-top: 70px !important;
+        position: relative !important;
+        z-index: 1 !important;
+    }
+    
+    /* Resto de estilos existentes... */
+
+
+
+                        
                     `;
                     clonedDoc.head.appendChild(style);
                     
