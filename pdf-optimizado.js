@@ -716,7 +716,7 @@ function generarPDFCorregido() {
         z-index: 1 !important;
     }
     
-    /* Resto de estilos existentes... */
+   
 
 
 
@@ -740,38 +740,6 @@ function generarPDFCorregido() {
                         }
                     });
                 }
-    // AGREGAR ESTO: Asegurar que el logo mantenga su posición correcta
-    const logoContainer = clonedDoc.querySelector('.logo-container');
-    if (logoContainer) {
-        // Garantizar que el logo aparezca en la parte superior
-        logoContainer.style.position = 'absolute';
-        logoContainer.style.top = '0';
-        logoContainer.style.left = '0';
-        logoContainer.style.width = '100%';
-        logoContainer.style.height = '120px';
-        logoContainer.style.display = 'flex';
-        logoContainer.style.justifyContent = 'center';
-        logoContainer.style.alignItems = 'center';
-        logoContainer.style.zIndex = '0';
-        logoContainer.style.overflow = 'hidden';
-        
-        // Ajustar el logo dentro del contenedor
-        const logoImg = logoContainer.querySelector('.logo-os10');
-        if (logoImg) {
-            logoImg.style.width = '200px';
-            logoImg.style.height = 'auto';
-            logoImg.style.opacity = '0.15';
-            logoImg.style.maxWidth = '80%';
-        }
-    }
-    
-    // Asegurar que el título tenga espacio para el logo
-    const titulo = clonedDoc.querySelector('h1');
-    if (titulo) {
-        titulo.style.marginTop = '70px';
-        titulo.style.position = 'relative';
-        titulo.style.zIndex = '1';
-    }
 
                
             },
