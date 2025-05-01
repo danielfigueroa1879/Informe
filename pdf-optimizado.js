@@ -1,9 +1,15 @@
 /**
- * pdf-optimizado.js - Versión con letras más pequeñas
- * Solución optimizada para la generación de PDF con texto más compacto
+ * pdf-optimizado.js - Versión con logo y título actualizados desde pdf-optimizado (1).js
+ * Solución optimizada para la generación de PDF sin páginas en blanco intermedias,
+ * con observaciones completas y tamaño de letra reducido
  */
+
+// Función principal que configura y genera el PDF
 function generarPDFCorregido() {
+    // Mostrar indicador de progreso
     mostrarIndicadorCarga();
+
+    // Verificar si html2pdf ya está cargado
     if (typeof html2pdf === 'undefined') {
         const script = document.createElement('script');
         script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
@@ -17,21 +23,30 @@ function generarPDFCorregido() {
         prepararYGenerarPDF();
     }
 
+    // Función principal de preparación y generación
     function prepararYGenerarPDF() {
         console.log("Iniciando generación de PDF optimizada...");
+
+        // 1. Obtener una copia limpia del contenido que vamos a convertir
         const container = document.querySelector('.container');
         if (!container) {
             ocultarIndicadorCarga();
             alert('Error: No se pudo encontrar el contenedor principal del documento.');
             return;
         }
+
+        // 2. Preparar el contenido limpiando elementos innecesarios
         const estadoOriginal = prepararContenidoParaPDF(container);
+
+        // 3. Generar el PDF con la configuración optimizada
         setTimeout(() => {
             generarPDFDesdeContenido(container, estadoOriginal);
-        }, 500);
+        }, 500); // Retraso para que los cambios de estilo se apliquen (era 300)
     }
 
+    // Función para preparar el contenido limpiando elementos no deseados
     function prepararContenidoParaPDF(container) {
+        // Guardar el estado original para restaurar después
         const estadoOriginal = {
             estilos: new Map(),
             ocultos: [],
@@ -39,106 +54,124 @@ function generarPDFCorregido() {
                 overflow: document.body.style.overflow,
                 height: document.body.style.height
             },
-            elementosCreados: []
+            elementosCreados: [] // Para rastrear elementos creados durante la preparación
         };
 
+        // Aplicar directamente estilos de tamaño pequeño a todos los elementos (Adaptado de pdf-optimizado (1).js)
         const elementosTexto = container.querySelectorAll('*');
         elementosTexto.forEach(el => {
             if (el.tagName) {
+                // Guardar estilos originales si no existen
                 if (!estadoOriginal.estilos.has(el)) {
-                    estadoOriginal.estilos.set(el, {
+                     estadoOriginal.estilos.set(el, {
                         fontSize: el.style.fontSize,
                         lineHeight: el.style.lineHeight,
                         padding: el.style.padding,
                         margin: el.style.margin
                     });
                 }
+
+                // Aplicar tamaños extremadamente pequeños según tipo de elemento (de pdf-optimizado (1).js)
                 const tagName = el.tagName.toLowerCase();
-                if (tagName === 'h1') {
-                    el.style.fontSize = '8pt'; // Reducido de 10pt
-                    el.style.marginLeft = '60px'; // Reducido de 70px
-                    el.style.marginBottom = '6px'; // Reducido de 8px
-                    el.style.marginTop = '6px'; // Reducido de 8px
+                 if (tagName === 'h1') {
+                    el.style.fontSize = '10pt';
+                    el.style.marginLeft = '70px'; // <-- Actualizado desde (1).js
+                    el.style.marginBottom = '8px'; // <-- Añadido desde (1).js
+                    el.style.marginTop = '8px';    // <-- Añadido desde (1).js
                 } else if (tagName === 'h2') {
-                    el.style.fontSize = '6pt'; // Reducido de 7pt
-                    el.style.marginTop = '4px'; // Reducido de 6px
-                    el.style.paddingTop = '2px'; // Reducido de 3px
+                    el.style.fontSize = '7pt';  // <-- Actualizado desde (1).js
+                    el.style.marginTop = '6px'; // <-- Añadido desde (1).js
+                    el.style.paddingTop = '3px';// <-- Añadido desde (1).js
                 } else if (tagName === 'h3') {
-                    el.style.fontSize = '5pt'; // Reducido de 6pt
-                    el.style.marginTop = '3px'; // Reducido de 4px
-                    el.style.marginBottom = '1px'; // Mantenido
+                    el.style.fontSize = '6pt';  // <-- Actualizado desde (1).js
+                    el.style.marginTop = '4px'; // <-- Añadido desde (1).js
+                    el.style.marginBottom = '1px';// <-- Añadido desde (1).js
                 } else if (tagName === 'th') {
-                    el.style.fontSize = '4.5pt'; // Reducido de 5.5pt
-                    el.style.padding = '1px 2px'; // Reducido de 1px 3px
+                    el.style.fontSize = '5.5pt';// <-- Actualizado desde (1).js
+                    el.style.padding = '1px 3px';// <-- Actualizado desde (1).js
                 } else if (tagName === 'td') {
-                    el.style.fontSize = '4pt'; // Reducido de 5pt
-                    el.style.padding = '1px 2px'; // Reducido de 1px 3px
+                    el.style.fontSize = '5pt';  // <-- Actualizado desde (1).js
+                    el.style.padding = '1px 3px';// <-- Actualizado desde (1).js
                 } else if (tagName === 'input' || tagName === 'textarea') {
-                    el.style.fontSize = '4pt'; // Reducido de 5pt
-                    el.style.padding = '0px';
+                    el.style.fontSize = '5pt';  // <-- Actualizado desde (1).js
+                    el.style.padding = '0px';   // <-- Actualizado desde (1).js
                     if (el.parentNode && el.parentNode.classList.contains('fecha-inputs')) {
-                        el.style.width = '12px'; // Reducido de 15px
+                        el.style.width = '15px';// <-- Actualizado desde (1).js
                     }
-                    if (tagName === 'textarea') {
-                        el.style.minHeight = '15px'; // Reducido de 20px
-                        el.style.lineHeight = '0.8'; // Reducido de 0.9
+                    if(tagName === 'textarea'){ // Estilos específicos para textarea de (1).js
+                         el.style.minHeight = '20px';
+                         el.style.lineHeight = '0.9';
                     }
                 } else if (tagName === 'p' || tagName === 'span' || tagName === 'div') {
-                    el.style.fontSize = '4pt'; // Reducido de 5pt
-                    el.style.lineHeight = '0.8'; // Reducido de 0.9
-                    el.style.margin = '0';
-                    el.style.padding = '0';
+                    // Aplicar a otros elementos de texto genéricos
+                    el.style.fontSize = '5pt'; // <-- Actualizado desde (1).js
+                    el.style.lineHeight = '0.9';// <-- Actualizado desde (1).js
+                    el.style.margin = '0';     // <-- Asegurado desde (1).js
+                    el.style.padding = '0';    // <-- Asegurado desde (1).js (era 1px top/bottom en original)
                 }
             }
         });
 
+        // Asegurar que el logo esté correctamente posicionado (Actualizado desde pdf-optimizado (1).js)
         const logoContainer = container.querySelector('.logo-container');
         if (logoContainer) {
-            if (!estadoOriginal.estilos.has(logoContainer)) {
+            // Guardar estado original si no existe
+             if (!estadoOriginal.estilos.has(logoContainer)) {
                 estadoOriginal.estilos.set(logoContainer, {
                     position: logoContainer.style.position,
                     top: logoContainer.style.top,
                     left: logoContainer.style.left,
                     zIndex: logoContainer.style.zIndex
                 });
-            }
+             }
+
+            // Forzar posición correcta del logo
             logoContainer.style.position = 'absolute';
-            logoContainer.style.top = '-6px'; // Reducido de -8px
-            logoContainer.style.left = '3px'; // Reducido de 5px
+            logoContainer.style.top = '-8px';  // <-- Valor de (1).js
+            logoContainer.style.left = '5px'; // <-- Valor de (1).js (era 10px)
             logoContainer.style.zIndex = '1000';
+
+            // Asegurarse que la imagen del logo sea visible
             const logoImage = logoContainer.querySelector('.logo-os10');
             if (logoImage) {
-                if (!estadoOriginal.estilos.has(logoImage)) {
+                 // Guardar estado original si no existe
+                 if (!estadoOriginal.estilos.has(logoImage)) {
                     estadoOriginal.estilos.set(logoImage, {
                         width: logoImage.style.width,
                         display: logoImage.style.display,
-                        height: logoImage.style.height
+                        height: logoImage.style.height // Guardar altura también
                     });
-                }
-                logoImage.style.width = '70px'; // Reducido de 85px
-                logoImage.style.height = 'auto';
+                 }
+                 // Usar el valor de width del JS en (1).js, que era 85px
+                logoImage.style.width = '85px'; // <-- Valor de (1).js (era 60px en CSS, 100px en original JS)
+                logoImage.style.height = 'auto'; // Asegurar altura automática
                 logoImage.style.display = 'block';
             }
         }
 
+        // Asegurar que el título esté correctamente posicionado (Actualizado desde pdf-optimizado (1).js)
         const titulo = container.querySelector('h1');
         if (titulo) {
-            if (!estadoOriginal.estilos.has(titulo)) {
+             // Guardar estado original si no existe
+             if (!estadoOriginal.estilos.has(titulo)) {
                 estadoOriginal.estilos.set(titulo, {
                     position: titulo.style.position,
                     marginLeft: titulo.style.marginLeft,
                     marginTop: titulo.style.marginTop,
                     fontSize: titulo.style.fontSize,
-                    marginBottom: titulo.style.marginBottom
+                    marginBottom: titulo.style.marginBottom // Guardar margen inferior
                 });
-            }
-            titulo.style.position = 'relative';
-            titulo.style.marginLeft = '60px'; // Reducido de 70px
-            titulo.style.marginTop = '6px'; // Reducido de 8px
-            titulo.style.marginBottom = '6px'; // Reducido de 8px
-            titulo.style.fontSize = '8pt'; // Reducido de 10pt
+             }
+
+            titulo.style.position = 'relative'; // Mantenido de original
+            titulo.style.marginLeft = '70px';  // <-- Valor de (1).js (era 90px)
+            titulo.style.marginTop = '8px';    // <-- Valor de (1).js (era 15px)
+            titulo.style.marginBottom = '8px'; // <-- Valor de (1).js
+            titulo.style.fontSize = '10pt';    // <-- Valor de (1).js (era 18pt)
         }
 
+
+        // 1. Eliminar espacios en blanco y elementos vacíos que pueden causar páginas en blanco
         const espaciosVacios = container.querySelectorAll('[style*="page-break"]');
         espaciosVacios.forEach(el => {
             if (!el.textContent.trim() && !el.querySelector('img') && el.clientHeight < 5) {
@@ -153,19 +186,23 @@ function generarPDFCorregido() {
             }
         });
 
+        // 2. Ocultar elementos con clase no-print, botones y la información de datos guardados
         const elementosOcultar = container.querySelectorAll('.botones, .no-print, .rich-text-toolbar, .datos-guardados-info, .mobile-nav, .mobile-action-button');
         elementosOcultar.forEach(el => {
-            if (!el.classList.contains('logo-container') && !el.classList.contains('logo-os10') && el.tagName !== 'H1') {
+             if(!el.classList.contains('logo-container') && !el.classList.contains('logo-os10') && el.tagName !== 'H1') { // No ocultar logo/titulo
                 estadoOriginal.ocultos.push({
                     element: el,
                     display: el.style.display
                 });
                 el.style.display = 'none';
-            }
+             }
         });
 
+        // 3. Forzar saltos de página antes de las secciones específicas
         const seccionResumen = container.querySelector('#seccion-resumen');
         const seccionFotos = container.querySelector('#seccion-fotos');
+
+        // Asegurarse de que la sección de resumen tenga un salto de página forzado
         if (seccionResumen) {
             if (!seccionResumen.classList.contains('forced-page-break')) {
                 seccionResumen.classList.add('forced-page-break');
@@ -173,6 +210,8 @@ function generarPDFCorregido() {
             seccionResumen.style.pageBreakBefore = 'always';
             seccionResumen.style.breakBefore = 'page';
         }
+
+        // Asegurarse de que la sección de fotos tenga un salto de página forzado
         if (seccionFotos) {
             if (!seccionFotos.classList.contains('forced-page-break')) {
                 seccionFotos.classList.add('forced-page-break');
@@ -181,41 +220,106 @@ function generarPDFCorregido() {
             seccionFotos.style.breakBefore = 'page';
         }
 
+        // (Eliminado salto antes de recomendaciones para seguir estructura original de pdf-optimizado.js)
+
+        // 4. Mejorar el manejo de las textareas (observaciones)
         const textareas = container.querySelectorAll('textarea');
         textareas.forEach(textarea => {
+            // Guardar estado original
             if (!estadoOriginal.estilos.has(textarea)) {
                 estadoOriginal.estilos.set(textarea, {
                     height: textarea.style.height,
                     overflow: textarea.style.overflow,
                     value: textarea.value,
-                    display: textarea.style.display
+                    display: textarea.style.display // Guardar display
                 });
             }
+
+            // Crear un div con el contenido de la textarea para asegurar que todo se muestre
             const contenidoTexto = document.createElement('div');
             contenidoTexto.textContent = textarea.value;
             contenidoTexto.className = 'textarea-contenido-pdf';
             Object.assign(contenidoTexto.style, {
-                minHeight: '15px', // Reducido de 20px
+                minHeight: '20px', // Valor de (1).js (era 50px)
                 width: '100%',
                 fontFamily: textarea.style.fontFamily || 'inherit',
-                fontSize: '4pt', // Reducido de 5pt
-                lineHeight: '0.8', // Reducido de 0.9
-                padding: '1px', // Mantenido
+                fontSize: '5pt', // Valor de (1).js (era 9pt/10pt)
+                lineHeight: '0.9', // Valor de (1).js (era 1.2/1.3)
+                padding: '1px', // Valor de (1).js (era 5px)
                 whiteSpace: 'pre-wrap',
                 wordBreak: 'break-word',
-                margin: '0'
+                margin: '0' // Añadido de (1).js
             });
+
+            // Insertar el div antes de la textarea y ocultar la textarea original
             textarea.parentNode.insertBefore(contenidoTexto, textarea);
             textarea.style.display = 'none';
+
+            // Registrar este elemento para eliminarlo después
             estadoOriginal.elementosCreados.push(contenidoTexto);
         });
 
+        // 5. Aplicar estilos óptimos para la impresión (Combinando estilos de ambos)
+        const elementosEstilizar = [
+            { selector: '.forced-page-break', estilos: {
+                display: 'block', height: '1px', pageBreakBefore: 'always', margin: '0', padding: '0'
+            }},
+            { selector: 'h2', estilos: { // Usando valores de (1).js
+                pageBreakBefore: 'always', marginTop: '6px', paddingTop: '3px', fontSize: '7pt'
+            }},
+            { selector: 'h3', estilos: { // Usando valores de (1).js
+                 fontSize: '6pt', marginTop: '4px', marginBottom: '1px'
+            }},
+            { selector: 'table', estilos: {
+                pageBreakInside: 'auto', fontSize: '5pt', margin: '0', padding: '0' // Añadido de (1).js
+            }},
+             { selector: 'th', estilos: { // Usando valores de (1).js
+                 fontSize: '5.5pt', padding: '1px 3px'
+             }},
+            { selector: 'td', estilos: { // Usando valores de (1).js
+                 fontSize: '5pt', padding: '1px 3px'
+            }},
+            { selector: 'tr', estilos: {
+                pageBreakInside: 'avoid', margin: '0', padding: '0' // Añadido de (1).js
+            }},
+            { selector: '#plan-accion-editor', estilos: { // Manteniendo estilo original pero con fuente reducida
+                height: 'auto', maxHeight: 'none', overflow: 'visible', fontSize: '5pt', lineHeight: '0.9' // Fuente/lineHeight de (1).js
+            }},
+             { selector: '.info-section input[type="text"]', estilos: { // De (1).js
+                 fontSize: '5pt', padding: '0', height: 'auto'
+             }},
+             { selector: '.fecha-inputs input[type="text"]', estilos: { // De (1).js
+                 fontSize: '5pt', padding: '0', width: '15px', textAlign: 'center'
+             }}
+        ];
+
+        // Aplicar los estilos y guardar los originales
+        elementosEstilizar.forEach(config => {
+            const elementos = container.querySelectorAll(config.selector);
+            elementos.forEach(el => {
+                // Guardar estilos originales si aún no se han guardado
+                if (!estadoOriginal.estilos.has(el)) {
+                    const estilosOriginales = {};
+                    Object.keys(config.estilos).forEach(prop => {
+                        estilosOriginales[prop] = el.style[prop];
+                    });
+                    estadoOriginal.estilos.set(el, estilosOriginales);
+                }
+
+                // Aplicar nuevos estilos
+                Object.keys(config.estilos).forEach(prop => {
+                    el.style[prop] = config.estilos[prop];
+                });
+            });
+        });
+
+        // 6. Añadir una hoja de estilos temporal con reglas específicas para PDF (Combinando y usando valores de (1).js)
         const estilosTemporales = document.createElement('style');
         estilosTemporales.id = 'estilos-temporales-pdf';
         estilosTemporales.textContent = `
             @page {
                 size: legal portrait;
-                margin: 6mm 4mm; /* Reducido de 8mm 5mm */
+                margin: 8mm 5mm; /* Márgenes de (1).js (eran 15mm 10mm) */
             }
             body {
                 -webkit-print-color-adjust: exact !important;
@@ -224,122 +328,143 @@ function generarPDFCorregido() {
                 margin: 0 !important;
                 padding: 0 !important;
             }
+            /* Estilos generales y contenedor de (1).js */
             body, .container, div, p, span, td, th, h1, h2, h3, h4, h5, h6, input, textarea {
-                font-size: 4pt !important; /* Reducido de 5pt */
-                line-height: 0.8 !important; /* Reducido de 0.9 */
+                font-size: 5pt !important;
+                line-height: 0.9 !important;
                 margin: 0 !important;
-                padding: 0 !important;
+                padding: 0 !important; /* Era padding: 1px !important; en (1).js */
             }
-            .container {
-                width: 85% !important; /* Reducido de 90% */
-                max-width: 85% !important; /* Reducido de 90% */
-                padding: 0.8mm !important; /* Reducido de 1mm */
+             .container {
+                width: 90% !important; /* Era 94% / 100% */
+                max-width: 90% !important; /* Era 94% / 100% */
+                padding: 1mm !important; /* Era 2mm / 5mm */
                 margin: 0 auto !important;
             }
+
+            /* Título (H1) de (1).js */
             h1 {
-                font-size: 8pt !important; /* Reducido de 10pt */
-                margin-left: 60px !important; /* Reducido de 70px */
-                margin-bottom: 6px !important; /* Reducido de 8px */
-                margin-top: 6px !important; /* Reducido de 8px */
-                position: relative !important;
+                font-size: 10pt !important;
+                margin-left: 70px !important;
+                margin-bottom: 8px !important;
+                margin-top: 8px !important;
+                position: relative !important; /* Añadido para consistencia */
             }
+
+            /* Logo posicionamiento específico de (1).js */
             .logo-container {
                 position: absolute !important;
-                top: -6px !important; /* Reducido de -8px */
-                left: 3px !important; /* Reducido de 5px */
+                top: -8px !important;
+                left: 5px !important; /* Era 10px */
                 z-index: 1000 !important;
-                width: auto !important;
-                height: auto !important;
+                width: auto !important; /* Asegurar auto */
+                height: auto !important;/* Asegurar auto */
             }
             .logo-os10 {
-                width: 70px !important; /* Reducido de 85px */
+                width: 85px !important; /* Ancho del JS de (1).js (era 60px CSS / 100px original)*/
                 height: auto !important;
                 display: block !important;
             }
+
+            /* Eliminar elementos vacíos que pueden causar páginas en blanco */
             div:empty, p:empty, span:empty {
                 display: none !important;
                 height: 0 !important;
                 margin: 0 !important;
                 padding: 0 !important;
             }
+
+             /* Títulos H2, H3 de (1).js */
             h2 {
-                font-size: 6pt !important; /* Reducido de 7pt */
+                font-size: 7pt !important;
                 page-break-before: always !important;
                 break-before: page !important;
                 page-break-after: avoid !important;
                 break-after: avoid !important;
-                margin-top: 4px !important; /* Reducido de 6px */
-                padding-top: 2px !important; /* Reducido de 3px */
+                margin-top: 6px !important;
+                padding-top: 3px !important;
             }
             h3 {
-                font-size: 5pt !important; /* Reducido de 6pt */
+                font-size: 6pt !important;
                 page-break-after: avoid !important;
                 break-after: avoid !important;
-                margin-top: 3px !important; /* Reducido de 4px */
+                margin-top: 4px !important;
                 margin-bottom: 1px !important;
             }
+            /* Tablas y celdas de (1).js */
             table {
                 page-break-inside: auto !important;
                 break-inside: auto !important;
-                font-size: 4pt !important; /* Reducido de 5pt */
-                margin: 0 !important;
-                padding: 0 !important;
+                font-size: 5pt !important;
+                margin: 0 !important; /* Añadido */
+                padding: 0 !important;/* Añadido */
             }
             th {
-                font-size: 4.5pt !important; /* Reducido de 5.5pt */
-                padding: 1px 2px !important; /* Reducido de 1px 3px */
-                background-color: #003366 !important;
-                color: white !important;
+                font-size: 5.5pt !important;
+                padding: 1px 3px !important;
+                background-color: #003366 !important; /* Fondo mantenido */
+                color: white !important; /* Color mantenido */
             }
             td {
-                font-size: 4pt !important; /* Reducido de 5pt */
-                padding: 1px 2px !important; /* Reducido de 1px 3px */
+                font-size: 5pt !important;
+                padding: 1px 3px !important;
             }
             tr {
                 page-break-inside: avoid !important;
                 break-inside: avoid !important;
-                margin: 0 !important;
-                padding: 0 !important;
+                margin: 0 !important; /* Añadido */
+                padding: 0 !important;/* Añadido */
             }
-            tr:nth-child(even) {
+            tr:nth-child(even) { /* Mantener estilo original */
                 background-color: #f9f9f9 !important;
             }
+            /* Salto forzado */
             .forced-page-break {
                 page-break-before: always !important;
                 break-before: page !important;
                 height: 1px !important;
                 visibility: hidden !important;
-                margin: 0 !important;
-                padding: 0 !important;
+                margin: 0 !important; /* Añadido */
+                padding: 0 !important;/* Añadido */
             }
+
+            /* Mejorar visualización de observaciones de (1).js */
             .textarea-contenido-pdf {
-                min-height: 15px !important; /* Reducido de 20px */
+                min-height: 20px !important;
                 padding: 1px !important;
                 font-family: inherit !important;
-                font-size: 4pt !important; /* Reducido de 5pt */
-                line-height: 0.8 !important; /* Reducido de 0.9 */
+                font-size: 5pt !important;
+                line-height: 0.9 !important;
                 white-space: pre-wrap !important;
                 word-break: break-word !important;
-                margin: 0 !important;
+                margin: 0 !important; /* Era margin-bottom: 1px */
             }
+
+            /* Inputs de texto de (1).js */
             .info-section input[type="text"] {
-                font-size: 4pt !important; /* Reducido de 5pt */
-                padding: 0 !important;
+                font-size: 5pt !important;
+                padding: 0 !important; /* Era 1px */
                 height: auto !important;
             }
             .fecha-inputs input[type="text"] {
-                font-size: 4pt !important; /* Reducido de 5pt */
+                font-size: 5pt !important;
                 padding: 0px !important;
-                width: 12px !important; /* Reducido de 15px */
+                width: 15px !important;
                 text-align: center !important;
             }
-            .result.seguro { background-color: #dff0d8 !important; color: #3c763d !important; border: 1px solid #d6e9c6 !important; font-size: 5pt !important; /* Reducido de 6pt */ padding: 1px !important; }
-            .result.riesgo { background-color: #fcf8e3 !important; color: #8a6d3b !important; border: 1px solid #faebcc !important; font-size: 5pt !important; /* Reducido de 6pt */ padding: 1px !important; }
-            .result.inseguro { background-color: #f2dede !important; color: #a94442 !important; border: 1px solid #ebccd1 !important; font-size: 5pt !important; /* Reducido de 6pt */ padding: 1px !important; }
-            img:not(.logo-os10) {
+
+             /* Estilos de resultado mantenidos */
+             .result.seguro { background-color: #dff0d8 !important; color: #3c763d !important; border: 1px solid #d6e9c6 !important; font-size: 6pt !important; padding: 1px !important; }
+             .result.riesgo { background-color: #fcf8e3 !important; color: #8a6d3b !important; border: 1px solid #faebcc !important; font-size: 6pt !important; padding: 1px !important; }
+             .result.inseguro { background-color: #f2dede !important; color: #a94442 !important; border: 1px solid #ebccd1 !important; font-size: 6pt !important; padding: 1px !important; }
+
+            /* Asegurar que las imágenes sean visibles */
+            img:not(.logo-os10) { /* No aplicar a logo */
                 display: inline-block !important;
                 max-width: 100% !important;
             }
+
+             /* Ocultar navegación móvil y otros elementos no deseados */
             .mobile-nav, .mobile-action-button, .mobile-control-panel, .botones, .no-print, .rich-text-toolbar {
                 display: none !important;
                 height: 0 !important;
@@ -352,8 +477,10 @@ function generarPDFCorregido() {
         document.head.appendChild(estilosTemporales);
         estadoOriginal.elementosCreados.push(estilosTemporales);
 
+        // 7. Eliminar elementos vacíos que puedan causar páginas en blanco (lógica original)
         const elementosVacios = Array.from(container.querySelectorAll('div, p, span'))
-            .filter(el => !el.textContent.trim() && !el.querySelector('img') && el.clientHeight < 20 && !el.id && !el.classList.contains('logo-container'));
+            .filter(el => !el.textContent.trim() && !el.querySelector('img') && el.clientHeight < 20 && !el.id && !el.classList.contains('logo-container')); // No eliminar contenedor del logo
+
         elementosVacios.forEach(el => {
             if (el.children.length === 0 || (el.children.length === 1 && el.children[0].textContent.trim() === '')) {
                 estadoOriginal.ocultos.push({
@@ -362,23 +489,30 @@ function generarPDFCorregido() {
                     parent: el.parentNode,
                     nextSibling: el.nextSibling
                 });
+
                 if (el.parentNode) {
                     el.parentNode.removeChild(el);
                 }
             }
         });
 
+        // 8. Restringir el flujo del documento para evitar problemas de renderizado
         document.body.style.overflow = 'visible';
         document.body.style.height = 'auto';
+
         return estadoOriginal;
     }
 
+    // Función para generar el PDF con la configuración óptima
     function generarPDFDesdeContenido(contenido, estadoOriginal) {
         console.log("Generando PDF con configuración óptima...");
+
+        // Configuración optimizada para tamaño legal/oficio (combinando)
         const opciones = {
             filename: `Fiscalizacion_${new Date().toLocaleDateString().replace(/\//g, '-')}.pdf`,
+
             html2canvas: {
-                scale: 0.8, // Reducido de 0.85
+                scale: 0.85, // Escala de (1).js (era 1.5)
                 useCORS: true,
                 allowTaint: true,
                 scrollX: 0,
@@ -391,68 +525,76 @@ function generarPDFCorregido() {
                 removeContainer: true,
                 foreignObjectRendering: false,
                 onclone: function(clonedDoc) {
+                    // Aplicar estilos directamente a todos los elementos en el clon (de pdf-optimizado (1).js)
                     const elementosClonados = clonedDoc.querySelectorAll('*');
                     elementosClonados.forEach(el => {
                         const tagName = el.tagName.toLowerCase();
+                         // Aplicar tamaños extremadamente pequeños según el tipo de elemento
                         if (tagName === 'h1') {
-                            el.style.fontSize = '8pt'; // Reducido de 10pt
-                            el.style.marginLeft = '60px'; // Reducido de 70px
-                            el.style.marginBottom = '6px'; // Reducido de 8px
-                            el.style.marginTop = '6px'; // Reducido de 8px
-                            el.style.position = 'relative';
+                            el.style.fontSize = '10pt'; // <-- (1).js
+                            el.style.marginLeft = '70px';// <-- (1).js
+                            el.style.marginBottom = '8px';// <-- (1).js
+                            el.style.marginTop = '8px'; // <-- (1).js
+                            el.style.position = 'relative'; // Añadido
                         } else if (tagName === 'h2') {
-                            el.style.fontSize = '6pt'; // Reducido de 7pt
-                            el.style.marginTop = '4px'; // Reducido de 6px
-                            el.style.paddingTop = '2px'; // Reducido de 3px
-                            el.style.pageBreakBefore = 'always';
-                            el.style.breakBefore = 'page';
+                            el.style.fontSize = '7pt';// <-- (1).js
+                            el.style.marginTop = '6px';// <-- (1).js
+                            el.style.paddingTop = '3px';// <-- (1).js
+                            el.style.pageBreakBefore = 'always'; // Asegurar salto
+                            el.style.breakBefore = 'page';     // Asegurar salto
                         } else if (tagName === 'h3') {
-                            el.style.fontSize = '5pt'; // Reducido de 6pt
-                            el.style.marginTop = '3px'; // Reducido de 4px
-                            el.style.marginBottom = '1px'; // Mantenido
+                            el.style.fontSize = '6pt';// <-- (1).js
+                            el.style.marginTop = '4px';// <-- (1).js
+                            el.style.marginBottom = '1px';// <-- (1).js
                         } else if (tagName === 'th') {
-                            el.style.fontSize = '4.5pt'; // Reducido de 5.5pt
-                            el.style.padding = '1px 2px'; // Reducido de 1px 3px
-                            el.style.backgroundColor = '#003366';
-                            el.style.color = 'white';
+                            el.style.fontSize = '5.5pt';// <-- (1).js
+                            el.style.padding = '1px 3px';// <-- (1).js
+                            el.style.backgroundColor = '#003366'; // Mantener color
+                            el.style.color = 'white'; // Mantener color
                         } else if (tagName === 'td') {
-                            el.style.fontSize = '4pt'; // Reducido de 5pt
-                            el.style.padding = '1px 2px'; // Reducido de 1px 3px
+                            el.style.fontSize = '5pt';// <-- (1).js
+                            el.style.padding = '1px 3px';// <-- (1).js
                         } else if (tagName === 'input' || tagName === 'textarea') {
-                            el.style.fontSize = '4pt'; // Reducido de 5pt
-                            el.style.padding = '0px';
+                            el.style.fontSize = '5pt';// <-- (1).js
+                            el.style.padding = '0px';// <-- (1).js
                             if (el.parentNode && el.parentNode.classList.contains('fecha-inputs')) {
-                                el.style.width = '12px'; // Reducido de 15px
-                                el.style.textAlign = 'center';
+                                el.style.width = '15px';// <-- (1).js
+                                el.style.textAlign = 'center'; //Añadido
                             }
-                            if (tagName === 'textarea') {
-                                el.style.minHeight = '15px'; // Reducido de 20px
-                                el.style.lineHeight = '0.8'; // Reducido de 0.9
-                            }
+                             if(tagName === 'textarea'){ // Estilos específicos para textarea de (1).js
+                                el.style.minHeight = '20px';
+                                el.style.lineHeight = '0.9';
+                             }
                         } else if (tagName === 'p' || tagName === 'span' || tagName === 'div') {
-                            if (!el.classList.contains('logo-container')) {
-                                el.style.fontSize = '4pt'; // Reducido de 5pt
-                                el.style.lineHeight = '0.8'; // Reducido de 0.9
-                                el.style.margin = '0';
-                                el.style.padding = '0';
+                            // Aplicar a otros elementos de texto genéricos
+                            if(!el.classList.contains('logo-container')){ // Evitar sobreescribir logo container
+                                el.style.fontSize = '5pt';// <-- (1).js
+                                el.style.lineHeight = '0.9';// <-- (1).js
+                                el.style.margin = '0';// <-- (1).js
+                                el.style.padding = '0';// <-- (1).js
                             }
                         }
                     });
 
+                    // Asegurar logo en posición correcta (de pdf-optimizado (1).js)
                     const logoContainer = clonedDoc.querySelector('.logo-container');
                     if (logoContainer) {
                         logoContainer.style.position = 'absolute';
-                        logoContainer.style.top = '-6px'; // Reducido de -8px
-                        logoContainer.style.left = '3px'; // Reducido de 5px
+                        logoContainer.style.top = '-8px';
+                        logoContainer.style.left = '5px'; // Era 10px
                         logoContainer.style.zIndex = '1000';
+
                         const logoImage = logoContainer.querySelector('.logo-os10');
                         if (logoImage) {
-                            logoImage.style.width = '70px'; // Reducido de 85px
+                            logoImage.style.width = '85px'; // Ancho del JS de (1).js
                             logoImage.style.height = 'auto';
                             logoImage.style.display = 'block';
                         }
                     }
 
+                    // (Título ya ajustado en el bucle anterior)
+
+                    // Forzar la visibilidad de los fondos y gráficos + Estilos CSS finales (Combinando de ambos)
                     const style = clonedDoc.createElement('style');
                     style.innerHTML = `
                         * {
@@ -462,64 +604,64 @@ function generarPDFCorregido() {
                         }
                         body, html { margin: 0 !important; padding: 0 !important; }
                         body, .container, div, p, span, td, th, h1, h2, h3, h4, h5, h6, input, textarea {
-                            font-size: 4pt !important; /* Reducido de 5pt */
-                            line-height: 0.8 !important; /* Reducido de 0.9 */
-                            margin: 0 !important;
-                            padding: 0 !important;
+                            font-size: 5pt !important; line-height: 0.9 !important; margin: 0 !important; padding: 0 !important;
                         }
-                        .container { width: 85% !important; /* Reducido de 90% */ max-width: 85% !important; /* Reducido de 90% */ padding: 0.8mm !important; /* Reducido de 1mm */ margin: 0 auto !important; }
-                        h1 { font-size: 8pt !important; /* Reducido de 10pt */ margin-left: 60px !important; /* Reducido de 70px */ margin-bottom: 6px !important; /* Reducido de 8px */ margin-top: 6px !important; /* Reducido de 8px */ position: relative !important; }
-                        .logo-container { position: absolute !important; top: -6px !important; /* Reducido de -8px */ left: 3px !important; /* Reducido de 5px */ z-index: 1000 !important; width: auto !important; height: auto !important; }
-                        .logo-os10 { width: 70px !important; /* Reducido de 85px */ height: auto !important; display: block !important; }
+                        .container { width: 90% !important; max-width: 90% !important; padding: 1mm !important; margin: 0 auto !important; }
+                        h1 { font-size: 10pt !important; margin-left: 70px !important; margin-bottom: 8px !important; margin-top: 8px !important; position: relative !important; }
+                        .logo-container { position: absolute !important; top: -8px !important; left: 5px !important; z-index: 1000 !important; width: auto !important; height: auto !important; }
+                        .logo-os10 { width: 85px !important; height: auto !important; display: block !important; }
                         div:empty, p:empty, span:empty { display: none !important; height: 0 !important; margin: 0 !important; padding: 0 !important; }
-                        h2 { font-size: 6pt !important; /* Reducido de 7pt */ page-break-before: always !important; break-before: page !important; page-break-after: avoid !important; break-after: avoid !important; margin-top: 4px !important; /* Reducido de 6px */ padding-top: 2px !important; /* Reducido de 3px */ }
-                        h3 { font-size: 5pt !important; /* Reducido de 6pt */ page-break-after: avoid !important; break-after: avoid !important; margin-top: 3px !important; /* Reducido de 4px */ margin-bottom: 1px !important; }
-                        table { page-break-inside: auto !important; break-inside: auto !important; font-size: 4pt !important; /* Reducido de 5pt */ margin: 0 !important; padding: 0 !important; }
-                        th { font-size: 4.5pt !important; /* Reducido de 5.5pt */ padding: 1px 2px !important; /* Reducido de 1px 3px */ background-color: #003366 !important; color: white !important; }
-                        td { font-size: 4pt !important; /* Reducido de 5pt */ padding: 1px 2px !important; /* Reducido de 1px 3px */ }
+                        h2 { font-size: 7pt !important; page-break-before: always !important; break-before: page !important; page-break-after: avoid !important; break-after: avoid !important; margin-top: 6px !important; padding-top: 3px !important; }
+                        h3 { font-size: 6pt !important; page-break-after: avoid !important; break-after: avoid !important; margin-top: 4px !important; margin-bottom: 1px !important; }
+                        table { page-break-inside: auto !important; break-inside: auto !important; font-size: 5pt !important; margin: 0 !important; padding: 0 !important; }
+                        th { font-size: 5.5pt !important; padding: 1px 3px !important; background-color: #003366 !important; color: white !important; }
+                        td { font-size: 5pt !important; padding: 1px 3px !important; }
                         tr { page-break-inside: avoid !important; break-inside: avoid !important; margin: 0 !important; padding: 0 !important; }
                         tr:nth-child(even) { background-color: #f9f9f9 !important; }
                         .forced-page-break { page-break-before: always !important; break-before: page !important; height: 1px !important; visibility: hidden !important; margin: 0 !important; padding: 0 !important; }
-                        .textarea-contenido-pdf { min-height: 15px !important; /* Reducido de 20px */ padding: 1px !important; font-family: inherit !important; font-size: 4pt !important; /* Reducido de 5pt */ line-height: 0.8 !important; /* Reducido de 0.9 */ white-space: pre-wrap !important; word-break: break-word !important; margin: 0 !important; }
-                        .info-section input[type="text"] { font-size: 4pt !important; /* Reducido de 5pt */ padding: 0px !important; height: auto !important; }
-                        .fecha-inputs input[type="text"] { font-size: 4pt !important; /* Reducido de 5pt */ padding: 0px !important; width: 12px !important; /* Reducido de 15px */ text-align: center !important; }
-                        .result { font-size: 5pt !important; /* Reducido de 6pt */ padding: 1px !important; border: 1px solid transparent !important; }
-                        .result.seguro { background-color: #dff0d8 !important; color: #3c763d !important; border-color: #d6e9c6 !important; }
-                        .result.riesgo { background-color: #fcf8e3 !important; color: #8a6d3b !important; border-color: #faebcc !important; }
-                        .result.inseguro { background-color: #f2dede !important; color: #a94442 !important; border-color: #ebccd1 !important; }
+                        .textarea-contenido-pdf { min-height: 20px !important; padding: 1px !important; font-family: inherit !important; font-size: 5pt !important; line-height: 0.9 !important; white-space: pre-wrap !important; word-break: break-word !important; margin: 0 !important; }
+                        .info-section input[type="text"] { font-size: 5pt !important; padding: 0px !important; height: auto !important; }
+                        .fecha-inputs input[type="text"] { font-size: 5pt !important; padding: 0px !important; width: 15px !important; text-align: center !important; }
+                        .result { font-size: 6pt !important; padding: 1px !important; border: 1px solid transparent !important; }
+                        .result.seguro { background-color: #dff0d8 !important; color: #3c763d !important; border-color: #d6e9c6 !important;}
+                        .result.riesgo { background-color: #fcf8e3 !important; color: #8a6d3b !important; border-color: #faebcc !important;}
+                        .result.inseguro { background-color: #f2dede !important; color: #a94442 !important; border-color: #ebccd1 !important;}
                         img:not(.logo-os10) { display: inline-block !important; max-width: 100% !important; }
-                        .mobile-nav, .mobile-action-button, .botones, .no-print, .rich-text-toolbar, .datos-guardados-info, .mobile-control-panel { display: none !important; height: 0 !important; width: 0 !important; visibility: hidden !important; margin: 0 !important; padding: 0 !important; }
+                        .mobile-nav, .mobile-action-button, .botones, .no-print, .rich-text-toolbar, .datos-guardados-info, .mobile-control-panel { display: none !important; height: 0 !important; width: 0 !important; visibility: hidden !important; margin: 0 !important; padding: 0 !important;}
                     `;
                     clonedDoc.head.appendChild(style);
 
+                    // Asegurar que las imágenes se muestran correctamente
                     Array.from(clonedDoc.querySelectorAll('img')).forEach(img => {
-                        img.style.display = 'block';
+                        img.style.display = 'block'; // Asegurar block o inline-block según necesidad
                         img.style.maxWidth = '100%';
                     });
-
+                    // Eliminar elementos vacíos en el clon que podrían causar páginas en blanco
                     const divs = Array.from(clonedDoc.querySelectorAll('div, p, span'));
                     divs.forEach(div => {
-                        if (!div.textContent.trim() && !div.querySelector('img') && div.clientHeight < 10 && !div.classList.contains('textarea-contenido-pdf') && !div.classList.contains('logo-container') && !div.id?.includes('seccion')) {
+                        if (!div.textContent.trim() && !div.querySelector('img') && div.clientHeight < 10 && !div.classList.contains('textarea-contenido-pdf') && !div.classList.contains('logo-container') && !div.id?.includes('seccion')) { // Ampliado de (1).js
                             if (div.parentNode) {
                                 div.parentNode.removeChild(div);
                             }
                         }
                     });
 
-                    const todosLosElementos = clonedDoc.querySelectorAll('*');
-                    todosLosElementos.forEach(el => {
-                        if (!el.tagName.toLowerCase().includes('h2') &&
-                            !el.classList.contains('forced-page-break')) {
-                            el.style.pageBreakBefore = 'auto';
-                            el.style.pageBreakAfter = 'auto';
-                            el.style.pageBreakInside = 'auto';
-                            el.style.breakBefore = 'auto';
-                            el.style.breakAfter = 'auto';
-                            el.style.breakInside = 'auto';
-                        }
-                    });
+                     // Establecer explícitamente propiedades de salto de página (de 1.js)
+                     const todosLosElementos = clonedDoc.querySelectorAll('*');
+                     todosLosElementos.forEach(el => {
+                         if (!el.tagName.toLowerCase().includes('h2') &&
+                             !el.classList.contains('forced-page-break')) {
+                             el.style.pageBreakBefore = 'auto';
+                             el.style.pageBreakAfter = 'auto';
+                             el.style.pageBreakInside = 'auto';
+                             el.style.breakBefore = 'auto';
+                             el.style.breakAfter = 'auto';
+                             el.style.breakInside = 'auto';
+                         }
+                     });
                 }
             },
+
             jsPDF: {
                 unit: 'mm',
                 format: 'legal',
@@ -528,38 +670,54 @@ function generarPDFCorregido() {
                 precision: 16,
                 putOnlyUsedFonts: true
             },
+
+            // Configuración de saltos de página (de 1.js)
             pagebreak: {
                 mode: ['avoid-all'],
-                before: ['h2'],
+                before: ['h2'], // Solo saltos explícitos en h2
                 avoid: ['table', 'img', '.textarea-contenido-pdf', 'tr']
             },
+
             enableLinks: false,
             image: { type: 'jpeg', quality: 0.98 },
-            margin: [4, 3, 4, 3], // Reducido de [5, 4, 5, 4]
+            margin: [5, 4, 5, 4], // Márgenes de (1).js (eran [15, 10, 15, 10])
+
+            // (Eliminada la segunda opción html2canvas que estaba en el original)
         };
 
+        // Generar el PDF con el manejo optimizado
         html2pdf()
             .from(contenido)
             .set(opciones)
             .toPdf()
             .get('pdf')
             .then(function(pdfObject) {
-                const totalPaginas = pdfObject.internal.getNumberOfPages();
-                console.log("PDF generado inicialmente con " + totalPaginas + " páginas");
-                for (let i = totalPaginas; i > 1; i--) {
-                    pdfObject.setPage(i);
-                    const pagina = pdfObject.getPageInfo(i);
-                    if (pagina && pagina.pageContext &&
-                        (!pagina.pageContext.stream || pagina.pageContext.stream.length < 150) &&
-                        (!pagina.pageContext.annotations || pagina.pageContext.annotations.length === 0)) {
-                        console.log("Eliminando página detectada como vacía: " + i);
-                        pdfObject.deletePage(i);
-                    }
-                }
+                 // Verificar si hay páginas en blanco y eliminarlas (de 1.js)
+                 const totalPaginas = pdfObject.internal.getNumberOfPages();
+                 console.log("PDF generado inicialmente con " + totalPaginas + " páginas");
+
+                 for (let i = totalPaginas; i > 1; i--) {
+                     pdfObject.setPage(i);
+                     const pagina = pdfObject.getPageInfo(i);
+                     // Criterio más estricto para página vacía
+                     if (pagina && pagina.pageContext &&
+                         (!pagina.pageContext.stream || pagina.pageContext.stream.length < 150) && // Umbral bajo
+                         (!pagina.pageContext.annotations || pagina.pageContext.annotations.length === 0)) {
+                         console.log("Eliminando página detectada como vacía: " + i);
+                         pdfObject.deletePage(i);
+                     }
+                 }
+
+                // Añadir metadatos y numeración
                 agregarMetadatosYNumeracion(pdfObject);
+
+                // Guardar el PDF
                 pdfObject.save(opciones.filename);
+
                 console.log("PDF generado exitosamente");
                 actualizarIndicadorExito();
+
+                // Restaurar el documento original después de un momento
                 setTimeout(() => {
                     restaurarDocumentoOriginal(estadoOriginal);
                 }, 1200);
@@ -572,8 +730,10 @@ function generarPDFCorregido() {
             });
     }
 
+    // Función para agregar metadatos y numeración al PDF
     function agregarMetadatosYNumeracion(pdf) {
         try {
+            // Añadir metadatos
             pdf.setProperties({
                 title: 'Cuadro de Fiscalización de Seguridad Privada',
                 subject: 'Informe de Fiscalización',
@@ -582,18 +742,30 @@ function generarPDFCorregido() {
                 creator: 'Sistema PDF Optimizado'
             });
 
-            const totalPaginas = pdf.internal.getNumberOfPages();
+            // Añadir numeración de páginas
+            const totalPaginas = pdf.internal.getNumberOfPages(); // Recalcular por si se eliminaron páginas
+
             for (let i = 1; i <= totalPaginas; i++) {
                 pdf.setPage(i);
-                pdf.setFontSize(7); // Reducido de 8
+
+                // Configuración de texto para el pie de página
+                pdf.setFontSize(8);
                 pdf.setTextColor(100, 100, 100);
+
+                // Obtener dimensiones de la página
                 const pageSize = pdf.internal.pageSize;
                 const pageWidth = pageSize.width ? pageSize.width : pageSize.getWidth();
                 const pageHeight = pageSize.height ? pageSize.height : pageSize.getHeight();
+
+                // Texto de numeración
                 const texto = `Página ${i} de ${totalPaginas}`;
-                const textWidth = pdf.getStringUnitWidth(texto) * 7 / pdf.internal.scaleFactor; // Ajustado por cambio de tamaño
-                const x = pageWidth - textWidth - 8; // Reducido de 10
-                const y = pageHeight - 7; // Reducido de 8
+
+                // Posicionar en la esquina inferior derecha
+                const textWidth = pdf.getStringUnitWidth(texto) * 8 / pdf.internal.scaleFactor;
+                const x = pageWidth - textWidth - 10; // Ajustado para margen derecho de 4mm (era 15)
+                const y = pageHeight - 8; // Ajustado para margen inferior de 5mm (era 10)
+
+                // Añadir el texto
                 pdf.text(texto, x, y);
             }
         } catch (error) {
@@ -601,43 +773,48 @@ function generarPDFCorregido() {
         }
     }
 
+    // Función para restaurar el documento a su estado original
     function restaurarDocumentoOriginal(estadoOriginal) {
         console.log("Restaurando documento a su estado original...");
+
         try {
+            // 1. Remover elementos creados durante la preparación
             if (estadoOriginal.elementosCreados) {
                 estadoOriginal.elementosCreados.forEach(el => {
                     if (el && el.parentNode) {
-                        try {
-                            el.parentNode.removeChild(el);
-                        } catch (e) {
-                            console.warn("Error removiendo elemento creado:", el, e);
-                        }
+                        try { // Añadido try-catch
+                           el.parentNode.removeChild(el);
+                        } catch(e){ console.warn("Error removiendo elemento creado:", el, e); }
                     }
                 });
             }
 
+            // 2. Restaurar elementos ocultos
             if (estadoOriginal.ocultos) {
                 estadoOriginal.ocultos.forEach(item => {
-                    try {
+                     try { // Añadido try-catch
+                        // Si el elemento fue removido completamente
                         if (item.parent && item.nextSibling) {
                             item.parent.insertBefore(item.element, item.nextSibling);
                         } else if (item.parent) {
                             item.parent.appendChild(item.element);
                         }
-                        if (item.display !== undefined && item.element && item.element.style) {
+
+                        // Restaurar visibilidad
+                        if (item.display !== undefined && item.element && item.element.style) { // Chequeo extra
                             item.element.style.display = item.display;
                         }
-                    } catch (e) {
-                        console.warn("Error restaurando elemento oculto:", item.element, e);
-                    }
+                     } catch(e){ console.warn("Error restaurando elemento oculto:", item.element, e); }
                 });
             }
 
+            // 3. Restaurar estilos originales
             if (estadoOriginal.estilos) {
                 estadoOriginal.estilos.forEach((estilos, elemento) => {
-                    try {
-                        if (elemento && elemento.style) {
+                     try { // Añadido try-catch
+                        if (elemento && elemento.style) { // Chequeo extra
                             Object.keys(estilos).forEach(prop => {
+                                // Manejar caso especial para textareas
                                 if (prop === 'value' && elemento.tagName === 'TEXTAREA') {
                                     elemento.value = estilos.value;
                                 } else {
@@ -645,46 +822,45 @@ function generarPDFCorregido() {
                                 }
                             });
                         }
-                    } catch (e) {
-                        console.warn("Error restaurando estilo:", elemento, e);
-                    }
+                     } catch(e){ console.warn("Error restaurando estilo:", elemento, e); }
                 });
             }
 
+            // 4. Restaurar estilos del body
             if (estadoOriginal.documentBody) {
                 document.body.style.overflow = estadoOriginal.documentBody.overflow || '';
                 document.body.style.height = estadoOriginal.documentBody.height || '';
             }
 
+            // 5. Eliminar hoja de estilos temporal si aún existe
             const estilosTemporales = document.getElementById('estilos-temporales-pdf');
             if (estilosTemporales && estilosTemporales.parentNode) {
-                try {
-                    estilosTemporales.parentNode.removeChild(estilosTemporales);
-                } catch (e) {}
+                 try { estilosTemporales.parentNode.removeChild(estilosTemporales); } catch(e){}
             }
+            // Añadido: Eliminar también otros estilos temporales si existen
+             const estiloTamanioMinimo = document.getElementById('estilo-tamanio-minimo');
+             if (estiloTamanioMinimo && estiloTamanioMinimo.parentNode) {
+                 try { estiloTamanioMinimo.parentNode.removeChild(estiloTamanioMinimo); } catch(e){}
+             }
+             const estiloNoPageBreak = document.getElementById('estilo-eliminar-page-breaks');
+              if (estiloNoPageBreak && estiloNoPageBreak.parentNode) {
+                 try { estiloNoPageBreak.parentNode.removeChild(estiloNoPageBreak); } catch(e){}
+             }
 
-            const estiloTamanioMinimo = document.getElementById('estilo-tamanio-minimo');
-            if (estiloTamanioMinimo && estiloTamanioMinimo.parentNode) {
-                try {
-                    estiloTamanioMinimo.parentNode.removeChild(estiloTamanioMinimo);
-                } catch (e) {}
-            }
 
-            const estiloNoPageBreak = document.getElementById('estilo-eliminar-page-breaks');
-            if (estiloNoPageBreak && estiloNoPageBreak.parentNode) {
-                try {
-                    estiloNoPageBreak.parentNode.removeChild(estiloNoPageBreak);
-                } catch (e) {}
-            }
-
+            // 6. Ocultar indicador de carga si aún está visible
             ocultarIndicadorCarga();
-        } catch (e) {
+
+        } catch (e) { // Catch general
              console.error("Error mayor durante la restauración:", e);
-        } finally {
+        } finally { // Asegurar que el indicador se oculte
              ocultarIndicadorCarga();
              console.log("Restauración del documento intentada.");
         }
     }
+
+
+    // --- Funciones del Indicador de Carga (sin cambios) ---
     function mostrarIndicadorCarga() {
         const indicadorExistente = document.getElementById('indicador-pdf-carga');
         if (indicadorExistente) {
@@ -791,4 +967,4 @@ window.addEventListener('load', () => { setTimeout(instalarBotonPDFCorregido, 15
 window.generarPDFCorregido = generarPDFCorregido;
 window.instalarBotonPDFCorregido = instalarBotonPDFCorregido;
 instalarBotonPDFCorregido();
-// --- Fin Ejecución ---
+// --- Fin Ejecución --
