@@ -967,16 +967,18 @@
 }
 
 .logo-container {
-    position: absolute; /* Volver a absolute */
-    top: 20px; /* Distancia desde la parte superior */
-    left: 350px; /* Distancia desde la izquierda */
+    position: absolute;
+    top: 20px;
+    left: calc(50% - 500px); /* Centrado con margen */
     width: auto;
     height: auto;
     z-index: 10;
+    max-width: 15%; /* Límite de tamaño */
 }
 
 .logo-os10 {
-    width: 120px;
+    width: 120px; /* Tamaño base */
+    max-width: 100%; /* Responsive */
     height: auto;
     display: block;
 }
@@ -988,6 +990,39 @@ h1 {
     margin-left: 0;
     text-align: center;
 }
+/* Media queries para diferentes tamaños de pantalla */
+@media screen and (max-width: 1200px) {
+    .logo-container {
+        left: 20px; /* Más cerca del borde en pantallas más pequeñas */
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .logo-container {
+        top: 10px;
+        left: 10px;
+        max-width: 25%; /* Más pequeño en móviles */
+    }
+
+    h1 {
+        padding-left: 100px; /* Ajustar espacio del título */
+        font-size: 1.5rem;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .logo-container {
+        top: 5px;
+        left: 5px;
+        max-width: 30%; /* Aún más pequeño en móviles muy pequeños */
+    }
+
+    h1 {
+        padding-left: 80px; /* Reducir espacio del título */
+        font-size: 1.2rem;
+    }
+}
+
 
 /* Para asegurar que se vea bien en la impresión */
 @media print {
