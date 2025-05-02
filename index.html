@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Fiscalización de Seguridad Privada</title>
+    <title>Informe de Seguridad Privada</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"">
                                                                                                   <!-- Incluir íconos de Font Awesome para navegación móvil -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -1076,6 +1076,57 @@ h1 {
         page-break-after: avoid !important;
     }
 }
+ 
+                              /* Estilos específicos para impresión y PDF */
+@media print {
+  /* Crear un encabezado fijo que aparecerá en cada página */
+  @page {
+    margin-top: 30mm; /* Dar espacio para el encabezado */
+  }
+  
+  /* Definir el logo como contenido de encabezado de página */
+  .logo-container {
+    position: fixed !important;
+    top: 10mm !important;
+    left: 10mm !important;
+    display: block !important;
+    z-index: 1000 !important;
+  }
+  
+  /* Asegurar que el logo sea visible y tenga un tamaño adecuado */
+  .logo-os10 {
+    width: 90px !important;
+    height: auto !important;
+    display: block !important;
+  }
+  
+  /* Añadir numeración de páginas en el pie de página */
+  .page-number:after {
+    content: counter(page) " de " counter(pages);
+    position: fixed;
+    bottom: 10mm;
+    right: 10mm;
+    font-size: 9pt;
+    color: #666;
+  }
+  
+  /* Añadir la clase page-number al footer existente */
+  .footer {
+    position: relative; /* Para que actúe como contenedor del número de página */
+  }
+  
+  .footer:after {
+    content: "";
+    display: block;
+    position: absolute;
+    bottom: 5mm;
+    right: 10mm;
+    font-size: 9pt;
+    color: #666;
+    counter-increment: page;
+    content: "Página " counter(page);
+  }
+}
     </style>
 </head>
 <script>
@@ -1426,9 +1477,10 @@ h1 {
 </script>
 <script src="autoguardado.js"></script>
 <body>
-   <div class="container">
+  /*<div class="container">
        <div class="logo-container">
-    <img src="https://raw.githubusercontent.com/danielfigueroa1879/Informe/716839bc31f50a5931d586f5a1a482ca2836bb3c/logo-os10.png" alt="Logo OS-10" class="logo-os10">
+    <img*/ 
+                src="https://raw.githubusercontent.com/danielfigueroa1879/Informe/716839bc31f50a5931d586f5a1a482ca2836bb3c/logo-os10.png" alt="Logo OS-10" class="logo-os10">
 </div>
         <form id="formulario-fiscalizacion">
             <h1>FISCALIZACIÓN DE SEGURIDAD PRIVADA</h1>
@@ -1449,7 +1501,6 @@ h1 {
                 <p><strong>Nombre y cargo persona entrevistada:</strong> <input type="text" name="Nombre y cargo persona entrevistada" /></p>
             </div>
             
-           
 
             <h2>1. DOCUMENTACIÓN OBLIGATORIA</h2>
 
@@ -1881,10 +1932,11 @@ h1 {
                 <button type="button" onclick="guardarPDF()">Guardar como PDF</button>
             </div>
             
-            <div class="footer">
+            <div class="footer page-number">
                 <p>Realizado según normativa vigente de seguridad privada.</p>
                 <p>© 2025 - Daniel Figueroa Ch.<br><span class="titulo">Ingeniero en Informática</span></p>
             </div>
+                                                                       
         </form>
     </div>
 <script>
@@ -2319,3 +2371,4 @@ document.addEventListener('DOMContentLoaded', function() {
                                
 </body>
 </html>
+              
