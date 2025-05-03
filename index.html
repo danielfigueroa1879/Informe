@@ -2032,9 +2032,170 @@ function mostrarNotificacionMovil(mensaje, tipo) {
         }, 500);
     }, 3000);
 }                                                          
-                                                             
-                                                                
-                                                                
+                                                                                                                           
+/**
+ * Función para mostrar la imagen seleccionada en la previsualización
+ * @param {HTMLInputElement} input - El elemento input de tipo file
+ * @param {string} previewId - El ID del contenedor de previsualización
+ */
+function mostrarImagen(input, previewId) {
+    // Obtener el contenedor de previsualización
+    const previewContainer = document.getElementById(previewId);
+    if (!previewContainer) return;
+    
+    // Limpiar previsualización anterior
+    previewContainer.innerHTML = '';
+    
+    // Verificar que se seleccionó un archivo
+    if (input.files && input.files[0]) {
+        const file = input.files[0];
+        
+        // Verificar que es una imagen
+        if (!file.type.startsWith('image/')) {
+            alert('Por favor seleccione un archivo de imagen válido.');
+            return;
+        }
+        
+        // Crear objeto FileReader
+        const reader = new FileReader();
+        
+        // Configurar el evento onload
+        reader.onload = function(e) {
+            // Crear elemento de imagen
+            const img = document.createElement('img');
+            img.src = e.target.result;
+            img.className = 'foto-preview';
+            
+            // Añadir la imagen al contenedor
+            previewContainer.appendChild(img);
+            
+            // Ajustar la interfaz
+            const placeholder = input.closest('.foto-placeholder');
+            if (placeholder) {
+                // Ocultar el texto placeholder
+                const textoPlaceholder = placeholder.querySelector('p');
+                if (textoPlaceholder) {
+                    textoPlaceholder.style.display = 'none';
+                }
+                
+                // Cambiar el texto del botón
+                const label = placeholder.querySelector('label');
+                if (label) {
+                    label.textContent = 'Cambiar imagen';
+                }
+            }
+        };
+        
+        // Iniciar la lectura del archivo como URL de datos
+        reader.readAsDataURL(file);
+    }
+}
+
+/**
+ * Función para eliminar la imagen seleccionada
+ * @param {string} inputId - El ID del input de tipo file
+ * @param {string} previewId - El ID del contenedor de previsualización
+ */
+function eliminarImagen(inputId, previewId) {
+    // Resetear el input de archivo
+    const input = document.getElementById(inputId);
+    if (input) {
+        input.value = '';
+    }
+    
+    // Limpiar la previsualización
+    const previewContainer = document.getElementById(previewId);
+    if (previewContainer) {
+        previewContainer.innerHTML = '';
+    }
+    
+    // Restaurar la interfaz
+    const placeholder = input.closest('.foto-placeholder');
+    if (placeholder) {
+        // Mostrar el texto placeholder
+        const textoPlaceholder = placeholder.querySelector('p');
+        if (textoPlaceholder) {
+            textoPlaceholder.style.display = 'block';
+        }
+        
+        // Restaurar el texto del botón
+        const label = placeholder.querySelector('label');
+        if (label) {
+            label.textContent = 'Seleccionar imagen';
+        }
+    }
+}
+
+// Añadir botones para eliminar las imágenes cuando el documento esté cargado
+document.addEventListener('DOMContentLoaded', function() {
+    // Crear botones de eliminar para cada contenedor de foto
+    const fotoPlaceholders = document.querySelectorAll('.foto-placeholder');
+    
+    fotoPlaceholders.forEach(function(placeholder, index) {
+        // Crear el botón
+        const botonEliminar = document.createElement('button');
+        botonEliminar.type = 'button';
+        botonEliminar.className = 'foto-eliminar-btn';
+        botonEliminar.textContent = 'Eliminar imagen';
+        botonEliminar.style.display = 'none'; // Oculto inicialmente
+        
+        // Configurar estilos
+        Object.assign(botonEliminar.style, {
+            backgroundColor: '#dc3545',
+            color: 'white',
+            border: 'none',
+            borderRadius: '4px',
+            padding: '6px 12px',
+            marginTop: '10px',
+            cursor: 'pointer',
+            fontFamily: 'Poppins, sans-serif',
+            fontSize: '0.9rem',
+            transition: 'background-color 0.3s'
+        });
+        
+        // Añadir evento hover
+        botonEliminar.onmouseover = function() {
+            this.style.backgroundColor = '#bd2130';
+        };
+        botonEliminar.onmouseout = function() {
+            this.style.backgroundColor = '#dc3545';
+        };
+        
+        // Configurar función onclick
+        const inputId = `foto${index + 1}`;
+        const previewId = `preview-foto${index + 1}`;
+        
+        botonEliminar.onclick = function() {
+            eliminarImagen(inputId, previewId);
+            this.style.display = 'none'; // Ocultar botón después de eliminar
+        };
+        
+        // Añadir el botón al placeholder
+        placeholder.appendChild(botonEliminar);
+        
+        // Modificar la función onchange del input
+        const input = placeholder.querySelector('input[type="file"]');
+        if (input) {
+            // Preservar la función original
+            const originalOnchange = input.onchange;
+            
+            // Añadir funcionalidad para mostrar botón de eliminar
+            input.onchange = function(e) {
+                // Llamar al manejador original
+                if (originalOnchange) {
+                    originalOnchange.call(this, e);
+                }
+                
+                // Mostrar botón eliminar si hay archivo seleccionado
+                if (this.files && this.files[0]) {
+                    botonEliminar.style.display = 'inline-block';
+                } else {
+                    botonEliminar.style.display = 'none';
+                }
+            };
+        }
+    });
+});                                                                
                                                                 
                                                                 
                                                                                                                  
