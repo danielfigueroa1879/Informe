@@ -1443,37 +1443,8 @@ h1 {
       });
     }
     
-    // Función para guardar como PDF
-    function guardarPDF() {
-        window.alert("Para guardar como PDF, utilice la opción de imprimir y seleccione 'Guardar como PDF' en las opciones de destino de su navegador.");
-        setTimeout(function() {
-            window.print();
-        }, 500);
-    }
-    
-    // Función para mostrar la imagen seleccionada
-    function mostrarImagen(input, previewId) {
-        var preview = document.getElementById(previewId);
-        preview.innerHTML = '';
-        
-        if (input.files && input.files[0]) {
-            var reader = new FileReader();
-            
-            reader.onload = function(e) {
-                var img = document.createElement('img');
-                img.src = e.target.result;
-                img.className = 'foto-preview';
-                preview.appendChild(img);
-                
-                // Ocultar el texto y el botón cuando hay una imagen
-                var placeholder = input.parentElement;
-                placeholder.querySelector('p').style.display = 'none';
-                placeholder.querySelector('label').style.display = 'none';
-            };
-            
-            reader.readAsDataURL(input.files[0]);
-        }
-    }
+  
+   
 </script>
 <script src="autoguardado.js"></script>
 <body>
@@ -1766,12 +1737,7 @@ h1 {
                 </tr>
             </table>
 
-            <div class="botones no-print">
-                <button type="button" onclick="imprimirFormulario()">Imprimir Formulario</button>
-                <button type="button" onclick="limpiarFormulario()">Limpiar Formulario</button>
-                <button type="button" onclick="guardarPDF()">Guardar como PDF</button>
-            </div>
-            
+        
             <!-- Salto de página controlado -->
 <div id="seccion-caracteristicas" class="forced-page-break"></div>
 <h2>5. CARACTERÍSTICAS DE LA INSTALACIÓN</h2>
@@ -1925,12 +1891,12 @@ h1 {
                     <textarea class="foto-descripcion" placeholder="Descripción de la fotografía 2..."></textarea>
                 </div>
             </div>
-            
             <div class="botones no-print">
-                <button type="button" onclick="imprimirFormulario()">Imprimir Formulario</button>
-                <button type="button" onclick="limpiarFormulario()">Limpiar Formulario</button>
-                <button type="button" onclick="guardarPDF()">Guardar como PDF</button>
-            </div>
+    <button type="button" onclick="imprimirFormulario()">Imprimir Formulario</button>
+    <button type="button" onclick="limpiarFormulario()">Limpiar Formulario</button>
+    <button type="button" onclick="generarPDFCorregido()">Descargar PDF Completo</button>
+</div>
+            
             
             <div class="footer page-number">
                 <p>Realizado según normativa vigente de seguridad privada.</p>
@@ -1940,181 +1906,9 @@ h1 {
         </form>
     </div>
 <script>
-// Solución mejorada para la generación de PDF
-function generarPDFMejorado() {
-    // Mostrar indicador de carga
-    const indicadorCarga = document.createElement('div');
-    indicadorCarga.style.position = 'fixed';
-    indicadorCarga.style.top = '0';
-    indicadorCarga.style.left = '0';
-    indicadorCarga.style.width = '100%';
-    indicadorCarga.style.height = '100%';
-    indicadorCarga.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
-    indicadorCarga.style.zIndex = '9999';
-    indicadorCarga.style.display = 'flex';
-    indicadorCarga.style.justifyContent = 'center';
-    indicadorCarga.style.alignItems = 'center';
-    indicadorCarga.style.color = 'white';
-    indicadorCarga.style.fontSize = '1.5rem';
-    indicadorCarga.innerHTML = '<div style="background-color: #003366; padding: 20px 40px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.3);">Generando PDF, por favor espere...</div>';
-    document.body.appendChild(indicadorCarga);
-
-    // Cargar la librería html2pdf si no está cargada
-    if (typeof html2pdf === 'undefined') {
-        const script = document.createElement('script');
-        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
-        script.onload = function() {
-            procesoGeneracionPDF();
-        };
-        document.head.appendChild(script);
-    } else {
-        procesoGeneracionPDF();
-    }
-
-    function procesoGeneracionPDF() {
-        // Guardar estado original de elementos que se ocultarán
-        const botonesOriginal = [];
-        document.querySelectorAll('.botones').forEach(div => {
-            botonesOriginal.push({
-                element: div,
-                display: div.style.display
-            });
-            div.style.display = 'none';
-        });
-
-        const noPrintOriginal = [];
-        document.querySelectorAll('.no-print').forEach(el => {
-            noPrintOriginal.push({
-                element: el,
-                display: el.style.display
-            });
-            el.style.display = 'none';
-        });
-
-        // Obtener el contenedor principal
-        const contenido = document.querySelector('.container');
-        
-        // Asegurarse de que el contenido del plan de acción sea visible
-        const planAccion = document.getElementById('plan-accion-editor');
-        if (planAccion) {
-            planAccion.style.height = 'auto';
-            planAccion.style.overflow = 'visible';
-        }
-
-        // Esperar a que los cambios en el DOM se apliquen
-        setTimeout(() => {
-            // Configuración optimizada
-            const opciones = {
-                margin: [5, 5, 5, 5], // Márgenes mínimos [superior, izquierdo, inferior, derecho] en mm
-                filename: `Fiscalizacion_${new Date().toLocaleDateString().replace(/\//g, '-')}.pdf`,
-                image: { 
-                    type: 'jpeg', 
-                    quality: 0.95
-                },
-                html2canvas: { 
-                    scale: 1.3, // Escala ajustada a 65% (1.3 * 0.5 = 0.65)
-                    useCORS: true,
-                    logging: true,
-                    letterRendering: true,
-                    allowTaint: true,
-                    backgroundColor: '#FFFFFF',
-                    removeContainer: true
-                },
-                jsPDF: { 
-                    unit: 'mm', 
-                    format: 'legal', // Formato legal
-                    orientation: 'portrait',
-                    compress: true,
-                    hotfixes: ["px_scaling"]
-                },
-                pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
-            };
-
-            // Crear el PDF de manera más robusta
-            html2pdf()
-                .set(opciones)
-                .from(contenido)
-                .toPdf()
-                .get('pdf')
-                .then((pdf) => {
-                    // Verificar que el PDF tiene contenido
-                    console.log("PDF generado con tamaño en bytes:", pdf.output('arraybuffer').byteLength);
-                    
-                    if (pdf.output('arraybuffer').byteLength < 1000) {
-                        alert("Advertencia: El PDF generado parece estar vacío o tiene muy poco contenido.");
-                    }
-                    
-                    // Guardar el PDF
-                    pdf.save(`Fiscalizacion_${new Date().toLocaleDateString().replace(/\//g, '-')}.pdf`);
-                    
-                    // Restaurar elementos originales
-                    restaurarElementos();
-                })
-                .catch(err => {
-                    console.error("Error generando PDF:", err);
-                    alert("Ocurrió un error al generar el PDF: " + err.message);
-                    restaurarElementos();
-                });
-        }, 500);  // Esperar 500ms para asegurarse de que los cambios visuales se apliquen
-
-        // Función para restaurar los elementos a su estado original
-        function restaurarElementos() {
-            // Quitar indicador de carga
-            document.body.removeChild(indicadorCarga);
-            
-            // Restaurar botones
-            botonesOriginal.forEach(item => {
-                item.element.style.display = item.display;
-            });
-            
-            // Restaurar otros elementos
-            noPrintOriginal.forEach(item => {
-                item.element.style.display = item.display;
-            });
-        }
-    }
-}
-
-// Agregar un botón de descarga PDF mejorado
-function agregarBotonPDFMejorado() {
-    const botonesDivs = document.querySelectorAll('.botones');
-    if (botonesDivs.length === 0) return;
-    
-    const ultimoBotonesDiv = botonesDivs[botonesDivs.length - 1];
-    
-    // Verificar si ya existe el botón
-    if (document.getElementById('btn-pdf-mejorado')) return;
-    
-    // Crear el botón
-    const boton = document.createElement('button');
-    boton.id = 'btn-pdf-mejorado';
-    boton.type = 'button';
-    boton.textContent = 'Descargar PDF';
-    boton.style.backgroundColor = '#28a745';
-    boton.style.color = 'white';
-    boton.style.padding = '12px 24px';
-    boton.style.fontSize = '1.1rem';
-    boton.style.fontWeight = 'bold';
-    boton.style.margin = '0 5px';
-    boton.style.border = 'none';
-    boton.style.borderRadius = '5px';
-    boton.style.cursor = 'pointer';
-    
-    // Agregar evento
-    boton.onclick = generarPDFMejorado;
-    
-    // Agregar al principio de los botones
-    ultimoBotonesDiv.insertBefore(boton, ultimoBotonesDiv.firstChild);
-    
-    // Sobrescribir función guardarPDF original
-    if (typeof window.guardarPDF === 'function') {
-        window.guardarPDF = generarPDFMejorado;
-    }
-}
 
 // Ejecutar cuando la página esté completamente cargada
 window.addEventListener('load', function() {
-    setTimeout(agregarBotonPDFMejorado, 1000);
 });
                                                                 
 // Función para navegar a secciones
@@ -2139,7 +1933,7 @@ function mostrarOpcionesGuardado() {
                 <button class="mobile-option-button" onclick="imprimirFormulario(); document.body.removeChild(this.closest('.mobile-modal'));">
                     <i class="fas fa-print"></i> Imprimir formulario
                 </button>
-                <button class="mobile-option-button" onclick="guardarPDF(); document.body.removeChild(this.closest('.mobile-modal'));">
+               <button class="mobile-option-button" onclick="generarPDFCorregido(); document.body.removeChild(this.closest('.mobile-modal'));">
                     <i class="fas fa-file-pdf"></i> Guardar como PDF
                 </button>
                 <button class="mobile-option-button" style="background-color:#f2f2f2; color:#333;" 
@@ -2290,13 +2084,14 @@ document.addEventListener('DOMContentLoaded', function() {
         panelControl.className = 'mobile-control-panel no-print';
         panelControl.innerHTML = `
             <div class="panel-button-group">
-                <button class="panel-button" onclick="scrollToSection('seccion-resumen')">
-                    <i class="fas fa-chart-pie"></i> Ver Resumen
-                </button>
-                <button class="panel-button" onclick="guardarPDF()">
-                    <i class="fas fa-file-pdf"></i> Guardar PDF
-                </button>
-            </div>
+    <button class="panel-button" onclick="scrollToSection('seccion-resumen')">
+        <i class="fas fa-chart-pie"></i> Ver Resumen
+    </button>
+    <button class="panel-button" onclick="generarPDFCorregido()">
+        <i class="fas fa-file-pdf"></i> Guardar PDF
+    </button>
+</div>
+                                  
         `;
         
         // Insertar después del div info-section
@@ -2371,4 +2166,4 @@ document.addEventListener('DOMContentLoaded', function() {
                                
 </body>
 </html>
-              
+        
