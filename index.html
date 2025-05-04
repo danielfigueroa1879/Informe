@@ -1129,17 +1129,18 @@ h1 {
 }
     </style>
 </head>
-<script>  
-// Ocultar el logo en la carga de la página
+
+
+<script>
+    // Ocultar el logo en la carga de la página
 document.addEventListener('DOMContentLoaded', function() {
     // Ocultar el logo-container que aparece en el HTML
     const logoContainer = document.querySelector('.logoo-container');
     if (logoContainer) {
         logoContainer.style.display = 'none';
     }
-});
-</script>  
-<script>
+})
+
     function contarCumplimiento() {
         var totalItems = document.querySelectorAll('input[type="radio"][name^="item_"]').length / 2;
         var itemsCumplen = document.querySelectorAll('input[type="radio"][value="cumple"]:checked').length;
