@@ -1908,14 +1908,6 @@ h1 {
     </div>
 <script>
     
-// Ocultar el logo en la carga de la página
-document.addEventListener('DOMContentLoaded', function() {
-    // Ocultar el logo-container que aparece en el HTML
-    const logoContainer = document.querySelector('.logoo-container');
-    if (logoContainer) {
-        logoContainer.style.display = 'none';
-    }
-});
 
     
 // Ejecutar cuando la página esté completamente cargada
@@ -2245,6 +2237,15 @@ document.addEventListener('DOMContentLoaded', function() {
 </button>
                                
 <script>
+// Ocultar el logo en la carga de la página
+document.addEventListener('DOMContentLoaded', function() {
+    // Ocultar el logo-container que aparece en el HTML
+    const logoContainer = document.querySelector('.logoo-container');
+    if (logoContainer) {
+        logoContainer.style.display = 'none';
+    }
+});
+    
 // Código para mejorar la experiencia móvil
 document.addEventListener('DOMContentLoaded', function() {
     // Detectar si es dispositivo móvil
