@@ -1446,11 +1446,12 @@ h1 {
   
    
 </script>
+    
 <script src="autoguardado.js"></script>
 <body>
-  /*<div class="container">
+  <div class="container">
        <div class="logo-container">
-    <img*/ 
+    <img 
                 src="https://raw.githubusercontent.com/danielfigueroa1879/Informe/716839bc31f50a5931d586f5a1a482ca2836bb3c/logo-os10.png" alt="Logo OS-10" class="logo-os10">
 </div>
         <form id="formulario-fiscalizacion">
@@ -1906,7 +1907,17 @@ h1 {
         </form>
     </div>
 <script>
+    
+// Ocultar el logo en la carga de la página
+document.addEventListener('DOMContentLoaded', function() {
+    // Ocultar el logo-container que aparece en el HTML
+    const logoContainer = document.querySelector('.logoo-container');
+    if (logoContainer) {
+        logoContainer.style.display = 'none';
+    }
+});
 
+    
 // Ejecutar cuando la página esté completamente cargada
 window.addEventListener('load', function() {
 });
