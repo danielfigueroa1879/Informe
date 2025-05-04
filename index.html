@@ -1129,18 +1129,7 @@ h1 {
 }
     </style>
 </head>
-
-
 <script>
-    // Ocultar el logo en la carga de la página
-document.addEventListener('DOMContentLoaded', function() {
-    // Ocultar el logo-container que aparece en el HTML
-    const logoContainer = document.querySelector('.logoo-container');
-    if (logoContainer) {
-        logoContainer.style.display = 'none';
-    }
-})
-
     function contarCumplimiento() {
         var totalItems = document.querySelectorAll('input[type="radio"][name^="item_"]').length / 2;
         var itemsCumplen = document.querySelectorAll('input[type="radio"][value="cumple"]:checked').length;
@@ -1457,11 +1446,10 @@ document.addEventListener('DOMContentLoaded', function() {
   
    
 </script>
-    
 <script src="autoguardado.js"></script>
 <body>
   <div class="container">
-       <div class="logo-container">
+       <div class="logoo-container">
     <img 
                 src="https://raw.githubusercontent.com/danielfigueroa1879/Informe/716839bc31f50a5931d586f5a1a482ca2836bb3c/logo-os10.png" alt="Logo OS-10" class="logo-os10">
 </div>
@@ -1918,9 +1906,7 @@ document.addEventListener('DOMContentLoaded', function() {
         </form>
     </div>
 <script>
-    
 
-    
 // Ejecutar cuando la página esté completamente cargada
 window.addEventListener('load', function() {
 });
@@ -2248,7 +2234,15 @@ document.addEventListener('DOMContentLoaded', function() {
 </button>
                                
 <script>
-
+                          
+// Ocultar el logo en la carga de la página
+document.addEventListener('DOMContentLoaded', function() {
+    // Ocultar el logo-container que aparece en el HTML
+    const logoContainer = document.querySelector('.logoo-container');
+    if (logoContainer) {
+        logoContainer.style.display = 'none';
+    }
+});
 // Código para mejorar la experiencia móvil
 document.addEventListener('DOMContentLoaded', function() {
     // Detectar si es dispositivo móvil
@@ -2334,12 +2328,13 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
-</script>  
-
+</script>                       
+                               
                                
                                
                                
                                
 </body>
 </html>
+        
         
