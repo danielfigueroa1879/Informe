@@ -192,7 +192,7 @@ function generarPDFCorregido() {
                 width: '100%',
                 fontFamily: textarea.style.fontFamily || 'inherit',
                 fontSize: '8pt', // Reducido de tamaño
-                lineHeight: '1.1', // Reducido
+                lineHeight: '1.2', // Reducido
                 paddingLeft: '5px',
                 whiteSpace: 'pre-wrap', // Preservar espacios y saltos de línea
                 wordBreak: 'break-word'
@@ -205,6 +205,48 @@ function generarPDFCorregido() {
             // Registrar este elemento para eliminarlo después
             estadoOriginal.elementosCreados.push(contenidoTexto);
         });
+// NUEVO: Reducir específicamente el tamaño del resumen automático
+const resumenAutomatico = container.querySelector('#resumen-automatico');
+if (resumenAutomatico) {
+    estadoOriginal.estilos.set(resumenAutomatico, {
+        fontSize: resumenAutomatico.style.fontSize,
+        lineHeight: resumenAutomatico.style.lineHeight
+    });
+    
+    resumenAutomatico.style.fontSize = '8pt'; // Muy reducido para el resumen
+    resumenAutomatico.style.lineHeight = '1.1'; // Interlineado muy compacto
+    
+    // También reducir elementos internos del resumen
+    const elementosResumen = resumenAutomatico.querySelectorAll('p, li, ul, span, strong');
+    elementosResumen.forEach(el => {
+        estadoOriginal.estilos.set(el, {
+            fontSize: el.style.fontSize,
+            lineHeight: el.style.lineHeight,
+            marginBottom: el.style.marginBottom
+        });
+        
+        el.style.fontSize = '9.5pt'; // Muy reducido
+        el.style.lineHeight = '1.1'; // Interlineado muy compacto
+        el.style.marginBottom = '2px'; // Reducir espacios entre párrafos
+    });
+    
+    // Reducir aún más los elementos de segundo nivel (sublistas)
+    const subElementosResumen = resumenAutomatico.querySelectorAll('ul ul li, .no-cumple-tag');
+    subElementosResumen.forEach(el => {
+        el.style.fontSize = '7.5pt'; // Extremadamente reducido
+        el.style.lineHeight = '1'; // Sin espacio adicional
+        el.style.marginBottom = '1px'; // Mínimo margen
+    });
+}
+
+
+
+
+
+
+
+
+
         
         // 4. Aplicar estilos óptimos para la impresión
         const elementosEstilizar = [
