@@ -203,6 +203,33 @@ if (titulosFotos.length > 0) {
         }
     });
 }
+        /* NUEVO: Forzar que el resumen comience en nueva página */
+#seccion-resumen, h2[textContent*="RESUMEN DE FISCALIZACIÓN"] {
+    page-break-before: always !important;
+    break-before: page !important;
+    margin-top: 20px !important;
+}
+
+/* NUEVO: Forzar que el set fotográfico comience en nueva página */
+#seccion-fotos, h2[textContent*="SET FOTOGRÁFICO"] {
+    page-break-before: always !important;
+    break-before: page !important;
+    margin-top: 20px !important;
+}
+        // MODIFICADO: Configuración de saltos de página con nombres exactos
+pagebreak: {
+    mode: ['avoid-all', 'css', 'legacy'],
+    before: [
+        'h2', 
+        '#seccion-resumen', 
+        '#seccion-fotos', 
+        '.forced-page-break', 
+        '.forced-page-break-strong',
+        'h2[textContent*="RESUMEN DE FISCALIZACIÓN"]',
+        'h2[textContent*="SET FOTOGRÁFICO"]'
+    ], 
+    avoid: ['table', 'img', '.textarea-contenido-pdf']
+},
         // 4. Mejorar el manejo de las textareas (observaciones)
         const textareas = container.querySelectorAll('textarea');
         textareas.forEach(textarea => {
