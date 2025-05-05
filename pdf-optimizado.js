@@ -188,11 +188,11 @@ function generarPDFCorregido() {
             contenidoTexto.textContent = textarea.value;
             contenidoTexto.className = 'textarea-contenido-pdf';
             Object.assign(contenidoTexto.style, {
-                minHeight: '50px',
+                minHeight: '40px',
                 width: '100%',
                 fontFamily: textarea.style.fontFamily || 'inherit',
-                fontSize: '10pt', // Reducido de tamaño
-                lineHeight: '1.3', // Reducido
+                fontSize: '8pt', // Reducido de tamaño
+                lineHeight: '1.2', // Reducido
                 paddingLeft: '5px',
                 whiteSpace: 'pre-wrap', // Preservar espacios y saltos de línea
                 wordBreak: 'break-word'
