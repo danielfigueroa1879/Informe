@@ -917,17 +917,13 @@ function agregarMetadatosYNumeracion(pdf) {
                 // Añadir el texto de numeración
                 pdf.text(texto, x, y);
                 
-                // Añadir fecha de generación junto al número de página
-                const fechaActual = new Date().toLocaleDateString();
-                const textoFecha = `Generado: ${fechaActual}`;
-                pdf.text(textoFecha, 12, y);
-                
+                             
                 // NUEVO: Texto "Seguridad Privada" centrado en el pie de página
                 pdf.setFontSize(6); // Extremadamente pequeño
                 pdf.setTextColor(120, 120, 120); // Color gris claro
                 
                 // Texto a añadir
-                const textoSeguridad = "Seguridad Privada";
+                const textoSeguridad = "Seguridad Privada O.S.1O Coquimbo";
                 
                 // Calcular posición centrada
                 const textoSeguridadWidth = pdf.getStringUnitWidth(textoSeguridad) * 6 / pdf.internal.scaleFactor;
@@ -980,7 +976,7 @@ function agregarMetadatosYNumeracion(pdf) {
                 const textoFecha = `Generado: ${fechaActual}`;
                 pdf.text(textoFecha, 12, y);
                 
-                // NUEVO: Texto "Seguridad Privada" centrado en el pie de página
+                // NUEVO: Texto "Seguridad Privada O.S.10 Coquimbo" centrado en el pie de página
                 pdf.setFontSize(6); // Extremadamente pequeño
                 pdf.setTextColor(120, 120, 120); // Color gris claro
                 
