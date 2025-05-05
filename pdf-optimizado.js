@@ -192,7 +192,7 @@ function generarPDFCorregido() {
                 width: '100%',
                 fontFamily: textarea.style.fontFamily || 'inherit',
                 fontSize: '8pt', // Reducido de tamaño
-                lineHeight: '1.2', // Reducido
+                lineHeight: '1.1', // Reducido
                 paddingLeft: '5px',
                 whiteSpace: 'pre-wrap', // Preservar espacios y saltos de línea
                 wordBreak: 'break-word'
@@ -217,14 +217,14 @@ function generarPDFCorregido() {
             }},
             { selector: 'h2', estilos: {
                 pageBreakBefore: 'always',
-                marginTop: '15px', // Reducido
-                paddingTop: '8px', // Reducido
-                fontSize: '14pt' // Tamaño reducido
+                marginTop: '12px', // Reducido
+                paddingTop: '6px', // Reducido
+                fontSize: '12pt' // Tamaño reducido
             }},
             { selector: 'h3', estilos: {
-                fontSize: '12pt', // Tamaño reducido
-                marginTop: '12px', // Reducido
-                marginBottom: '5px' // Reducido
+                fontSize: '10pt', // Tamaño reducido
+                marginTop: '10px', // Reducido
+                marginBottom: '4px' // Reducido
             }},
             { selector: 'table', estilos: {
                 pageBreakInside: 'auto'
@@ -272,8 +272,8 @@ function generarPDFCorregido() {
             
             // No modificar elementos que ya tengan estilos específicos establecidos
             if (!el.classList.contains('result') && !el.classList.contains('header-row')) {
-                el.style.fontSize = '10pt'; // Tamaño reducido
-                el.style.lineHeight = '1.3'; // Ajustar interlineado
+                el.style.fontSize = '8pt'; // Tamaño reducido
+                el.style.lineHeight = '1.1'; // Ajustar interlineado
             }
         });
         
@@ -291,7 +291,7 @@ function generarPDFCorregido() {
                 color-adjust: exact !important;
             }
             .container {
-                font-size: 10pt !important; /* Reducido de 12pt */
+                font-size: 8pt !important; /* Reducido de 12pt */
                 width: 100% !important;
                 max-width: 100% !important;
                 padding: 0 !important;
@@ -323,11 +323,11 @@ function generarPDFCorregido() {
                 font-size: 9pt !important; /* Reducido */
             }
             th {
-                font-size: 9.5pt !important; /* Reducido */
+                font-size: 7.5pt !important; /* Reducido */
             }
             td {
-                font-size: 9pt !important; /* Reducido */
-                padding: 5px 8px !important; /* Reducido */
+                font-size: 8pt !important; /* Reducido */
+                padding: 3px 5px !important; /* Reducido */
             }
             tr {
                 page-break-inside: avoid !important;
@@ -392,8 +392,8 @@ function generarPDFCorregido() {
             }
             
             .result {
-                font-size: 12pt !important; /* Reducido */
-                padding: 15px !important; /* Reducido */
+                font-size: 10pt !important; /* Reducido */
+                padding: 10px !important; /* Reducido */
             }
             
             /* Ajustar resumen automático */
