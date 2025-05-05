@@ -903,7 +903,7 @@ function agregarMetadatosYNumeracion(pdf) {
                 pdf.addImage(logoImg, 'PNG', 10, 3, logoWidth, logoHeight);
                 
                 // Configuración de texto para el pie de página
-                pdf.setFontSize(7); // Tamaño reducido
+                pdf.setFontSize(9); // Tamaño reducido
                 pdf.setTextColor(100, 100, 100);
                 
                 // Texto de numeración
