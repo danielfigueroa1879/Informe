@@ -131,48 +131,78 @@ function generarPDFCorregido() {
             el.style.display = 'none';
         });
         
-        // 3. Forzar saltos de página antes de las secciones específicas
-        const seccionResumen = container.querySelector('#seccion-resumen');
-        const seccionFotos = container.querySelector('#seccion-fotos');
-        
-        // Asegurarse de que la sección de resumen tenga un salto de página forzado
-        if (seccionResumen) {
-            if (!seccionResumen.classList.contains('forced-page-break')) {
-                seccionResumen.classList.add('forced-page-break');
-            }
-            seccionResumen.style.pageBreakBefore = 'always';
-            seccionResumen.style.breakBefore = 'page';
-        }
-        
+       // 3. MODIFICADO: Forzar saltos de página antes de las secciones específicas
+const seccionResumen = container.querySelector('#seccion-resumen');
+const seccionFotos = container.querySelector('#seccion-fotos');
+const resumenTitulo = container.querySelector('h2:contains("RESUMEN DE FISCALIZACIÓN")');
+
+// Asegurarse de que la sección de resumen tenga un salto de página forzado
+if (seccionResumen) {
+    if (!seccionResumen.classList.contains('forced-page-break')) {
+        seccionResumen.classList.add('forced-page-break');
+    }
+    seccionResumen.style.pageBreakBefore = 'always';
+    seccionResumen.style.breakBefore = 'page';
+    // Añadir más propiedades para forzar el salto
+    seccionResumen.style.display = 'block';
+    seccionResumen.style.height = '1px';
+    seccionResumen.style.margin = '0';
+    seccionResumen.style.clear = 'both';
+}
+
+// También buscar el título específico del resumen
+const titulosResumen = Array.from(container.querySelectorAll('h2')).filter(h2 => 
+    h2.textContent.includes('RESUMEN DE FISCALIZACIÓN')
+);
+if (titulosResumen.length > 0) {
+    titulosResumen.forEach(titulo => {
+        titulo.style.pageBreakBefore = 'always';
+        titulo.style.breakBefore = 'page';
+        titulo.style.marginTop = '20px';
+    });
+}
         // Asegurarse de que la sección de fotos tenga un salto de página forzado
-        if (seccionFotos) {
-            if (!seccionFotos.classList.contains('forced-page-break')) {
-                seccionFotos.classList.add('forced-page-break');
-            }
-            seccionFotos.style.pageBreakBefore = 'always';
-            seccionFotos.style.breakBefore = 'page';
-        }
+if (seccionFotos) {
+    if (!seccionFotos.classList.contains('forced-page-break')) {
+        seccionFotos.classList.add('forced-page-break');
+    }
+    seccionFotos.style.pageBreakBefore = 'always';
+    seccionFotos.style.breakBefore = 'page';
+    // Añadir más propiedades para forzar el salto
+    seccionFotos.style.display = 'block';
+    seccionFotos.style.height = '1px';
+    seccionFotos.style.margin = '0';
+    seccionFotos.style.clear = 'both';
+}
+
+// Buscar específicamente el título "SET FOTOGRÁFICO"
+const titulosFotos = Array.from(container.querySelectorAll('h2')).filter(h2 => 
+    h2.textContent.includes('SET FOTOGRÁFICO')
+);
+if (titulosFotos.length > 0) {
+    titulosFotos.forEach(titulo => {
+        titulo.style.pageBreakBefore = 'always';
+        titulo.style.breakBefore = 'page';
+        titulo.style.marginTop = '20px';
         
-        // Asegurarse de que la sección de recomendaciones esté en una página separada
-        // Buscar el encabezado de recomendaciones dentro del summary
-        const seccionRecomendaciones = container.querySelector('.summary h3:nth-of-type(2)');
-        if (seccionRecomendaciones) {
-            // Crear un div para el salto de página antes de las recomendaciones
-            const divSalto = document.createElement('div');
-            divSalto.className = 'forced-page-break';
-            divSalto.style.pageBreakBefore = 'always';
-            divSalto.style.breakBefore = 'page';
-            divSalto.style.height = '1px';
-            divSalto.style.margin = '0';
-            divSalto.style.padding = '0';
-            
-            // Insertar antes del encabezado de recomendaciones
-            seccionRecomendaciones.parentNode.insertBefore(divSalto, seccionRecomendaciones);
-            
-            // Registrar este elemento para eliminarlo después
-            estadoOriginal.elementosCreados.push(divSalto);
-        }
+        // Añadir una línea separadora invisible antes del título para forzar salto
+        const separadorFotos = document.createElement('div');
+        separadorFotos.className = 'forced-page-break-strong';
+        separadorFotos.style.pageBreakBefore = 'always';
+        separadorFotos.style.breakBefore = 'page';
+        separadorFotos.style.margin = '0';
+        separadorFotos.style.padding = '0';
+        separadorFotos.style.height = '1px';
+        separadorFotos.style.visibility = 'hidden';
         
+        // Insertarlo justo antes del elemento
+        if (titulo.parentNode) {
+            titulo.parentNode.insertBefore(separadorFotos, titulo);
+            // Registrar para eliminar después
+            estadoOriginal.elementosCreados.push(separadorFotos);
+        }
+    });
+}
         // 4. Mejorar el manejo de las textareas (observaciones)
         const textareas = container.querySelectorAll('textarea');
         textareas.forEach(textarea => {
