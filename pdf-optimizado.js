@@ -131,79 +131,48 @@ function generarPDFCorregido() {
             el.style.display = 'none';
         });
         
-       // 3. MODIFICADO: Forzar saltos de página antes de las secciones específicas
-const seccionResumen = container.querySelector('#seccion-resumen');
-const seccionFotos = container.querySelector('#seccion-fotos');
-const resumenTitulo = container.querySelector('h2:contains("RESUMEN DE FISCALIZACIÓN")');
-
-// Asegurarse de que la sección de resumen tenga un salto de página forzado
-if (seccionResumen) {
-    if (!seccionResumen.classList.contains('forced-page-break')) {
-        seccionResumen.classList.add('forced-page-break');
-    }
-    seccionResumen.style.pageBreakBefore = 'always';
-    seccionResumen.style.breakBefore = 'page';
-    // Añadir más propiedades para forzar el salto
-    seccionResumen.style.display = 'block';
-    seccionResumen.style.height = '1px';
-    seccionResumen.style.margin = '0';
-    seccionResumen.style.clear = 'both';
-}
-
-// También buscar el título específico del resumen
-const titulosResumen = Array.from(container.querySelectorAll('h2')).filter(h2 => 
-    h2.textContent.includes('RESUMEN DE FISCALIZACIÓN')
-);
-if (titulosResumen.length > 0) {
-    titulosResumen.forEach(titulo => {
-        titulo.style.pageBreakBefore = 'always';
-        titulo.style.breakBefore = 'page';
-        titulo.style.marginTop = '20px';
-    });
-}
-        // Asegurarse de que la sección de fotos tenga un salto de página forzado
-if (seccionFotos) {
-    if (!seccionFotos.classList.contains('forced-page-break')) {
-        seccionFotos.classList.add('forced-page-break');
-    }
-    seccionFotos.style.pageBreakBefore = 'always';
-    seccionFotos.style.breakBefore = 'page';
-    // Añadir más propiedades para forzar el salto
-    seccionFotos.style.display = 'block';
-    seccionFotos.style.height = '1px';
-    seccionFotos.style.margin = '0';
-    seccionFotos.style.clear = 'both';
-}
-
-// Buscar específicamente el título "SET FOTOGRÁFICO"
-const titulosFotos = Array.from(container.querySelectorAll('h2')).filter(h2 => 
-    h2.textContent.includes('SET FOTOGRÁFICO')
-);
-if (titulosFotos.length > 0) {
-    titulosFotos.forEach(titulo => {
-        titulo.style.pageBreakBefore = 'always';
-        titulo.style.breakBefore = 'page';
-        titulo.style.marginTop = '20px';
+        // 3. Forzar saltos de página antes de las secciones específicas
+        const seccionResumen = container.querySelector('#seccion-resumen');
+        const seccionFotos = container.querySelector('#seccion-fotos');
         
-        // Añadir una línea separadora invisible antes del título para forzar salto
-        const separadorFotos = document.createElement('div');
-        separadorFotos.className = 'forced-page-break-strong';
-        separadorFotos.style.pageBreakBefore = 'always';
-        separadorFotos.style.breakBefore = 'page';
-        separadorFotos.style.margin = '0';
-        separadorFotos.style.padding = '0';
-        separadorFotos.style.height = '1px';
-        separadorFotos.style.visibility = 'hidden';
-        
-        // Insertarlo justo antes del elemento
-        if (titulo.parentNode) {
-            titulo.parentNode.insertBefore(separadorFotos, titulo);
-            // Registrar para eliminar después
-            estadoOriginal.elementosCreados.push(separadorFotos);
+        // Asegurarse de que la sección de resumen tenga un salto de página forzado
+        if (seccionResumen) {
+            if (!seccionResumen.classList.contains('forced-page-break')) {
+                seccionResumen.classList.add('forced-page-break');
+            }
+            seccionResumen.style.pageBreakBefore = 'always';
+            seccionResumen.style.breakBefore = 'page';
         }
-    });
-}
-       
+        
+        // Asegurarse de que la sección de fotos tenga un salto de página forzado
+        if (seccionFotos) {
+            if (!seccionFotos.classList.contains('forced-page-break')) {
+                seccionFotos.classList.add('forced-page-break');
+            }
+            seccionFotos.style.pageBreakBefore = 'always';
+            seccionFotos.style.breakBefore = 'page';
+        }
+        
+        // Asegurarse de que la sección de recomendaciones esté en una página separada
+        // Buscar el encabezado de recomendaciones dentro del summary
+        const seccionRecomendaciones = container.querySelector('.summary h3:nth-of-type(2)');
+        if (seccionRecomendaciones) {
+            // Crear un div para el salto de página antes de las recomendaciones
+            const divSalto = document.createElement('div');
+            divSalto.className = 'forced-page-break';
+            divSalto.style.pageBreakBefore = 'always';
+            divSalto.style.breakBefore = 'page';
+            divSalto.style.height = '1px';
+            divSalto.style.margin = '0';
+            divSalto.style.padding = '0';
+            
+            // Insertar antes del encabezado de recomendaciones
+            seccionRecomendaciones.parentNode.insertBefore(divSalto, seccionRecomendaciones);
+            
+            // Registrar este elemento para eliminarlo después
+            estadoOriginal.elementosCreados.push(divSalto);
+        }
+        
         // 4. Mejorar el manejo de las textareas (observaciones)
         const textareas = container.querySelectorAll('textarea');
         textareas.forEach(textarea => {
@@ -238,25 +207,25 @@ if (titulosFotos.length > 0) {
         });
         
         // 4. Aplicar estilos óptimos para la impresión
-      const elementosEstilizar = [
-    { selector: '.forced-page-break', estilos: {
-        display: 'block',
-        height: '1px',
-        pageBreakBefore: 'always',
-        margin: '0',
-        padding: '0'
-    }},
-    { selector: 'h2', estilos: {
-        pageBreakBefore: 'always',
-        marginTop: '12px', // MODIFICADO: Reducido aún más
-        paddingTop: '6px', // MODIFICADO: Reducido aún más
-        fontSize: '12pt' // MODIFICADO: Reducido aún más
-    }},
-    { selector: 'h3', estilos: {
-        fontSize: '10pt', // MODIFICADO: Reducido aún más
-        marginTop: '10px', // MODIFICADO: Reducido aún más
-        marginBottom: '4px' // MODIFICADO: Reducido aún más
-    }},
+        const elementosEstilizar = [
+            { selector: '.forced-page-break', estilos: {
+                display: 'block',
+                height: '1px',
+                pageBreakBefore: 'always',
+                margin: '0',
+                padding: '0'
+            }},
+            { selector: 'h2', estilos: {
+                pageBreakBefore: 'always',
+                marginTop: '15px', // Reducido
+                paddingTop: '8px', // Reducido
+                fontSize: '14pt' // Tamaño reducido
+            }},
+            { selector: 'h3', estilos: {
+                fontSize: '12pt', // Tamaño reducido
+                marginTop: '12px', // Reducido
+                marginBottom: '5px' // Reducido
+            }},
             { selector: 'table', estilos: {
                 pageBreakInside: 'auto'
             }},
@@ -307,41 +276,6 @@ if (titulosFotos.length > 0) {
                 el.style.lineHeight = '1.3'; // Ajustar interlineado
             }
         });
-
-// NUEVO: Reducir específicamente el tamaño del resumen automático
-const resumenAutomatico = container.querySelector('#resumen-automatico');
-if (resumenAutomatico) {
-    estadoOriginal.estilos.set(resumenAutomatico, {
-        fontSize: resumenAutomatico.style.fontSize,
-        lineHeight: resumenAutomatico.style.lineHeight
-    });
-    
-    resumenAutomatico.style.fontSize = '8pt'; // Muy reducido para el resumen
-    resumenAutomatico.style.lineHeight = '1.1'; // Interlineado muy compacto
-    
-    // También reducir elementos internos del resumen
-    const elementosResumen = resumenAutomatico.querySelectorAll('p, li, ul, span, strong');
-    elementosResumen.forEach(el => {
-        estadoOriginal.estilos.set(el, {
-            fontSize: el.style.fontSize,
-            lineHeight: el.style.lineHeight,
-            marginBottom: el.style.marginBottom
-        });
-        
-        el.style.fontSize = '8pt'; // Muy reducido
-        el.style.lineHeight = '1.1'; // Interlineado muy compacto
-        el.style.marginBottom = '2px'; // Reducir espacios entre párrafos
-    });
-    
-    // Reducir aún más los elementos de segundo nivel (sublistas)
-    const subElementosResumen = resumenAutomatico.querySelectorAll('ul ul li, .no-cumple-tag');
-    subElementosResumen.forEach(el => {
-        el.style.fontSize = '7.5pt'; // Extremadamente reducido
-        el.style.lineHeight = '1'; // Sin espacio adicional
-        el.style.marginBottom = '1px'; // Mínimo margen
-    });
-}
-        
         
         // 6. Añadir una hoja de estilos temporal con reglas específicas para PDF
         const estilosTemporales = document.createElement('style');
@@ -462,42 +396,22 @@ if (resumenAutomatico) {
                 padding: 15px !important; /* Reducido */
             }
             
-            /* MODIFICADO: Ajustar resumen automático con texto mucho más pequeño */
-#resumen-automatico {
-    font-size: 8pt !important; /* MODIFICADO: Reducido de 9pt */
-    line-height: 1.1 !important; /* MODIFICADO: Reducido de 1.3 */
-    padding: 8px !important; /* MODIFICADO: Añadido padding reducido */
-}
-
-#resumen-automatico strong {
-    font-size: 8pt !important; /* MODIFICADO: Mismo tamaño que el texto normal */
-}
-
-#resumen-automatico ul {
-    margin: 4px 0 !important; /* MODIFICADO: Reducido */
-    padding-left: 12px !important; /* MODIFICADO: Reducido */
-}
-
-#resumen-automatico ul li {
-    font-size: 8pt !important; /* MODIFICADO: Reducido de 9pt */
-    margin-bottom: 2px !important; /* MODIFICADO: Reducido de 3px */
-}
-
-#resumen-automatico ul ul {
-    margin: 2px 0 !important; /* MODIFICADO: Reducido */
-    padding-left: 10px !important; /* MODIFICADO: Reducido */
-}
-
-#resumen-automatico ul ul li {
-    font-size: 7.5pt !important; /* MODIFICADO: Reducido de 8.5pt */
-    line-height: 1 !important; /* MODIFICADO: Reducido de 1.2 */
-    margin-bottom: 1px !important; /* MODIFICADO: Reducido */
-}
-
-#resumen-automatico .no-cumple-tag {
-    font-size: 7pt !important; /* MODIFICADO: Muy reducido */
-    margin-left: 2px !important; /* MODIFICADO: Reducido */
-}
+            /* Ajustar resumen automático */
+            #resumen-automatico {
+                font-size: 9pt !important; /* Reducido */
+                line-height: 1.3 !important; /* Reducido */
+            }
+            
+            #resumen-automatico ul li {
+                font-size: 9pt !important; /* Reducido */
+                margin-bottom: 3px !important; /* Reducido */
+            }
+            
+            #resumen-automatico ul ul li {
+                font-size: 8.5pt !important; /* Reducido */
+                line-height: 1.2 !important; /* Reducido */
+            }
+            
             /* Ajustar plan de acción para formato tipo oficio formal */
             #plan-accion-editor {
                 font-size: 11pt !important; /* Reducido */
