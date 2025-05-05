@@ -276,6 +276,41 @@ function generarPDFCorregido() {
                 el.style.lineHeight = '1.3'; // Ajustar interlineado
             }
         });
+
+// NUEVO: Reducir específicamente el tamaño del resumen automático
+const resumenAutomatico = container.querySelector('#resumen-automatico');
+if (resumenAutomatico) {
+    estadoOriginal.estilos.set(resumenAutomatico, {
+        fontSize: resumenAutomatico.style.fontSize,
+        lineHeight: resumenAutomatico.style.lineHeight
+    });
+    
+    resumenAutomatico.style.fontSize = '8pt'; // Muy reducido para el resumen
+    resumenAutomatico.style.lineHeight = '1.1'; // Interlineado muy compacto
+    
+    // También reducir elementos internos del resumen
+    const elementosResumen = resumenAutomatico.querySelectorAll('p, li, ul, span, strong');
+    elementosResumen.forEach(el => {
+        estadoOriginal.estilos.set(el, {
+            fontSize: el.style.fontSize,
+            lineHeight: el.style.lineHeight,
+            marginBottom: el.style.marginBottom
+        });
+        
+        el.style.fontSize = '8pt'; // Muy reducido
+        el.style.lineHeight = '1.1'; // Interlineado muy compacto
+        el.style.marginBottom = '2px'; // Reducir espacios entre párrafos
+    });
+    
+    // Reducir aún más los elementos de segundo nivel (sublistas)
+    const subElementosResumen = resumenAutomatico.querySelectorAll('ul ul li, .no-cumple-tag');
+    subElementosResumen.forEach(el => {
+        el.style.fontSize = '7.5pt'; // Extremadamente reducido
+        el.style.lineHeight = '1'; // Sin espacio adicional
+        el.style.marginBottom = '1px'; // Mínimo margen
+    });
+}
+        
         
         // 6. Añadir una hoja de estilos temporal con reglas específicas para PDF
         const estilosTemporales = document.createElement('style');
@@ -396,22 +431,42 @@ function generarPDFCorregido() {
                 padding: 15px !important; /* Reducido */
             }
             
-            /* Ajustar resumen automático */
-            #resumen-automatico {
-                font-size: 9pt !important; /* Reducido */
-                line-height: 1.3 !important; /* Reducido */
-            }
-            
-            #resumen-automatico ul li {
-                font-size: 9pt !important; /* Reducido */
-                margin-bottom: 3px !important; /* Reducido */
-            }
-            
-            #resumen-automatico ul ul li {
-                font-size: 8.5pt !important; /* Reducido */
-                line-height: 1.2 !important; /* Reducido */
-            }
-            
+            /* MODIFICADO: Ajustar resumen automático con texto mucho más pequeño */
+#resumen-automatico {
+    font-size: 8pt !important; /* MODIFICADO: Reducido de 9pt */
+    line-height: 1.1 !important; /* MODIFICADO: Reducido de 1.3 */
+    padding: 8px !important; /* MODIFICADO: Añadido padding reducido */
+}
+
+#resumen-automatico strong {
+    font-size: 8pt !important; /* MODIFICADO: Mismo tamaño que el texto normal */
+}
+
+#resumen-automatico ul {
+    margin: 4px 0 !important; /* MODIFICADO: Reducido */
+    padding-left: 12px !important; /* MODIFICADO: Reducido */
+}
+
+#resumen-automatico ul li {
+    font-size: 8pt !important; /* MODIFICADO: Reducido de 9pt */
+    margin-bottom: 2px !important; /* MODIFICADO: Reducido de 3px */
+}
+
+#resumen-automatico ul ul {
+    margin: 2px 0 !important; /* MODIFICADO: Reducido */
+    padding-left: 10px !important; /* MODIFICADO: Reducido */
+}
+
+#resumen-automatico ul ul li {
+    font-size: 7.5pt !important; /* MODIFICADO: Reducido de 8.5pt */
+    line-height: 1 !important; /* MODIFICADO: Reducido de 1.2 */
+    margin-bottom: 1px !important; /* MODIFICADO: Reducido */
+}
+
+#resumen-automatico .no-cumple-tag {
+    font-size: 7pt !important; /* MODIFICADO: Muy reducido */
+    margin-left: 2px !important; /* MODIFICADO: Reducido */
+}
             /* Ajustar plan de acción para formato tipo oficio formal */
             #plan-accion-editor {
                 font-size: 11pt !important; /* Reducido */
