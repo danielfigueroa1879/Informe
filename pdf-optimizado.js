@@ -862,122 +862,164 @@ if (resumenAutomatico) {
                 restaurarDocumentoOriginal(estadoOriginal);
             });
     }
-    
+
     // Función para agregar metadatos, numeración y logo a cada página del PDF
-    function agregarMetadatosYNumeracion(pdf) {
-        try {
-            // Añadir metadatos
-            pdf.setProperties({
-                title: 'Cuadro de Fiscalización de Seguridad Privada',
-                subject: 'Informe de Fiscalización',
-                author: document.querySelector('input[name="fiscalizador"]')?.value || 'Sistema de Fiscalización',
-                keywords: 'seguridad, fiscalización, informe',
-                creator: 'Sistema PDF Optimizado'
-            });
+function agregarMetadatosYNumeracion(pdf) {
+    try {
+        // Añadir metadatos
+        pdf.setProperties({
+            title: 'Cuadro de Fiscalización de Seguridad Privada',
+            subject: 'Informe de Fiscalización',
+            author: document.querySelector('input[name="fiscalizador"]')?.value || 'Sistema de Fiscalización',
+            keywords: 'seguridad, fiscalización, informe',
+            creator: 'Sistema PDF Optimizado'
+        });
+        
+        // Obtener el logo
+        const logoUrl = 'https://raw.githubusercontent.com/danielfigueroa1879/Informe/716839bc31f50a5931d586f5a1a482ca2836bb3c/logo-os10.png';
+        
+        // Cargar la imagen como objeto para poder dibujarla en cada página
+        const logoImg = new Image();
+        logoImg.src = logoUrl;
+        
+        // Esperar a que la imagen se cargue antes de continuar
+        logoImg.onload = function() {
+            // Procesar cada página del PDF
+            const totalPaginas = pdf.internal.getNumberOfPages();
             
-            // Obtener el logo
-            const logoUrl = 'https://raw.githubusercontent.com/danielfigueroa1879/Informe/716839bc31f50a5931d586f5a1a482ca2836bb3c/logo-os10.png';
+            for (let i = 1; i <= totalPaginas; i++) {
+                pdf.setPage(i);
+                
+                // Obtener dimensiones de la página
+                const pageSize = pdf.internal.pageSize;
+                const pageWidth = pageSize.width ? pageSize.width : pageSize.getWidth();
+                const pageHeight = pageSize.height ? pageSize.height : pageSize.getHeight();
+                
+                // Añadir logo en la esquina superior izquierda de cada página
+                const logoWidth = 22; // Ancho en mm reducido
+                const aspectRatio = logoImg.height / logoImg.width;
+                const logoHeight = logoWidth * aspectRatio; // Mantener proporción
+                
+                pdf.addImage(logoImg, 'PNG', 10, 3, logoWidth, logoHeight);
+                
+                // Configuración de texto para el pie de página
+                pdf.setFontSize(7); // Tamaño reducido
+                pdf.setTextColor(100, 100, 100);
+                
+                // Texto de numeración
+                const texto = `Página ${i} de ${totalPaginas}`;
+                
+                // Posicionar en la esquina inferior derecha
+                const textWidth = pdf.getStringUnitWidth(texto) * 7 / pdf.internal.scaleFactor;
+                const x = pageWidth - textWidth - 12;
+                const y = pageHeight - 8;
+                
+                // Añadir el texto de numeración
+                pdf.text(texto, x, y);
+                
+                // Añadir fecha de generación junto al número de página
+                const fechaActual = new Date().toLocaleDateString();
+                const textoFecha = `Generado: ${fechaActual}`;
+                pdf.text(textoFecha, 12, y);
+                
+                // NUEVO: Texto "Seguridad Privada" centrado en el pie de página
+                pdf.setFontSize(6); // Extremadamente pequeño
+                pdf.setTextColor(120, 120, 120); // Color gris claro
+                
+                // Texto a añadir
+                const textoSeguridad = "Seguridad Privada";
+                
+                // Calcular posición centrada
+                const textoSeguridadWidth = pdf.getStringUnitWidth(textoSeguridad) * 6 / pdf.internal.scaleFactor;
+                const xCentrado = (pageWidth - textoSeguridadWidth) / 2;
+                const yAbajo = pageHeight - 5; // 5mm desde el borde inferior
+                
+                // Añadir el texto centrado
+                pdf.text(textoSeguridad, xCentrado, yAbajo);
+            }
             
-            // Cargar la imagen como objeto para poder dibujarla en cada página
-            const logoImg = new Image();
-            logoImg.src = logoUrl;
-            
-            // Esperar a que la imagen se cargue antes de continuar
-            logoImg.onload = function() {
-                // Procesar cada página del PDF
-                const totalPaginas = pdf.internal.getNumberOfPages();
-                
-                for (let i = 1; i <= totalPaginas; i++) {
-                    pdf.setPage(i);
-                    
-                    // Obtener dimensiones de la página
-                    const pageSize = pdf.internal.pageSize;
-                    const pageWidth = pageSize.width ? pageSize.width : pageSize.getWidth();
-                    const pageHeight = pageSize.height ? pageSize.height : pageSize.getHeight();
-                    
-                    // Añadir logo en la esquina superior izquierda de cada página
-                    const logoWidth = 25; // Ancho en mm
-                    const aspectRatio = logoImg.height / logoImg.width;
-                    const logoHeight = logoWidth * aspectRatio; // Mantener proporción
-                    
-                    pdf.addImage(logoImg, 'PNG', 10, 3, logoWidth, logoHeight);
-                    
-                    // Configuración de texto para el pie de página
-                    pdf.setFontSize(8);
-                    pdf.setTextColor(100, 100, 100);
-                    
-                    // Texto de numeración
-                    const texto = `Página ${i} de ${totalPaginas}`;
-                    
-                    // Posicionar en la esquina inferior derecha
-                    const textWidth = pdf.getStringUnitWidth(texto) * 8 / pdf.internal.scaleFactor;
-                    const x = pageWidth - textWidth - 15;
-                    const y = pageHeight - 10;
-                    
-                    // Añadir el texto
-                    pdf.text(texto, x, y);
-                }
-                
-                // Guardar el PDF después de procesar todas las páginas
-                pdf.save(`Fiscalizacion_${new Date().toLocaleDateString().replace(/\//g, '-')}.pdf`);
-                
-                // Ahora, después de guardar correctamente, actualizamos el indicador de éxito
-                console.log("PDF generado exitosamente");
-                actualizarIndicadorExito();
-            };
-            
-            // Manejar errores de carga de imagen
-            logoImg.onerror = function() {
-                console.warn("Error al cargar el logo. Continuando sin logo en las páginas...");
-                
-                // Procesar el PDF sin logo
-                const totalPaginas = pdf.internal.getNumberOfPages();
-                for (let i = 1; i <= totalPaginas; i++) {
-                    pdf.setPage(i);
-                    
-                    // Obtener dimensiones de la página
-                    const pageSize = pdf.internal.pageSize;
-                    const pageWidth = pageSize.width ? pageSize.width : pageSize.getWidth();
-                    const pageHeight = pageSize.height ? pageSize.height : pageSize.getHeight();
-                    
-                    // Configuración de texto para el pie de página
-                    pdf.setFontSize(8);
-                    pdf.setTextColor(100, 100, 100);
-                    
-                    // Texto de numeración
-                    const texto = `Página ${i} de ${totalPaginas}`;
-                    
-                    // Posicionar en la esquina inferior derecha
-                    const textWidth = pdf.getStringUnitWidth(texto) * 8 / pdf.internal.scaleFactor;
-                    const x = pageWidth - textWidth - 15;
-                    const y = pageHeight - 10;
-                    
-                    // Añadir el texto
-                    pdf.text(texto, x, y);
-                }
-                
-                // Guardar el PDF
-                pdf.save(`Fiscalizacion_${new Date().toLocaleDateString().replace(/\//g, '-')}.pdf`);
-                
-                // Actualizar indicador de éxito
-                console.log("PDF generado exitosamente (sin logo)");
-                actualizarIndicadorExito();
-            };
-            
-            // Importante: Esta función es asíncrona debido a la carga de la imagen
-            // Por lo tanto, no debemos guardar el PDF aquí, sino en los callbacks
-            return true;
-        } catch (error) {
-            console.warn("Error al añadir metadatos, numeración o logo:", error);
-            // En caso de error, guardar el PDF sin características especiales
+            // Guardar el PDF después de procesar todas las páginas
             pdf.save(`Fiscalizacion_${new Date().toLocaleDateString().replace(/\//g, '-')}.pdf`);
             
-            // Actualizar indicador aun así
+            // Ahora, después de guardar correctamente, actualizamos el indicador de éxito
+            console.log("PDF generado exitosamente");
             actualizarIndicadorExito();
-            return false;
-        }
+        };
+        
+        // Manejar errores de carga de imagen
+        logoImg.onerror = function() {
+            console.warn("Error al cargar el logo. Continuando sin logo en las páginas...");
+            
+            // Procesar el PDF sin logo
+            const totalPaginas = pdf.internal.getNumberOfPages();
+            for (let i = 1; i <= totalPaginas; i++) {
+                pdf.setPage(i);
+                
+                // Obtener dimensiones de la página
+                const pageSize = pdf.internal.pageSize;
+                const pageWidth = pageSize.width ? pageSize.width : pageSize.getWidth();
+                const pageHeight = pageSize.height ? pageSize.height : pageSize.getHeight();
+                
+                // Configuración de texto para el pie de página
+                pdf.setFontSize(7); // Tamaño reducido
+                pdf.setTextColor(100, 100, 100);
+                
+                // Texto de numeración
+                const texto = `Página ${i} de ${totalPaginas}`;
+                
+                // Posicionar en la esquina inferior derecha
+                const textWidth = pdf.getStringUnitWidth(texto) * 7 / pdf.internal.scaleFactor;
+                const x = pageWidth - textWidth - 12;
+                const y = pageHeight - 8;
+                
+                // Añadir el texto
+                pdf.text(texto, x, y);
+                
+                // Añadir fecha de generación junto al número de página
+                const fechaActual = new Date().toLocaleDateString();
+                const textoFecha = `Generado: ${fechaActual}`;
+                pdf.text(textoFecha, 12, y);
+                
+                // NUEVO: Texto "Seguridad Privada" centrado en el pie de página
+                pdf.setFontSize(6); // Extremadamente pequeño
+                pdf.setTextColor(120, 120, 120); // Color gris claro
+                
+                // Texto a añadir
+                const textoSeguridad = "Seguridad Privada O.S.10 Coquimbo";
+                
+                // Calcular posición centrada
+                const textoSeguridadWidth = pdf.getStringUnitWidth(textoSeguridad) * 6 / pdf.internal.scaleFactor;
+                const xCentrado = (pageWidth - textoSeguridadWidth) / 2;
+                const yAbajo = pageHeight - 5; // 5mm desde el borde inferior
+                
+                // Añadir el texto centrado
+                pdf.text(textoSeguridad, xCentrado, yAbajo);
+            }
+            
+            // Guardar el PDF
+            pdf.save(`Fiscalizacion_${new Date().toLocaleDateString().replace(/\//g, '-')}.pdf`);
+            
+            // Actualizar indicador de éxito
+            console.log("PDF generado exitosamente (sin logo)");
+            actualizarIndicadorExito();
+        };
+        
+        // Importante: Esta función es asíncrona debido a la carga de la imagen
+        // Por lo tanto, no debemos guardar el PDF aquí, sino en los callbacks
+        return true;
+    } catch (error) {
+        console.warn("Error al añadir metadatos, numeración o logo:", error);
+        // En caso de error, guardar el PDF sin características especiales
+        pdf.save(`Fiscalizacion_${new Date().toLocaleDateString().replace(/\//g, '-')}.pdf`);
+        
+        // Actualizar indicador aun así
+        actualizarIndicadorExito();
+        return false;
     }
+}
+
     
+     
     // Función para restaurar el documento a su estado original
     function restaurarDocumentoOriginal(estadoOriginal) {
         console.log("Restaurando documento a su estado original...");
