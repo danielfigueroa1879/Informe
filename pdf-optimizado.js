@@ -919,7 +919,7 @@ function agregarMetadatosYNumeracion(pdf) {
                 
                              
                 // NUEVO: Texto "Seguridad Privada" centrado en el pie de página
-                pdf.setFontSize(6); // Extremadamente pequeño
+                pdf.setFontSize(8); // Extremadamente pequeño
                 pdf.setTextColor(120, 120, 120); // Color gris claro
                 
                 // Texto a añadir
