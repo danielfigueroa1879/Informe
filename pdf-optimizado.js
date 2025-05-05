@@ -207,25 +207,25 @@ function generarPDFCorregido() {
         });
         
         // 4. Aplicar estilos óptimos para la impresión
-        const elementosEstilizar = [
-            { selector: '.forced-page-break', estilos: {
-                display: 'block',
-                height: '1px',
-                pageBreakBefore: 'always',
-                margin: '0',
-                padding: '0'
-            }},
-            { selector: 'h2', estilos: {
-                pageBreakBefore: 'always',
-                marginTop: '15px', // Reducido
-                paddingTop: '8px', // Reducido
-                fontSize: '14pt' // Tamaño reducido
-            }},
-            { selector: 'h3', estilos: {
-                fontSize: '12pt', // Tamaño reducido
-                marginTop: '12px', // Reducido
-                marginBottom: '5px' // Reducido
-            }},
+      const elementosEstilizar = [
+    { selector: '.forced-page-break', estilos: {
+        display: 'block',
+        height: '1px',
+        pageBreakBefore: 'always',
+        margin: '0',
+        padding: '0'
+    }},
+    { selector: 'h2', estilos: {
+        pageBreakBefore: 'always',
+        marginTop: '12px', // MODIFICADO: Reducido aún más
+        paddingTop: '6px', // MODIFICADO: Reducido aún más
+        fontSize: '12pt' // MODIFICADO: Reducido aún más
+    }},
+    { selector: 'h3', estilos: {
+        fontSize: '10pt', // MODIFICADO: Reducido aún más
+        marginTop: '10px', // MODIFICADO: Reducido aún más
+        marginBottom: '4px' // MODIFICADO: Reducido aún más
+    }},
             { selector: 'table', estilos: {
                 pageBreakInside: 'auto'
             }},
