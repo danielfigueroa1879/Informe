@@ -262,9 +262,9 @@ tablas.forEach(tabla => {
         margin: tabla.style.margin
     });
     
-    tabla.style.width = '98%'; // Ligeramente reducido para evitar desbordamientos
-    tabla.style.marginLeft = '0';
-    tabla.style.marginRight = '0';
+    tabla.style.width = '96%'; // Ligeramente reducido para evitar desbordamientos
+    tabla.style.marginLeft = '1%'; // Margen izquierdo para centrar
+    tabla.style.marginRight = '1%'; // Margen derecho para centrar
 });
 
 // MODIFICADO: Reducir el ancho de las columnas de check
@@ -275,8 +275,8 @@ columnasCheck.forEach(col => {
         padding: col.style.padding
     });
     
-    col.style.width = '35px'; // Reducido para ganar espacio
-    col.style.padding = '2px 1px';
+    col.style.width = '45px'; // Reducido para ganar espacio
+    col.style.padding = '2px 2px';
 });
 
 
@@ -446,6 +446,13 @@ columnasCheck.forEach(col => {
                 font-size: 10pt !important; /* Reducido */
                 margin: 8px 0 !important; /* Reducido */
             }
+            /* Reducir tamaño de los botones de radio */
+input[type="radio"] {
+    width: 14px !important; /* Reducido de 20px aproximadamente */
+    height: 14px !important; /* Reducido de 20px aproximadamente */
+    margin: 0 auto !important;
+    vertical-align: middle !important;
+}
             
             /* Reducir específicamente el tamaño del texto en los campos de entrada */
             .info-section input[type="text"] {
