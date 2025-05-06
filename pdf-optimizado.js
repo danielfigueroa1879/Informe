@@ -400,7 +400,10 @@ columnasCheck.forEach(col => {
             table {
                 page-break-inside: auto !important;
                 break-inside: auto !important;
-                font-size: 9pt !important; /* Reducido */
+                font-size: 7.5pt !important;
+                width: 98% !important; /* Usar ancho completo */
+                margin-left: 0 !important; /* Sin margen */
+                margin-right: 0 !important; /* Sin margen */
             }
             th {
                 font-size: 7.5pt !important; /* Reducido */
