@@ -504,8 +504,8 @@ input[type="radio"] {
             
             /* Ajustar plan de acción para formato tipo oficio formal */
             #plan-accion-editor {
-                font-size: 13pt !important; /* Reducido */
-                line-height: 1.4 !important; /* Mejorado para legibilidad */
+                font-size: 12pt !important; /* Reducido */
+                line-height: 1.5 !important; /* Mejorado para legibilidad */
                 padding: 20px 25px !important; /* Márgenes internos para simular oficio */
                 background-color: #fff !important; /* Fondo blanco */
                 border: 1px solid #e0e0e0 !important; /* Borde sutil */
@@ -777,8 +777,8 @@ input[type="radio"] {
                         
                         /* Estilo formal para el plan de acción */
                         #plan-accion-editor {
-                            font-size: 13pt !important;
-                            line-height: 1.4 !important;
+                            font-size: 12pt !important;
+                            line-height: 1.5 !important;
                             padding: 20px 25px !important;
                             background-color: #fff !important;
                             border: 1px solid #e0e0e0 !important;
@@ -799,7 +799,7 @@ input[type="radio"] {
                         #plan-accion-editor p, 
                         #plan-accion-editor li, 
                         #plan-accion-editor span {
-                        font-size: 13pt !important; /* Asegurar que todos los elementos internos tengan el mismo tamaño */
+                        font-size: 12pt !important; /* Asegurar que todos los elementos internos tengan el mismo tamaño */
                         }
                         #plan-accion-editor ul, 
                         #plan-accion-editor ol {
