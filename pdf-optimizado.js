@@ -504,7 +504,7 @@ input[type="radio"] {
             
             /* Ajustar plan de acción para formato tipo oficio formal */
             #plan-accion-editor {
-                font-size: 13pt !important; /* Reducido */
+                font-size: 14pt !important; /* Reducido */
                 line-height: 1.5 !important; /* Mejorado para legibilidad */
                 padding: 20px 25px !important; /* Márgenes internos para simular oficio */
                 background-color: #fff !important; /* Fondo blanco */
