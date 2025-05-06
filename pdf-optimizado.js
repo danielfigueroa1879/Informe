@@ -254,7 +254,30 @@ if (resumenAutomatico) {
     });
 }
 
+// MODIFICADO: Reducir el ancho general de las tablas
+const tablas = container.querySelectorAll('table');
+tablas.forEach(tabla => {
+    estadoOriginal.estilos.set(tabla, {
+        width: tabla.style.width,
+        margin: tabla.style.margin
+    });
+    
+    tabla.style.width = '98%'; // Ligeramente reducido para evitar desbordamientos
+    tabla.style.marginLeft = '0';
+    tabla.style.marginRight = '0';
+});
 
+// MODIFICADO: Reducir el ancho de las columnas de check
+const columnasCheck = container.querySelectorAll('.check-column');
+columnasCheck.forEach(col => {
+    estadoOriginal.estilos.set(col, {
+        width: col.style.width,
+        padding: col.style.padding
+    });
+    
+    col.style.width = '35px'; // Reducido para ganar espacio
+    col.style.padding = '2px 1px';
+});
 
 
 
