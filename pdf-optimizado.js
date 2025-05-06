@@ -777,7 +777,7 @@ input[type="radio"] {
                         
                         /* Estilo formal para el plan de acción */
                         #plan-accion-editor {
-                            font-size: 13pt !important;
+                            font-size: 15pt !important;
                             line-height: 1.5 !important;
                             padding: 20px 25px !important;
                             background-color: #fff !important;
