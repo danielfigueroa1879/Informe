@@ -532,7 +532,7 @@ input[type="radio"] {
             /* Estilos específicos para párrafos dentro del plan de acción */
             #plan-accion-editor p {
                 margin-bottom: 15px !important;
-                text-indent: 20px !important; /* Sangría de primera línea para estilo formal */
+                text-indent: 0px !important; /* Sangría de primera línea para estilo formal */
             }
             
             #plan-accion-editor br {
