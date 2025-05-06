@@ -793,13 +793,13 @@ input[type="radio"] {
                         }
                         
                         #plan-accion-editor p {
-                            margin-bottom: 8px !important;
+                            margin-bottom: 15px !important;
                             text-indent: 20px !important;
                         }
                         #plan-accion-editor p, 
                         #plan-accion-editor li, 
                         #plan-accion-editor span {
-                        font-size: 12pt !important; /* Asegurar que todos los elementos internos tengan el mismo tamaño */
+                        font-size: 9pt !important; /* Asegurar que todos los elementos internos tengan el mismo tamaño */
                         }
                         #plan-accion-editor ul, 
                         #plan-accion-editor ol {
