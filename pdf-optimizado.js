@@ -399,11 +399,11 @@ columnasCheck.forEach(col => {
             }
             table {
                 page-break-inside: auto !important;
-                break-inside: auto !important;
-                font-size: 7.5pt !important;
-                width: 98% !important; /* Usar ancho completo */
-                margin-left: 0 !important; /* Sin margen */
-                margin-right: 0 !important; /* Sin margen */
+    break-inside: auto !important;
+    font-size: 7.5pt !important;
+    width: 98% !important; /* Usar ancho completo */
+    margin-left: 0 !important; /* Sin margen */
+    margin-right: 0 !important; /* Sin margen */
             }
             th {
                 font-size: 7.5pt !important; /* Reducido */
@@ -502,9 +502,19 @@ input[type="radio"] {
                 line-height: 1.2 !important; /* Reducido */
             }
             
+            #plan-accion-editor p, 
+#plan-accion-editor li, 
+#plan-accion-editor span {
+    font-size: 10pt !important; /* Asegurar que todos los elementos internos tengan el mismo tamaño */
+}
+            
+                       
+         
+            
+            
             /* Ajustar plan de acción para formato tipo oficio formal */
             #plan-accion-editor {
-                font-size: 13pt !important; /* Reducido */
+                font-size: 12pt !important; /* Reducido */
                 line-height: 2.5 !important; /* Mejorado para legibilidad */
                 padding: 20px 25px !important; /* Márgenes internos para simular oficio */
                 background-color: #fff !important; /* Fondo blanco */
@@ -522,14 +532,20 @@ input[type="radio"] {
             /* Estilos específicos para párrafos dentro del plan de acción */
             #plan-accion-editor p {
                 margin-bottom: 15px !important;
-                text-indent: 0px !important; /* Sangría de primera línea para estilo formal */
+                text-indent: 20px !important; /* Sangría de primera línea para estilo formal */
             }
+            
+            #plan-accion-editor br {
+    content: "";
+    display: block;
+    margin-bottom: 10px !important;
+}
             
             /* Estilos para listas dentro del plan de acción */
             #plan-accion-editor ul, 
             #plan-accion-editor ol {
                 margin: 10px 0 10px 15px !important;
-                padding-left: 10px !important;
+                padding-left: 13px !important;
             }
             
             #plan-accion-editor li {
@@ -793,14 +809,10 @@ input[type="radio"] {
                         }
                         
                         #plan-accion-editor p {
-                            margin-bottom: 15px !important;
+                            margin-bottom: 12px !important;
                             text-indent: 20px !important;
                         }
-                        #plan-accion-editor p, 
-                        #plan-accion-editor li, 
-                        #plan-accion-editor span {
-                        font-size: 11pt !important; /* Asegurar que todos los elementos internos tengan el mismo tamaño */
-                        }
+                        
                         #plan-accion-editor ul, 
                         #plan-accion-editor ol {
                             margin: 10px 0 10px 15px !important;
