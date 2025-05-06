@@ -59,16 +59,7 @@ function generarPDFCorregido() {
             elementosCreados: [] // Para rastrear elementos creados durante la preparación
         };
 
-        // 2. Ocultar elementos con clase no-print, botones y la información de datos guardados
-const elementosOcultar = container.querySelectorAll('.botones, .no-print, .rich-text-toolbar, .datos-guardados-info');
-elementosOcultar.forEach(el => {
-    estadoOriginal.ocultos.push({
-        element: el,
-        display: el.style.display
-    });
-    el.style.display = 'none';
-});
-
+        
 // AÑADIR AQUÍ EL CÓDIGO PARA OCULTAR LOS BOTONES DE LAS IMÁGENES
         
         // Asegurar que el logo esté correctamente posicionado
