@@ -58,6 +58,18 @@ function generarPDFCorregido() {
             },
             elementosCreados: [] // Para rastrear elementos creados durante la preparación
         };
+
+        // 2. Ocultar elementos con clase no-print, botones y la información de datos guardados
+const elementosOcultar = container.querySelectorAll('.botones, .no-print, .rich-text-toolbar, .datos-guardados-info');
+elementosOcultar.forEach(el => {
+    estadoOriginal.ocultos.push({
+        element: el,
+        display: el.style.display
+    });
+    el.style.display = 'none';
+});
+
+// AÑADIR AQUÍ EL CÓDIGO PARA OCULTAR LOS BOTONES DE LAS IMÁGENES
         
         // Asegurar que el logo esté correctamente posicionado
         const logoContainer = container.querySelector('.logo-container');
@@ -130,6 +142,18 @@ function generarPDFCorregido() {
             });
             el.style.display = 'none';
         });
+
+// Ocultar específicamente los botones de "Eliminar imagen" y "Cambiar imagen" en la sección fotográfica
+const botonesImagenes = container.querySelectorAll('.foto-eliminar-btn, .foto-label');
+botonesImagenes.forEach(boton => {
+    estadoOriginal.ocultos.push({
+        element: boton,
+        display: boton.style.display
+    });
+    boton.style.display = 'none';
+});
+
+
         
         // 3. Forzar saltos de página antes de las secciones específicas
         const seccionResumen = container.querySelector('#seccion-resumen');
