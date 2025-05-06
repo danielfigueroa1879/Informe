@@ -529,7 +529,7 @@ input[type="radio"] {
             #plan-accion-editor ul, 
             #plan-accion-editor ol {
                 margin: 10px 0 10px 15px !important;
-                padding-left: 15px !important;
+                padding-left: 10px !important;
             }
             
             #plan-accion-editor li {
