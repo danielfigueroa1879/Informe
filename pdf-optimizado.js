@@ -503,10 +503,10 @@ input[type="radio"] {
             }
             
             #plan-accion-editor p, 
-#plan-accion-editor li, 
-#plan-accion-editor span {
-    font-size: 11pt !important; /* Asegurar que todos los elementos internos tengan el mismo tamaño */
-}
+            #plan-accion-editor li, 
+            #plan-accion-editor span {
+            font-size: 10pt !important; /* Asegurar que todos los elementos internos tengan el mismo tamaño */
+            }
             
                        
          
@@ -960,7 +960,7 @@ function agregarMetadatosYNumeracion(pdf) {
                 const pageHeight = pageSize.height ? pageSize.height : pageSize.getHeight();
                 
                 // Añadir logo en la esquina superior izquierda de cada página
-                const logoWidth = 22; // Ancho en mm reducido
+                const logoWidth = 21; // Ancho en mm reducido
                 const aspectRatio = logoImg.height / logoImg.width;
                 const logoHeight = logoWidth * aspectRatio; // Mantener proporción
                 
