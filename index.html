@@ -71,29 +71,32 @@
         }
         
         .foto-marco {
-            border: 2px dashed #ccc;
+            border: 2px solid #7a9cbf;
             border-radius: 10px;
-            padding: 15px;
-            min-height: 300px;
+            padding: 20px;
+            min-height: 280px;
             display: flex;
             align-items: center;
             justify-content: center;
+            background-color: #f0f5fb;
+            box-shadow: inset 0 1px 4px rgba(0,51,102,0.08);
         }
         
         .foto-placeholder {
             text-align: center;
             width: 100%;
-            height: 100%;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
+            gap: 10px;
         }
         
         .foto-placeholder p {
-            font-size: 1.2rem;
-            color: #666;
-            margin-bottom: 15px;
+            font-size: 1.1rem;
+            color: #4a6a8a;
+            font-weight: 600;
+            margin: 0;
         }
         
         .foto-input {
@@ -124,18 +127,18 @@
         
         .preview-imagen {
             width: 100%;
-            min-height: 200px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-top: 15px;
         }
         
         .foto-preview {
-            max-width: 100%;
-            max-height: 300px;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            width: 380px;
+            height: 260px;
+            object-fit: cover;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+            display: block;
         }
         
         .linea-firma {
@@ -580,6 +583,25 @@
 
 /* Estilos de impresión para resumen automático */
 @media print {
+    /* Ocultar botones de acción al imprimir o generar PDF */
+    .ocultar-impresion,
+    .no-print {
+        display: none !important;
+    }
+
+    /* Tamaño estándar de fotografías en impresión */
+    .foto-preview {
+        width: 320px !important;
+        height: 220px !important;
+        object-fit: cover !important;
+    }
+
+    .foto-marco {
+        background-color: #f0f5fb !important;
+        border: 1px solid #7a9cbf !important;
+        min-height: auto !important;
+        padding: 10px !important;
+    }
     /* Ajustes para el resumen automático */
     #resumen-automatico {
         font-size: 12px !important; /* Un poco más grande que el tamaño anterior */
@@ -1274,10 +1296,28 @@ h1 {
                 planHidden.value = '';
             }
             
-            // Limpiar previsualizaciones de fotos fijas
-            document.getElementById('preview-foto1').innerHTML = '';
-            document.getElementById('preview-foto2').innerHTML = '';
-            
+            // Restaurar marcos de fotos fijas (1 y 2)
+            ['marco-foto1', 'marco-foto2'].forEach(function(marcoId, idx) {
+                var n = idx + 1;
+                var marco = document.getElementById(marcoId);
+                if (marco) {
+                    marco.innerHTML = `
+                        <div class="foto-placeholder">
+                            <p>FOTOGRAFÍA ${n}</p>
+                            <input type="file" accept="image/*" id="foto${n}" class="foto-input">
+                            <label for="foto${n}" class="foto-label">Seleccionar imagen</label>
+                        </div>
+                    `;
+                    // Reasignar listener
+                    var inp = document.getElementById('foto' + n);
+                    if (inp) {
+                        inp.addEventListener('change', function() {
+                            mostrarImagen(this, marcoId);
+                        });
+                    }
+                }
+            });
+
             // Eliminar contenedores de fotos agregadas dinámicamente (desde foto 3 en adelante)
             var set = document.getElementById('set-fotografico');
             var contenedores = set.querySelectorAll('.foto-container');
@@ -1287,16 +1327,7 @@ h1 {
                 }
             });
             contadorFotos = 2;
-            
-            // Restaurar etiquetas y textos de fotografías fijas
-            var fotoPlaceholders = document.querySelectorAll('.foto-placeholder');
-            for (var i = 0; i < fotoPlaceholders.length; i++) {
-                var p = fotoPlaceholders[i].querySelector('p');
-                var lbl = fotoPlaceholders[i].querySelector('label');
-                if (p) p.style.display = 'block';
-                if (lbl) lbl.style.display = 'inline-block';
-            }
-            
+
             // Limpiar descripciones de fotos
             var fotoDescripciones = document.querySelectorAll('.foto-descripcion');
             for (var i = 0; i < fotoDescripciones.length; i++) {
@@ -1880,31 +1911,29 @@ h1 {
             
             <div class="set-fotografico" id="set-fotografico">
                 <div class="foto-container" id="foto-container-1">
-                    <div class="foto-marco">
+                    <div class="foto-marco" id="marco-foto1">
                         <div class="foto-placeholder">
                             <p>FOTOGRAFÍA 1</p>
-                            <input type="file" accept="image/*" id="foto1" class="foto-input" onchange="mostrarImagen(this, 'preview-foto1')">
+                            <input type="file" accept="image/*" id="foto1" class="foto-input">
                             <label for="foto1" class="foto-label">Seleccionar imagen</label>
-                            <div id="preview-foto1" class="preview-imagen"></div>
                         </div>
                     </div>
                     <textarea class="foto-descripcion" placeholder="Descripción de la fotografía 1..."></textarea>
                 </div>
                 
                 <div class="foto-container" id="foto-container-2">
-                    <div class="foto-marco">
+                    <div class="foto-marco" id="marco-foto2">
                         <div class="foto-placeholder">
                             <p>FOTOGRAFÍA 2</p>
-                            <input type="file" accept="image/*" id="foto2" class="foto-input" onchange="mostrarImagen(this, 'preview-foto2')">
+                            <input type="file" accept="image/*" id="foto2" class="foto-input">
                             <label for="foto2" class="foto-label">Seleccionar imagen</label>
-                            <div id="preview-foto2" class="preview-imagen"></div>
                         </div>
                     </div>
                     <textarea class="foto-descripcion" placeholder="Descripción de la fotografía 2..."></textarea>
                 </div>
             </div>
 
-            <div style="display:flex; justify-content:center; margin-top:20px;">
+            <div style="display:flex; justify-content:center; margin-top:20px;" class="ocultar-impresion">
                 <button type="button" onclick="agregarFoto()"
                     style="background-color:#28a745; color:white; border:none; border-radius:8px;
                            padding:14px 30px; font-family:'Poppins',sans-serif; font-size:1.1rem;
@@ -2059,57 +2088,32 @@ function mostrarNotificacionMovil(mensaje, tipo) {
  * @param {HTMLInputElement} input - El elemento input de tipo file
  * @param {string} previewId - El ID del contenedor de previsualización
  */
-function mostrarImagen(input, previewId) {
-    // Obtener el contenedor de previsualización
-    const previewContainer = document.getElementById(previewId);
-    if (!previewContainer) return;
-    
-    // Limpiar previsualización anterior
-    previewContainer.innerHTML = '';
-    
-    // Verificar que se seleccionó un archivo
-    if (input.files && input.files[0]) {
-        const file = input.files[0];
-        
-        // Verificar que es una imagen
-        if (!file.type.startsWith('image/')) {
-            alert('Por favor seleccione un archivo de imagen válido.');
-            return;
-        }
-        
-        // Crear objeto FileReader
-        const reader = new FileReader();
-        
-        // Configurar el evento onload
-        reader.onload = function(e) {
-            // Crear elemento de imagen
-            const img = document.createElement('img');
-            img.src = e.target.result;
-            img.className = 'foto-preview';
-            
-            // Añadir la imagen al contenedor
-            previewContainer.appendChild(img);
-            
-            // Ajustar la interfaz
-            const placeholder = input.closest('.foto-placeholder');
-            if (placeholder) {
-                // Ocultar el texto placeholder
-                const textoPlaceholder = placeholder.querySelector('p');
-                if (textoPlaceholder) {
-                    textoPlaceholder.style.display = 'none';
-                }
-                
-                // Cambiar el texto del botón
-                const label = placeholder.querySelector('label');
-                if (label) {
-                    label.textContent = 'Cambiar imagen';
-                }
-            }
-        };
-        
-        // Iniciar la lectura del archivo como URL de datos
-        reader.readAsDataURL(file);
+function mostrarImagen(input, marcoId) {
+    var marco = document.getElementById(marcoId);
+    if (!marco) return;
+
+    if (!input.files || !input.files[0]) return;
+    var file = input.files[0];
+    if (!file.type.startsWith('image/')) {
+        alert('Por favor seleccione un archivo de imagen válido.');
+        return;
     }
+
+    var reader = new FileReader();
+    reader.onload = function(e) {
+        // Reemplazar TODO el contenido del marco con solo la imagen y botón cambiar
+        marco.innerHTML = `
+            <div style="display:flex; flex-direction:column; align-items:center; gap:12px; width:100%;">
+                <img src="${e.target.result}" class="foto-preview">
+                <div class="ocultar-impresion">
+                    <label for="${input.id}" class="foto-label" style="cursor:pointer; font-size:0.9rem; padding:7px 16px;">
+                        ↺ Cambiar imagen
+                    </label>
+                </div>
+            </div>
+        `;
+    };
+    reader.readAsDataURL(file);
 }
 
 /**
@@ -2154,15 +2158,15 @@ var contadorFotos = 2;
 function agregarFoto() {
     contadorFotos++;
     var n = contadorFotos;
-    var inputId   = 'foto' + n;
-    var previewId = 'preview-foto' + n;
+    var inputId = 'foto' + n;
+    var marcoId = 'marco-foto' + n;
 
     var contenedor = document.createElement('div');
     contenedor.className = 'foto-container';
     contenedor.id = 'foto-container-' + n;
 
     contenedor.innerHTML = `
-        <div style="display:flex; justify-content:flex-end; margin-bottom:5px;">
+        <div style="display:flex; justify-content:flex-end; margin-bottom:5px;" class="ocultar-impresion">
             <button type="button" onclick="eliminarContenedorFoto('foto-container-${n}')"
                 style="background-color:#dc3545; color:white; border:none; border-radius:4px;
                        padding:6px 14px; cursor:pointer; font-family:'Poppins',sans-serif;
@@ -2170,12 +2174,11 @@ function agregarFoto() {
                 ✕ Eliminar fotografía ${n}
             </button>
         </div>
-        <div class="foto-marco">
-            <div class="foto-placeholder" id="placeholder-${n}">
+        <div class="foto-marco" id="${marcoId}">
+            <div class="foto-placeholder">
                 <p>FOTOGRAFÍA ${n}</p>
                 <input type="file" accept="image/*" id="${inputId}" class="foto-input">
                 <label for="${inputId}" class="foto-label">Seleccionar imagen</label>
-                <div id="${previewId}" class="preview-imagen"></div>
             </div>
         </div>
         <textarea class="foto-descripcion" placeholder="Descripción de la fotografía ${n}..."></textarea>
@@ -2186,7 +2189,7 @@ function agregarFoto() {
     // Asignar evento al input recién creado
     var input = document.getElementById(inputId);
     input.addEventListener('change', function() {
-        mostrarImagen(this, previewId);
+        mostrarImagen(this, marcoId);
     });
 }
 
@@ -2196,18 +2199,16 @@ function eliminarContenedorFoto(containerId) {
     if (el) el.remove();
 }
 
-// Inicializar botones eliminar-imagen en las fotos fijas (1 y 2)
+// Inicializar eventos de fotos fijas (1 y 2) con un solo handler
 document.addEventListener('DOMContentLoaded', function() {
-    var fotosFijas = [
-        { inputId: 'foto1', previewId: 'preview-foto1' },
-        { inputId: 'foto2', previewId: 'preview-foto2' }
-    ];
-
-    fotosFijas.forEach(function(f) {
+    [
+        { inputId: 'foto1', marcoId: 'marco-foto1' },
+        { inputId: 'foto2', marcoId: 'marco-foto2' }
+    ].forEach(function(f) {
         var input = document.getElementById(f.inputId);
         if (!input) return;
         input.addEventListener('change', function() {
-            mostrarImagen(this, f.previewId);
+            mostrarImagen(this, f.marcoId);
         });
     });
 });                                                                
