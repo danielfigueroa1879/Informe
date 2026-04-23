@@ -580,6 +580,11 @@
 
 /* Estilos de impresión para resumen automático */
 @media print {
+    /* Ocultar botones de acción al imprimir o generar PDF */
+    .ocultar-impresion,
+    .no-print {
+        display: none !important;
+    }
     /* Ajustes para el resumen automático */
     #resumen-automatico {
         font-size: 12px !important; /* Un poco más grande que el tamaño anterior */
@@ -1904,7 +1909,7 @@ h1 {
                 </div>
             </div>
 
-            <div style="display:flex; justify-content:center; margin-top:20px;">
+            <div style="display:flex; justify-content:center; margin-top:20px;" class="ocultar-impresion">
                 <button type="button" onclick="agregarFoto()"
                     style="background-color:#28a745; color:white; border:none; border-radius:8px;
                            padding:14px 30px; font-family:'Poppins',sans-serif; font-size:1.1rem;
@@ -2162,7 +2167,7 @@ function agregarFoto() {
     contenedor.id = 'foto-container-' + n;
 
     contenedor.innerHTML = `
-        <div style="display:flex; justify-content:flex-end; margin-bottom:5px;">
+        <div style="display:flex; justify-content:flex-end; margin-bottom:5px;" class="ocultar-impresion">
             <button type="button" onclick="eliminarContenedorFoto('foto-container-${n}')"
                 style="background-color:#dc3545; color:white; border:none; border-radius:4px;
                        padding:6px 14px; cursor:pointer; font-family:'Poppins',sans-serif;
