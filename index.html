@@ -1274,15 +1274,27 @@ h1 {
                 planHidden.value = '';
             }
             
-            // Limpiar previsualizaciones de fotos
+            // Limpiar previsualizaciones de fotos fijas
             document.getElementById('preview-foto1').innerHTML = '';
             document.getElementById('preview-foto2').innerHTML = '';
             
-            // Restaurar etiquetas y textos de fotografías
+            // Eliminar contenedores de fotos agregadas dinámicamente (desde foto 3 en adelante)
+            var set = document.getElementById('set-fotografico');
+            var contenedores = set.querySelectorAll('.foto-container');
+            contenedores.forEach(function(c) {
+                if (c.id !== 'foto-container-1' && c.id !== 'foto-container-2') {
+                    c.remove();
+                }
+            });
+            contadorFotos = 2;
+            
+            // Restaurar etiquetas y textos de fotografías fijas
             var fotoPlaceholders = document.querySelectorAll('.foto-placeholder');
             for (var i = 0; i < fotoPlaceholders.length; i++) {
-                fotoPlaceholders[i].querySelector('p').style.display = 'block';
-                fotoPlaceholders[i].querySelector('label').style.display = 'inline-block';
+                var p = fotoPlaceholders[i].querySelector('p');
+                var lbl = fotoPlaceholders[i].querySelector('label');
+                if (p) p.style.display = 'block';
+                if (lbl) lbl.style.display = 'inline-block';
             }
             
             // Limpiar descripciones de fotos
@@ -1866,8 +1878,8 @@ h1 {
             <div id="seccion-fotos" class="forced-page-break"></div>
             <h2>SET FOTOGRÁFICO</h2>
             
-            <div class="set-fotografico">
-                <div class="foto-container">
+            <div class="set-fotografico" id="set-fotografico">
+                <div class="foto-container" id="foto-container-1">
                     <div class="foto-marco">
                         <div class="foto-placeholder">
                             <p>FOTOGRAFÍA 1</p>
@@ -1879,7 +1891,7 @@ h1 {
                     <textarea class="foto-descripcion" placeholder="Descripción de la fotografía 1..."></textarea>
                 </div>
                 
-                <div class="foto-container">
+                <div class="foto-container" id="foto-container-2">
                     <div class="foto-marco">
                         <div class="foto-placeholder">
                             <p>FOTOGRAFÍA 2</p>
@@ -1890,6 +1902,12 @@ h1 {
                     </div>
                     <textarea class="foto-descripcion" placeholder="Descripción de la fotografía 2..."></textarea>
                 </div>
+            </div>
+
+            <div class="botones no-print" style="margin-top:20px;">
+                <button type="button" onclick="agregarFoto()" style="background-color:#28a745;">
+                    ＋ Agregar Fotografía
+                </button>
             </div>
             <div class="botones no-print">
     <button type="button" onclick="imprimirFormulario()">Imprimir Formulario</button>
@@ -2126,74 +2144,68 @@ function eliminarImagen(inputId, previewId) {
     }
 }
 
-// Añadir botones para eliminar las imágenes cuando el documento esté cargado
+// Contador global de fotografías
+var contadorFotos = 2;
+
+// Agregar nueva fotografía dinámicamente
+function agregarFoto() {
+    contadorFotos++;
+    var n = contadorFotos;
+    var inputId   = 'foto' + n;
+    var previewId = 'preview-foto' + n;
+
+    var contenedor = document.createElement('div');
+    contenedor.className = 'foto-container';
+    contenedor.id = 'foto-container-' + n;
+
+    contenedor.innerHTML = `
+        <div style="display:flex; justify-content:flex-end; margin-bottom:5px;">
+            <button type="button" onclick="eliminarContenedorFoto('foto-container-${n}')"
+                style="background-color:#dc3545; color:white; border:none; border-radius:4px;
+                       padding:6px 14px; cursor:pointer; font-family:'Poppins',sans-serif;
+                       font-size:0.85rem; margin:0;">
+                ✕ Eliminar fotografía ${n}
+            </button>
+        </div>
+        <div class="foto-marco">
+            <div class="foto-placeholder" id="placeholder-${n}">
+                <p>FOTOGRAFÍA ${n}</p>
+                <input type="file" accept="image/*" id="${inputId}" class="foto-input">
+                <label for="${inputId}" class="foto-label">Seleccionar imagen</label>
+                <div id="${previewId}" class="preview-imagen"></div>
+            </div>
+        </div>
+        <textarea class="foto-descripcion" placeholder="Descripción de la fotografía ${n}..."></textarea>
+    `;
+
+    document.getElementById('set-fotografico').appendChild(contenedor);
+
+    // Asignar evento al input recién creado
+    var input = document.getElementById(inputId);
+    input.addEventListener('change', function() {
+        mostrarImagen(this, previewId);
+    });
+}
+
+// Eliminar un contenedor de fotografía completo
+function eliminarContenedorFoto(containerId) {
+    var el = document.getElementById(containerId);
+    if (el) el.remove();
+}
+
+// Inicializar botones eliminar-imagen en las fotos fijas (1 y 2)
 document.addEventListener('DOMContentLoaded', function() {
-    // Crear botones de eliminar para cada contenedor de foto
-    const fotoPlaceholders = document.querySelectorAll('.foto-placeholder');
-    
-    fotoPlaceholders.forEach(function(placeholder, index) {
-        // Crear el botón
-        const botonEliminar = document.createElement('button');
-        botonEliminar.type = 'button';
-        botonEliminar.className = 'foto-eliminar-btn';
-        botonEliminar.textContent = 'Eliminar imagen';
-        botonEliminar.style.display = 'none'; // Oculto inicialmente
-        
-        // Configurar estilos
-        Object.assign(botonEliminar.style, {
-            backgroundColor: '#dc3545',
-            color: 'white',
-            border: 'none',
-            borderRadius: '4px',
-            padding: '6px 12px',
-            marginTop: '10px',
-            cursor: 'pointer',
-            fontFamily: 'Poppins, sans-serif',
-            fontSize: '0.9rem',
-            transition: 'background-color 0.3s'
+    var fotosFijas = [
+        { inputId: 'foto1', previewId: 'preview-foto1' },
+        { inputId: 'foto2', previewId: 'preview-foto2' }
+    ];
+
+    fotosFijas.forEach(function(f) {
+        var input = document.getElementById(f.inputId);
+        if (!input) return;
+        input.addEventListener('change', function() {
+            mostrarImagen(this, f.previewId);
         });
-        
-        // Añadir evento hover
-        botonEliminar.onmouseover = function() {
-            this.style.backgroundColor = '#bd2130';
-        };
-        botonEliminar.onmouseout = function() {
-            this.style.backgroundColor = '#dc3545';
-        };
-        
-        // Configurar función onclick
-        const inputId = `foto${index + 1}`;
-        const previewId = `preview-foto${index + 1}`;
-        
-        botonEliminar.onclick = function() {
-            eliminarImagen(inputId, previewId);
-            this.style.display = 'none'; // Ocultar botón después de eliminar
-        };
-        
-        // Añadir el botón al placeholder
-        placeholder.appendChild(botonEliminar);
-        
-        // Modificar la función onchange del input
-        const input = placeholder.querySelector('input[type="file"]');
-        if (input) {
-            // Preservar la función original
-            const originalOnchange = input.onchange;
-            
-            // Añadir funcionalidad para mostrar botón de eliminar
-            input.onchange = function(e) {
-                // Llamar al manejador original
-                if (originalOnchange) {
-                    originalOnchange.call(this, e);
-                }
-                
-                // Mostrar botón eliminar si hay archivo seleccionado
-                if (this.files && this.files[0]) {
-                    botonEliminar.style.display = 'inline-block';
-                } else {
-                    botonEliminar.style.display = 'none';
-                }
-            };
-        }
     });
 });                                                                
                                                                 
