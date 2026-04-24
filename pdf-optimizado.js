@@ -859,8 +859,65 @@ input[type="radio"] {
                     `;
                     clonedDoc.head.appendChild(style);
                     
-                    // Asegurar que las imágenes se muestran correctamente
-                    Array.from(clonedDoc.querySelectorAll('img')).forEach(img => {
+                    // ── SET FOTOGRÁFICO: 2 fotos por página, sin cortes ──
+                    const estilosFoto = `
+                        .set-fotografico {
+                            display: flex !important;
+                            flex-direction: column !important;
+                            gap: 14px !important;
+                        }
+                        .foto-container {
+                            page-break-inside: avoid !important;
+                            break-inside: avoid !important;
+                            display: flex !important;
+                            flex-direction: column !important;
+                            gap: 8px !important;
+                        }
+                        .foto-marco {
+                            page-break-inside: avoid !important;
+                            break-inside: avoid !important;
+                            border: 1px solid #7a9cbf !important;
+                            background-color: #f0f5fb !important;
+                            padding: 10px !important;
+                            display: flex !important;
+                            align-items: center !important;
+                            justify-content: center !important;
+                        }
+                        .foto-preview {
+                            width: 100% !important;
+                            height: auto !important;
+                            max-height: 300px !important;
+                            object-fit: contain !important;
+                            display: block !important;
+                            page-break-inside: avoid !important;
+                            break-inside: avoid !important;
+                        }
+                        .foto-descripcion-pdf {
+                            font-size: 9pt !important;
+                            border: 1px solid #ddd !important;
+                            padding: 6px !important;
+                            min-height: 40px !important;
+                        }
+                        .foto-salto-pagina {
+                            page-break-before: always !important;
+                            break-before: page !important;
+                            height: 0 !important;
+                            display: block !important;
+                        }
+                    `;
+                    const estFoto = clonedDoc.createElement('style');
+                    estFoto.innerHTML = estilosFoto;
+                    clonedDoc.head.appendChild(estFoto);
+
+                    // Insertar div de salto ANTES de cada foto 3, 5, 7... (cada par nuevo)
+                    const fotoContainers = Array.from(clonedDoc.querySelectorAll('.foto-container'));
+                    fotoContainers.forEach((fc, idx) => {
+                        if (idx > 0 && idx % 2 === 0) {
+                            const salto = clonedDoc.createElement('div');
+                            salto.className = 'foto-salto-pagina html2pdf__page-break';
+                            fc.parentNode.insertBefore(salto, fc);
+                        }
+                    });
                         img.style.display = 'block';
                         img.style.maxWidth = '100%';
                     });
@@ -888,9 +945,9 @@ input[type="radio"] {
             
             // Configuración de saltos de página - Modificada para evitar páginas en blanco
             pagebreak: {
-                mode: ['avoid-all'], // Simplificar el algoritmo
-                before: ['h2'], // Solo saltos explícitos en h2
-                avoid: ['table', 'img', '.textarea-contenido-pdf']
+                mode: ['avoid-all', 'css'],
+                before: ['h2', '.foto-salto-pagina'],
+                avoid: ['table', 'img', '.textarea-contenido-pdf', '.foto-container', '.foto-marco']
             },
             
             // Usar el nuevo modo para división de contenido
