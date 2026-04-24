@@ -312,10 +312,16 @@ columnasCheck.forEach(col => {
             { selector: 'tr', estilos: {
                 pageBreakInside: 'avoid'
             }},
+            { selector: '.set-fotografico', estilos: {
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '16px'
+            }},
             { selector: '.foto-container', estilos: {
                 pageBreakInside: 'avoid',
                 breakInside: 'avoid',
-                display: 'block'
+                display: 'flex',
+                flexDirection: 'column'
             }},
             { selector: '.foto-marco', estilos: {
                 pageBreakInside: 'avoid',
