@@ -61,13 +61,19 @@
             margin-top: 20px;
             display: flex;
             flex-direction: column;
-            gap: 40px;
+            gap: 20px;
+        }
+        
+        /* Cada par de fotos (2da, 4ta, 6ta...) fuerza salto de página ANTES del 3ro, 5to... */
+        .foto-container:nth-child(2n+3) {
+            break-before: page;
+            page-break-before: always;
         }
         
         .foto-container {
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 10px;
             break-inside: avoid;
             page-break-inside: avoid;
         }
@@ -75,8 +81,8 @@
         .foto-marco {
             border: 2px solid #7a9cbf;
             border-radius: 10px;
-            padding: 20px;
-            min-height: 320px;
+            padding: 16px;
+            min-height: 220px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -137,8 +143,8 @@
         }
         
         .foto-preview {
-            width: 460px;
-            height: 320px;
+            width: 100%;
+            height: 310px;
             object-fit: cover;
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.15);
@@ -593,11 +599,25 @@
         display: none !important;
     }
 
-    /* Fotografías: tamaño mayor y nunca cortadas */
+    /* Columna única, 2 fotos por página */
+    .set-fotografico {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 16px !important;
+    }
+
+    /* Salto de página antes de la 3ra foto, 5ta, 7ma... */
+    .foto-container:nth-child(2n+3) {
+        break-before: page !important;
+        page-break-before: always !important;
+    }
+
     .foto-container {
         break-inside: avoid !important;
         page-break-inside: avoid !important;
-        display: block !important;
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 8px !important;
     }
 
     .foto-marco {
@@ -605,16 +625,21 @@
         page-break-inside: avoid !important;
         background-color: #f0f5fb !important;
         border: 1px solid #7a9cbf !important;
+        padding: 10px !important;
         min-height: auto !important;
-        padding: 12px !important;
     }
 
     .foto-preview {
-        width: 400px !important;
-        height: 280px !important;
+        width: 100% !important;
+        height: 270px !important;
         object-fit: cover !important;
         break-inside: avoid !important;
         page-break-inside: avoid !important;
+    }
+
+    .foto-descripcion {
+        min-height: 50px !important;
+        font-size: 10pt !important;
     }
     /* Ajustes para el resumen automático */
     #resumen-automatico {
