@@ -364,19 +364,18 @@ columnasCheck.forEach(col => {
         
         // 5b. Aplicar estilos específicos al editor de plan de acción
         if (editorPlanAccion) {
-            editorPlanAccion.style.setProperty('font-size', '11pt', 'important');
+            editorPlanAccion.style.setProperty('font-size', '10pt', 'important');
             editorPlanAccion.style.setProperty('line-height', '1.5', 'important');
             editorPlanAccion.style.setProperty('text-align', 'justify', 'important');
-            // Aplicar a cada párrafo hijo para respetar espaciado entre párrafos
-            editorPlanAccion.querySelectorAll('p').forEach(function(p) {
-                p.style.setProperty('font-size', '11pt', 'important');
-                p.style.setProperty('line-height', '1.5', 'important');
-                p.style.setProperty('margin-top', '0', 'important');
-                p.style.setProperty('margin-bottom', '1em', 'important');
-                p.style.setProperty('text-align', 'justify', 'important');
+            editorPlanAccion.querySelectorAll('p, div, li').forEach(function(el) {
+                el.style.setProperty('font-size', '10pt', 'important');
+                el.style.setProperty('line-height', '1.5', 'important');
+                el.style.setProperty('text-align', 'justify', 'important');
+                el.style.setProperty('padding-bottom', '14px', 'important');
+                el.style.setProperty('margin-bottom', '0', 'important');
             });
-            editorPlanAccion.querySelectorAll('span, li, div').forEach(function(el) {
-                el.style.setProperty('font-size', '11pt', 'important');
+            editorPlanAccion.querySelectorAll('span').forEach(function(el) {
+                el.style.setProperty('font-size', '10pt', 'important');
                 el.style.setProperty('line-height', '1.5', 'important');
             });
         }
@@ -529,13 +528,13 @@ input[type="radio"] {
             #plan-accion-editor li, 
             #plan-accion-editor span,
             #plan-accion-editor div {
-                font-size: 11pt !important;
+                font-size: 10pt !important;
                 line-height: 1.5 !important;
             }
             
             /* Ajustar plan de acción para formato tipo oficio formal */
             #plan-accion-editor {
-                font-size: 11pt !important;
+                font-size: 10pt !important;
                 line-height: 1.5 !important;
                 padding: 20px 25px !important;
                 background-color: #fff !important;
@@ -550,19 +549,20 @@ input[type="radio"] {
                 min-height: 200px !important;
             }
             
-            /* Párrafos con espacio visible entre ellos */
+            /* Párrafos con espacio visible - usar padding en lugar de margin */
             #plan-accion-editor p {
                 margin-top: 0 !important;
-                margin-bottom: 12pt !important;
+                margin-bottom: 0 !important;
+                padding-bottom: 14px !important;
                 text-indent: 0 !important;
-                font-size: 11pt !important;
+                font-size: 10pt !important;
                 line-height: 1.5 !important;
             }
             
             #plan-accion-editor br {
                 content: "";
                 display: block;
-                margin-bottom: 12pt !important;
+                padding-bottom: 14px !important;
             }
             
             /* Estilos para listas dentro del plan de acción */
@@ -831,7 +831,7 @@ input[type="radio"] {
                         
                         /* Estilo formal para el plan de acción */
                         #plan-accion-editor {
-                            font-size: 11pt !important;
+                            font-size: 10pt !important;
                             line-height: 1.5 !important;
                             padding: 20px 25px !important;
                             background-color: #fff !important;
@@ -850,14 +850,16 @@ input[type="radio"] {
                         #plan-accion-editor li,
                         #plan-accion-editor span,
                         #plan-accion-editor div {
-                            font-size: 11pt !important;
+                            font-size: 10pt !important;
                             line-height: 1.5 !important;
                         }
 
                         #plan-accion-editor p {
                             margin-top: 0 !important;
-                            margin-bottom: 12pt !important;
+                            padding-bottom: 12pt !important;
+                            margin-bottom: 0 !important;
                             text-indent: 0 !important;
+                        }
                         }
                         
                         #plan-accion-editor ul, 
@@ -951,15 +953,33 @@ input[type="radio"] {
                         }
                     });
 
+                    // ── PLAN DE ACCIÓN: respetar espaciado entre párrafos ──
+                    const editorClone = clonedDoc.querySelector('#plan-accion-editor');
+                    if (editorClone) {
+                        // Aplicar estilos inline a cada elemento hijo
+                        Array.from(editorClone.children).forEach(function(hijo) {
+                            hijo.style.setProperty('font-size', '10pt', 'important');
+                            hijo.style.setProperty('line-height', '1.5', 'important');
+                            hijo.style.setProperty('text-align', 'justify', 'important');
+                            // Convertir margin en padding para que html2canvas lo respete
+                            hijo.style.setProperty('padding-bottom', '14px', 'important');
+                            hijo.style.setProperty('margin-bottom', '0', 'important');
+                            hijo.style.setProperty('margin-top', '0', 'important');
+                        });
+                    }
+
                     // Asegurar que las imágenes se muestran correctamente
                     Array.from(clonedDoc.querySelectorAll('img')).forEach(img => {
                         img.style.display = 'block';
                         img.style.maxWidth = '100%';
                     });
                     
-                    // Eliminar elementos vacíos en el clon que podrían causar páginas en blanco
+                    // Eliminar elementos vacíos que podrían causar páginas en blanco
+                    // EXCEPTO los hijos del editor de plan de acción (son espaciados intencionales)
+                    const editorCloneRef = clonedDoc.querySelector('#plan-accion-editor');
                     const divs = Array.from(clonedDoc.querySelectorAll('div, p, span'));
                     divs.forEach(div => {
+                        if (editorCloneRef && (div === editorCloneRef || editorCloneRef.contains(div))) return;
                         if (!div.textContent.trim() && !div.querySelector('img') && div.clientHeight < 20 && !div.classList.contains('textarea-contenido-pdf')) {
                             if (div.parentNode) {
                                 div.parentNode.removeChild(div);
