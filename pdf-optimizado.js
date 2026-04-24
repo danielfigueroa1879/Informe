@@ -343,7 +343,11 @@ columnasCheck.forEach(col => {
         
         // 5. Reducir tamaño de texto de todos los párrafos y elementos de texto
         const elementosTexto = container.querySelectorAll('p, span, td, div:not(.header-row):not(.rich-text-toolbar)');
+        const editorPlanAccion = container.querySelector('#plan-accion-editor');
         elementosTexto.forEach(el => {
+            // Excluir el editor de plan de acción y todos sus hijos
+            if (editorPlanAccion && (el === editorPlanAccion || editorPlanAccion.contains(el))) return;
+
             if (!estadoOriginal.estilos.has(el)) {
                 estadoOriginal.estilos.set(el, {
                     fontSize: el.style.fontSize,
@@ -358,6 +362,24 @@ columnasCheck.forEach(col => {
             }
         });
         
+        // 5b. Aplicar estilos específicos al editor de plan de acción
+        if (editorPlanAccion) {
+            editorPlanAccion.style.setProperty('font-size', '11pt', 'important');
+            editorPlanAccion.style.setProperty('line-height', '1.5', 'important');
+            editorPlanAccion.style.setProperty('text-align', 'justify', 'important');
+            // Aplicar a cada párrafo hijo para respetar espaciado entre párrafos
+            editorPlanAccion.querySelectorAll('p').forEach(function(p) {
+                p.style.setProperty('font-size', '11pt', 'important');
+                p.style.setProperty('line-height', '1.5', 'important');
+                p.style.setProperty('margin-top', '0', 'important');
+                p.style.setProperty('margin-bottom', '1em', 'important');
+                p.style.setProperty('text-align', 'justify', 'important');
+            });
+            editorPlanAccion.querySelectorAll('span, li, div').forEach(function(el) {
+                el.style.setProperty('font-size', '11pt', 'important');
+                el.style.setProperty('line-height', '1.5', 'important');
+            });
+        }
         // 6. Añadir una hoja de estilos temporal con reglas específicas para PDF
         const estilosTemporales = document.createElement('style');
         estilosTemporales.id = 'estilos-temporales-pdf';
