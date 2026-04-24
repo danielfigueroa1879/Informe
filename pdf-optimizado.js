@@ -312,6 +312,15 @@ columnasCheck.forEach(col => {
             { selector: 'tr', estilos: {
                 pageBreakInside: 'avoid'
             }},
+            { selector: '.foto-container', estilos: {
+                pageBreakInside: 'avoid',
+                breakInside: 'avoid',
+                display: 'block'
+            }},
+            { selector: '.foto-marco', estilos: {
+                pageBreakInside: 'avoid',
+                breakInside: 'avoid'
+            }},
             { selector: '#plan-accion-editor', estilos: {
                 height: 'auto',
                 maxHeight: 'none',
