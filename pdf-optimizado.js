@@ -1028,7 +1028,7 @@ input[type="radio"] {
     function agregarPaginasFotos(pdf, contenido) {
         return new Promise(function(resolve) {
 
-            // Buscar foto-containers que tengan imagen real (no placeholder vacío)
+            // Buscar foto-containers que tengan imagen real
             var containers = Array.from(
                 contenido.querySelectorAll('.foto-container')
             ).filter(function(fc) {
@@ -1037,100 +1037,125 @@ input[type="radio"] {
 
             if (containers.length === 0) { resolve(); return; }
 
-            // Agrupar en pares [par1=[fc1,fc2], par2=[fc3,fc4], ...]
-            var pares = [];
-            for (var i = 0; i < containers.length; i += 2) {
-                pares.push(containers.slice(i, i + 2));
+            // Asegurar que html2canvas esté disponible como global
+            function cargarHtml2CanvasYProcesar() {
+                if (typeof html2canvas !== 'undefined') {
+                    procesarFotos();
+                    return;
+                }
+                var sc = document.createElement('script');
+                sc.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+                sc.onload  = procesarFotos;
+                sc.onerror = function() { console.error('No se pudo cargar html2canvas'); resolve(); };
+                document.head.appendChild(sc);
             }
 
-            var pageSize  = pdf.internal.pageSize;
-            var pageW     = pageSize.width  ? pageSize.width  : pageSize.getWidth();
-            var pageH     = pageSize.height ? pageSize.height : pageSize.getHeight();
-            var margin    = 10; // mm
-            var areaW     = pageW - margin * 2;
-            var areaH     = (pageH - margin * 2 - 20) / 2; // espacio para 2 fotos + descripción
-
-            // Renderizar cada par secuencialmente
-            function procesarPar(idx) {
-                if (idx >= pares.length) { resolve(); return; }
-
-                var par = pares[idx];
-                pdf.addPage();
-
-                // Título de sección en la nueva página
-                pdf.setFontSize(13);
-                pdf.setTextColor(0, 51, 102);
-                pdf.setFont(undefined, 'bold');
-                pdf.text('SET FOTOGRÁFICO', margin, margin + 5);
-                pdf.setFont(undefined, 'normal');
-                pdf.setTextColor(0, 0, 0);
-
-                var yOffset = margin + 12; // donde empieza la primera foto
-
-                function renderizarFoto(fcIdx) {
-                    if (fcIdx >= par.length) {
-                        procesarPar(idx + 1);
-                        return;
-                    }
-
-                    var fc = par[fcIdx];
-                    var img = fc.querySelector('img.foto-preview');
-                    var desc = fc.querySelector('.foto-descripcion');
-                    var descText = desc ? desc.value || '' : '';
-
-                    // Calcular altura disponible para esta foto en la página
-                    var alturaFoto   = areaH * 0.80; // 80% para imagen
-                    var alturaDesc   = areaH * 0.18; // 18% para descripción
-                    var gapDesc      = areaH * 0.02;
-
-                    html2canvas(fc, {
-                        scale: 2,
-                        useCORS: true,
-                        allowTaint: true,
-                        backgroundColor: '#ffffff',
-                        logging: false
-                    }).then(function(canvas) {
-
-                        // Calcular proporciones para ajustar imagen completa
-                        var cW = canvas.width;
-                        var cH = canvas.height;
-                        // Convertir areaW y alturaFoto a px (96 dpi → mm a px: * 3.7795)
-                        var maxWpx = areaW  * 3.7795;
-                        var maxHpx = alturaFoto * 3.7795;
-                        var ratio  = Math.min(maxWpx / cW, maxHpx / cH, 1);
-                        var drawW  = (cW * ratio) / 3.7795; // back to mm
-                        var drawH  = (cH * ratio) / 3.7795;
-
-                        // Centrar horizontalmente
-                        var xImg = margin + (areaW - drawW) / 2;
-
-                        // Marco de la foto
-                        pdf.setDrawColor(122, 156, 191);
-                        pdf.setFillColor(240, 245, 251);
-                        pdf.roundedRect(margin, yOffset, areaW, alturaFoto, 3, 3, 'FD');
-
-                        // Insertar imagen centrada dentro del marco
-                        var yImg = yOffset + (alturaFoto - drawH) / 2;
-                        var imgData = canvas.toDataURL('image/jpeg', 0.92);
-                        pdf.addImage(imgData, 'JPEG', xImg, yImg, drawW, drawH);
-
-                        // Descripción debajo de la foto
-                        if (descText.trim()) {
-                            pdf.setFontSize(9);
-                            pdf.setTextColor(50, 50, 50);
-                            var lines = pdf.splitTextToSize(descText, areaW);
-                            pdf.text(lines, margin, yOffset + alturaFoto + gapDesc + 4);
-                        }
-
-                        yOffset += alturaFoto + alturaDesc + 6;
-                        renderizarFoto(fcIdx + 1);
-                    });
+            function procesarFotos() {
+                // Agrupar en pares
+                var pares = [];
+                for (var i = 0; i < containers.length; i += 2) {
+                    pares.push(containers.slice(i, i + 2));
                 }
 
-                renderizarFoto(0);
+                var pageSize = pdf.internal.pageSize;
+                var pageW    = pageSize.width  ? pageSize.width  : pageSize.getWidth();
+                var pageH    = pageSize.height ? pageSize.height : pageSize.getHeight();
+                var margin   = 12; // mm
+                var areaW    = pageW - margin * 2;
+                // Cada foto ocupa aproximadamente la mitad de la página menos márgenes y título
+                var alturaFoto = (pageH - margin * 2 - 18) / 2 * 0.80;
+                var alturaDesc = (pageH - margin * 2 - 18) / 2 * 0.18;
+                var gap        = (pageH - margin * 2 - 18) / 2 * 0.02;
+
+                function procesarPar(idx) {
+                    if (idx >= pares.length) { resolve(); return; }
+
+                    var par = pares[idx];
+                    pdf.addPage();
+
+                    // Título de sección
+                    pdf.setFontSize(13);
+                    pdf.setTextColor(0, 51, 102);
+                    pdf.setFont(undefined, 'bold');
+                    pdf.text('SET FOTOGRÁFICO', margin, margin + 5);
+                    pdf.setFont(undefined, 'normal');
+                    pdf.setTextColor(0, 0, 0);
+
+                    var yOffset = margin + 12;
+
+                    function renderizarFoto(fcIdx) {
+                        if (fcIdx >= par.length) {
+                            procesarPar(idx + 1);
+                            return;
+                        }
+
+                        var fc       = par[fcIdx];
+                        var imgEl    = fc.querySelector('img.foto-preview');
+                        var descEl   = fc.querySelector('.foto-descripcion');
+                        var descText = descEl ? (descEl.value || '') : '';
+
+                        // Usar el elemento img directamente en lugar del contenedor completo
+                        // para evitar capturar botones u otros elementos
+                        var tempDiv = document.createElement('div');
+                        tempDiv.style.cssText = 'width:700px;background:#fff;padding:8px;';
+                        var clonImg = imgEl.cloneNode(true);
+                        clonImg.style.cssText = 'max-width:100%;height:auto;display:block;';
+                        tempDiv.appendChild(clonImg);
+                        document.body.appendChild(tempDiv);
+
+                        html2canvas(tempDiv, {
+                            scale: 1.5,
+                            useCORS: true,
+                            allowTaint: true,
+                            backgroundColor: '#ffffff',
+                            logging: false
+                        }).then(function(canvas) {
+                            document.body.removeChild(tempDiv);
+
+                            var cW    = canvas.width;
+                            var cH    = canvas.height;
+                            // Convertir mm a px (96dpi: 1mm = 3.7795px)
+                            var maxWpx = areaW * 3.7795;
+                            var maxHpx = alturaFoto * 3.7795;
+                            var ratio  = Math.min(maxWpx / cW, maxHpx / cH);
+                            var drawW  = (cW * ratio) / 3.7795; // px → mm
+                            var drawH  = (cH * ratio) / 3.7795;
+
+                            // Marco
+                            pdf.setDrawColor(122, 156, 191);
+                            pdf.setFillColor(240, 245, 251);
+                            pdf.roundedRect(margin, yOffset, areaW, alturaFoto, 2, 2, 'FD');
+
+                            // Imagen centrada dentro del marco
+                            var xImg = margin + (areaW - drawW) / 2;
+                            var yImg = yOffset + (alturaFoto - drawH) / 2;
+                            pdf.addImage(canvas.toDataURL('image/jpeg', 0.92), 'JPEG', xImg, yImg, drawW, drawH);
+
+                            // Descripción
+                            if (descText.trim()) {
+                                pdf.setFontSize(9);
+                                pdf.setTextColor(50, 50, 50);
+                                var lines = pdf.splitTextToSize(descText, areaW);
+                                pdf.text(lines, margin, yOffset + alturaFoto + gap + 4);
+                            }
+
+                            yOffset += alturaFoto + alturaDesc + gap;
+                            renderizarFoto(fcIdx + 1);
+
+                        }).catch(function(err) {
+                            document.body.removeChild(tempDiv);
+                            console.error('Error renderizando foto:', err);
+                            renderizarFoto(fcIdx + 1);
+                        });
+                    }
+
+                    renderizarFoto(0);
+                }
+
+                procesarPar(0);
             }
 
-            procesarPar(0);
+            cargarHtml2CanvasYProcesar();
         });
     }
 
