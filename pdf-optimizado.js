@@ -1035,9 +1035,9 @@ input[type="radio"] {
                 var margin   = 12; // mm
                 var areaW    = pageW - margin * 2;
                 // Cada foto ocupa aproximadamente la mitad de la página menos márgenes y título
-                var alturaFoto = (pageH - margin * 2 - 18) / 2 * 0.80;
-                var alturaDesc = (pageH - margin * 2 - 18) / 2 * 0.18;
-                var gap        = (pageH - margin * 2 - 18) / 2 * 0.02;
+                var alturaFoto = (pageH - margin * 2 - 18) / 2 * 0.68;
+                var alturaDesc = (pageH - margin * 2 - 18) / 2 * 0.28;
+                var gap        = (pageH - margin * 2 - 18) / 2 * 0.04;
 
                 function procesarPar(idx) {
                     if (idx >= pares.length) { resolve(); return; }
@@ -1106,12 +1106,35 @@ input[type="radio"] {
                             var yImg = yOffset + (alturaFoto - drawH) / 2;
                             pdf.addImage(canvas.toDataURL('image/jpeg', 0.92), 'JPEG', xImg, yImg, drawW, drawH);
 
-                            // Descripción
+                            // Descripción justificada debajo de la foto
                             if (descText.trim()) {
                                 pdf.setFontSize(9);
                                 pdf.setTextColor(50, 50, 50);
+                                var yDesc = yOffset + alturaFoto + gap + 4;
                                 var lines = pdf.splitTextToSize(descText, areaW);
-                                pdf.text(lines, margin, yOffset + alturaFoto + gap + 4);
+                                lines.forEach(function(linea, li) {
+                                    var esUltima = (li === lines.length - 1);
+                                    if (esUltima) {
+                                        // Última línea: alineada a la izquierda
+                                        pdf.text(linea, margin, yDesc);
+                                    } else {
+                                        // Líneas intermedias: justificadas
+                                        var palabras = linea.trim().split(/\s+/);
+                                        if (palabras.length <= 1) {
+                                            pdf.text(linea, margin, yDesc);
+                                        } else {
+                                            var anchoTexto = pdf.getStringUnitWidth(palabras.join('')) * 9 / pdf.internal.scaleFactor;
+                                            var espacioTotal = areaW - anchoTexto;
+                                            var espacioEntreP = espacioTotal / (palabras.length - 1);
+                                            var xP = margin;
+                                            palabras.forEach(function(pal, pi) {
+                                                pdf.text(pal, xP, yDesc);
+                                                xP += pdf.getStringUnitWidth(pal) * 9 / pdf.internal.scaleFactor + espacioEntreP;
+                                            });
+                                        }
+                                    }
+                                    yDesc += 5; // interlineado
+                                });
                             }
 
                             yOffset += alturaFoto + alturaDesc + gap;
