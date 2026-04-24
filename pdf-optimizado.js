@@ -918,6 +918,9 @@ input[type="radio"] {
                             fc.parentNode.insertBefore(salto, fc);
                         }
                     });
+
+                    // Asegurar que las imágenes se muestran correctamente
+                    Array.from(clonedDoc.querySelectorAll('img')).forEach(img => {
                         img.style.display = 'block';
                         img.style.maxWidth = '100%';
                     });
