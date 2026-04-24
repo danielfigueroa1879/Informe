@@ -146,33 +146,6 @@ botonesImagenes.forEach(boton => {
 
 
         
-        // Ocultar el set fotográfico del flujo principal (se renderizará aparte)
-        const setFotografico   = container.querySelector('.set-fotografico');
-        const tituloFotos      = container.querySelector('#seccion-fotos');
-        const h2Fotos          = container.querySelector('h2[data-fotos]') ||
-                                 Array.from(container.querySelectorAll('h2'))
-                                      .find(h => h.textContent.includes('FOTOGRÁFICO'));
-
-        if (setFotografico) {
-            estadoOriginal.estilos.set(setFotografico, { display: setFotografico.style.display });
-            setFotografico.style.display = 'none';
-        }
-        if (tituloFotos) {
-            estadoOriginal.estilos.set(tituloFotos, { display: tituloFotos.style.display });
-            tituloFotos.style.display = 'none';
-        }
-        if (h2Fotos) {
-            estadoOriginal.estilos.set(h2Fotos, { display: h2Fotos.style.display });
-            h2Fotos.style.display = 'none';
-        }
-
-        // Ocultar botón agregar foto
-        const btnAgregarFoto = container.querySelector('[onclick="agregarFoto()"]');
-        if (btnAgregarFoto && btnAgregarFoto.parentElement) {
-            estadoOriginal.estilos.set(btnAgregarFoto.parentElement, { display: btnAgregarFoto.parentElement.style.display });
-            btnAgregarFoto.parentElement.style.display = 'none';
-        }
-
         // 3. Forzar saltos de página antes de las secciones específicas
         const seccionResumen = container.querySelector('#seccion-resumen');
         const seccionFotos = container.querySelector('#seccion-fotos');
@@ -338,21 +311,6 @@ columnasCheck.forEach(col => {
             }},
             { selector: 'tr', estilos: {
                 pageBreakInside: 'avoid'
-            }},
-            { selector: '.set-fotografico', estilos: {
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '16px'
-            }},
-            { selector: '.foto-container', estilos: {
-                pageBreakInside: 'avoid',
-                breakInside: 'avoid',
-                display: 'flex',
-                flexDirection: 'column'
-            }},
-            { selector: '.foto-marco', estilos: {
-                pageBreakInside: 'avoid',
-                breakInside: 'avoid'
             }},
             { selector: '#plan-accion-editor', estilos: {
                 height: 'auto',
@@ -686,6 +644,20 @@ input[type="radio"] {
         // 8. Restringir el flujo del documento para evitar problemas de renderizado
         document.body.style.overflow = 'visible';
         document.body.style.height = 'auto';
+
+        // 9. Ocultar set fotográfico DESPUÉS de todos los estilos (para evitar que se sobreescriba)
+        const _setFotos = container.querySelector('.set-fotografico');
+        const _h2Fotos  = Array.from(container.querySelectorAll('h2'))
+                               .find(h => h.textContent.includes('FOTOGRÁFICO'));
+        const _divFotos = container.querySelector('#seccion-fotos');
+        const _btnFoto  = container.querySelector('[onclick="agregarFoto()"]');
+
+        [_setFotos, _h2Fotos, _divFotos].forEach(function(el) {
+            if (el) el.style.setProperty('display', 'none', 'important');
+        });
+        if (_btnFoto && _btnFoto.parentElement) {
+            _btnFoto.parentElement.style.setProperty('display', 'none', 'important');
+        }
         
         return estadoOriginal;
     }
@@ -1073,11 +1045,14 @@ input[type="radio"] {
                     var par = pares[idx];
                     pdf.addPage();
 
-                    // Título de sección
-                    pdf.setFontSize(13);
+                    // Título centrado
+                    pdf.setFontSize(14);
                     pdf.setTextColor(0, 51, 102);
                     pdf.setFont(undefined, 'bold');
-                    pdf.text('SET FOTOGRÁFICO', margin, margin + 5);
+                    var titulo = 'SET FOTOGRÁFICO';
+                    var tituloW = pdf.getStringUnitWidth(titulo) * 14 / pdf.internal.scaleFactor;
+                    var tituloX = (pageW - tituloW) / 2;
+                    pdf.text(titulo, tituloX, margin + 7);
                     pdf.setFont(undefined, 'normal');
                     pdf.setTextColor(0, 0, 0);
 
