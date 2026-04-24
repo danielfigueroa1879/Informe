@@ -316,7 +316,8 @@ columnasCheck.forEach(col => {
                 height: 'auto',
                 maxHeight: 'none',
                 overflow: 'visible',
-                fontSize: '10pt' // Tamaño reducido
+                fontSize: '11pt',
+                lineHeight: '1.5'
             }}
         ];
         
@@ -504,42 +505,43 @@ input[type="radio"] {
             
             #plan-accion-editor p, 
             #plan-accion-editor li, 
-            #plan-accion-editor span {
-            font-size: 10pt !important; /* Asegurar que todos los elementos internos tengan el mismo tamaño */
+            #plan-accion-editor span,
+            #plan-accion-editor div {
+                font-size: 11pt !important;
+                line-height: 1.5 !important;
             }
-            
-                       
-         
-            
             
             /* Ajustar plan de acción para formato tipo oficio formal */
             #plan-accion-editor {
-                font-size: 12pt !important; /* Reducido */
-                line-height: 3.0 !important; /* Mejorado para legibilidad */
-                padding: 20px 25px !important; /* Márgenes internos para simular oficio */
-                background-color: #fff !important; /* Fondo blanco */
-                border: 1px solid #e0e0e0 !important; /* Borde sutil */
-                box-shadow: 0 1px 3px rgba(0,0,0,0.05) !important; /* Sombra sutil */
-                border-radius: 0 !important; /* Sin bordes redondeados para estilo formal */
-                font-family: 'Poppins', sans-serif !important; /* Usar Poppins como el resto */
-                text-align: justify !important; /* Texto justificado para apariencia formal */
-                color: #000 !important; /* Negro sólido para texto formal */
+                font-size: 11pt !important;
+                line-height: 1.5 !important;
+                padding: 20px 25px !important;
+                background-color: #fff !important;
+                border: 1px solid #e0e0e0 !important;
+                box-shadow: 0 1px 3px rgba(0,0,0,0.05) !important;
+                border-radius: 0 !important;
+                font-family: 'Poppins', sans-serif !important;
+                text-align: justify !important;
+                color: #000 !important;
                 margin-top: 15px !important;
                 margin-bottom: 20px !important;
-                min-height: 200px !important; /* Altura mínima para apariencia adecuada */
+                min-height: 200px !important;
             }
             
-            /* Estilos específicos para párrafos dentro del plan de acción */
+            /* Párrafos con espacio visible entre ellos */
             #plan-accion-editor p {
-                margin-bottom: 15px !important;
-                text-indent: 0px !important; /* Sangría de primera línea para estilo formal */
+                margin-top: 0 !important;
+                margin-bottom: 12pt !important;
+                text-indent: 0 !important;
+                font-size: 11pt !important;
+                line-height: 1.5 !important;
             }
             
             #plan-accion-editor br {
-    content: "";
-    display: block;
-    margin-bottom: 10px !important;
-}
+                content: "";
+                display: block;
+                margin-bottom: 12pt !important;
+            }
             
             /* Estilos para listas dentro del plan de acción */
             #plan-accion-editor ul, 
@@ -807,12 +809,12 @@ input[type="radio"] {
                         
                         /* Estilo formal para el plan de acción */
                         #plan-accion-editor {
-                            font-size: 13pt !important;
-                            line-height: 3.0 !important;
+                            font-size: 11pt !important;
+                            line-height: 1.5 !important;
                             padding: 20px 25px !important;
                             background-color: #fff !important;
                             border: 1px solid #e0e0e0 !important;
-                            box-shadow: 0 1px 3px rgba(0,0,0,0.05) !important;
+                            box-shadow: none !important;
                             border-radius: 0 !important;
                             font-family: 'Poppins', sans-serif !important;
                             text-align: justify !important;
@@ -822,9 +824,18 @@ input[type="radio"] {
                             min-height: 200px !important;
                         }
                         
+                        #plan-accion-editor p,
+                        #plan-accion-editor li,
+                        #plan-accion-editor span,
+                        #plan-accion-editor div {
+                            font-size: 11pt !important;
+                            line-height: 1.5 !important;
+                        }
+
                         #plan-accion-editor p {
-                            margin-bottom: 12px !important;
-                            text-indent: 20px !important;
+                            margin-top: 0 !important;
+                            margin-bottom: 12pt !important;
+                            text-indent: 0 !important;
                         }
                         
                         #plan-accion-editor ul, 
