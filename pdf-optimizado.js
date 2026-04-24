@@ -146,6 +146,33 @@ botonesImagenes.forEach(boton => {
 
 
         
+        // Ocultar el set fotográfico del flujo principal (se renderizará aparte)
+        const setFotografico   = container.querySelector('.set-fotografico');
+        const tituloFotos      = container.querySelector('#seccion-fotos');
+        const h2Fotos          = container.querySelector('h2[data-fotos]') ||
+                                 Array.from(container.querySelectorAll('h2'))
+                                      .find(h => h.textContent.includes('FOTOGRÁFICO'));
+
+        if (setFotografico) {
+            estadoOriginal.estilos.set(setFotografico, { display: setFotografico.style.display });
+            setFotografico.style.display = 'none';
+        }
+        if (tituloFotos) {
+            estadoOriginal.estilos.set(tituloFotos, { display: tituloFotos.style.display });
+            tituloFotos.style.display = 'none';
+        }
+        if (h2Fotos) {
+            estadoOriginal.estilos.set(h2Fotos, { display: h2Fotos.style.display });
+            h2Fotos.style.display = 'none';
+        }
+
+        // Ocultar botón agregar foto
+        const btnAgregarFoto = container.querySelector('[onclick="agregarFoto()"]');
+        if (btnAgregarFoto && btnAgregarFoto.parentElement) {
+            estadoOriginal.estilos.set(btnAgregarFoto.parentElement, { display: btnAgregarFoto.parentElement.style.display });
+            btnAgregarFoto.parentElement.style.display = 'none';
+        }
+
         // 3. Forzar saltos de página antes de las secciones específicas
         const seccionResumen = container.querySelector('#seccion-resumen');
         const seccionFotos = container.querySelector('#seccion-fotos');
@@ -980,19 +1007,14 @@ input[type="radio"] {
             .toPdf()
             .get('pdf')
             .then(function(pdfObject) {
-                // Añadir metadatos y numeración
-                agregarMetadatosYNumeracion(pdfObject);
-                
-                // IMPORTANTE: Ya no guardamos el PDF aquí, 
-                // solo lo hacemos en la función agregarMetadatosYNumeracion
-                // para evitar la duplicación de archivos
-                
-                console.log("PDF en proceso de generación...");
-                
-                // Restaurar el documento original después de un momento
-                setTimeout(() => {
-                    restaurarDocumentoOriginal(estadoOriginal);
-                }, 2500); // Aumentar el tiempo para asegurar que se complete la generación
+                // Agregar páginas fotográficas al PDF antes de los metadatos
+                return agregarPaginasFotos(pdfObject, contenido).then(function() {
+                    agregarMetadatosYNumeracion(pdfObject);
+                    console.log("PDF en proceso de generación...");
+                    setTimeout(() => {
+                        restaurarDocumentoOriginal(estadoOriginal);
+                    }, 2500);
+                });
             })
             .catch(function(error) {
                 console.error("Error al generar el PDF:", error);
@@ -1000,6 +1022,116 @@ input[type="radio"] {
                 alert("Ocurrió un error al generar el PDF. Por favor, intente nuevamente.");
                 restaurarDocumentoOriginal(estadoOriginal);
             });
+    }
+
+    // Agrega páginas fotográficas: 2 fotos por página, nunca cortadas
+    function agregarPaginasFotos(pdf, contenido) {
+        return new Promise(function(resolve) {
+
+            // Buscar foto-containers que tengan imagen real (no placeholder vacío)
+            var containers = Array.from(
+                contenido.querySelectorAll('.foto-container')
+            ).filter(function(fc) {
+                return fc.querySelector('img.foto-preview') !== null;
+            });
+
+            if (containers.length === 0) { resolve(); return; }
+
+            // Agrupar en pares [par1=[fc1,fc2], par2=[fc3,fc4], ...]
+            var pares = [];
+            for (var i = 0; i < containers.length; i += 2) {
+                pares.push(containers.slice(i, i + 2));
+            }
+
+            var pageSize  = pdf.internal.pageSize;
+            var pageW     = pageSize.width  ? pageSize.width  : pageSize.getWidth();
+            var pageH     = pageSize.height ? pageSize.height : pageSize.getHeight();
+            var margin    = 10; // mm
+            var areaW     = pageW - margin * 2;
+            var areaH     = (pageH - margin * 2 - 20) / 2; // espacio para 2 fotos + descripción
+
+            // Renderizar cada par secuencialmente
+            function procesarPar(idx) {
+                if (idx >= pares.length) { resolve(); return; }
+
+                var par = pares[idx];
+                pdf.addPage();
+
+                // Título de sección en la nueva página
+                pdf.setFontSize(13);
+                pdf.setTextColor(0, 51, 102);
+                pdf.setFont(undefined, 'bold');
+                pdf.text('SET FOTOGRÁFICO', margin, margin + 5);
+                pdf.setFont(undefined, 'normal');
+                pdf.setTextColor(0, 0, 0);
+
+                var yOffset = margin + 12; // donde empieza la primera foto
+
+                function renderizarFoto(fcIdx) {
+                    if (fcIdx >= par.length) {
+                        procesarPar(idx + 1);
+                        return;
+                    }
+
+                    var fc = par[fcIdx];
+                    var img = fc.querySelector('img.foto-preview');
+                    var desc = fc.querySelector('.foto-descripcion');
+                    var descText = desc ? desc.value || '' : '';
+
+                    // Calcular altura disponible para esta foto en la página
+                    var alturaFoto   = areaH * 0.80; // 80% para imagen
+                    var alturaDesc   = areaH * 0.18; // 18% para descripción
+                    var gapDesc      = areaH * 0.02;
+
+                    html2canvas(fc, {
+                        scale: 2,
+                        useCORS: true,
+                        allowTaint: true,
+                        backgroundColor: '#ffffff',
+                        logging: false
+                    }).then(function(canvas) {
+
+                        // Calcular proporciones para ajustar imagen completa
+                        var cW = canvas.width;
+                        var cH = canvas.height;
+                        // Convertir areaW y alturaFoto a px (96 dpi → mm a px: * 3.7795)
+                        var maxWpx = areaW  * 3.7795;
+                        var maxHpx = alturaFoto * 3.7795;
+                        var ratio  = Math.min(maxWpx / cW, maxHpx / cH, 1);
+                        var drawW  = (cW * ratio) / 3.7795; // back to mm
+                        var drawH  = (cH * ratio) / 3.7795;
+
+                        // Centrar horizontalmente
+                        var xImg = margin + (areaW - drawW) / 2;
+
+                        // Marco de la foto
+                        pdf.setDrawColor(122, 156, 191);
+                        pdf.setFillColor(240, 245, 251);
+                        pdf.roundedRect(margin, yOffset, areaW, alturaFoto, 3, 3, 'FD');
+
+                        // Insertar imagen centrada dentro del marco
+                        var yImg = yOffset + (alturaFoto - drawH) / 2;
+                        var imgData = canvas.toDataURL('image/jpeg', 0.92);
+                        pdf.addImage(imgData, 'JPEG', xImg, yImg, drawW, drawH);
+
+                        // Descripción debajo de la foto
+                        if (descText.trim()) {
+                            pdf.setFontSize(9);
+                            pdf.setTextColor(50, 50, 50);
+                            var lines = pdf.splitTextToSize(descText, areaW);
+                            pdf.text(lines, margin, yOffset + alturaFoto + gapDesc + 4);
+                        }
+
+                        yOffset += alturaFoto + alturaDesc + 6;
+                        renderizarFoto(fcIdx + 1);
+                    });
+                }
+
+                renderizarFoto(0);
+            }
+
+            procesarPar(0);
+        });
     }
 
     // Función para agregar metadatos, numeración y logo a cada página del PDF
