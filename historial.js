@@ -376,7 +376,9 @@
         btn.type = 'button';
         btn.className = 'btn-historial no-print';
         btn.textContent = '📁 Historial de Informes';
-        btn.onclick = abrirPanelHistorial;
+        // Nota: se usa addEventListener (no btn.onclick=) para que otros scripts que
+        // reasignan onclick de botones cuyo source contenga "PDF" no lo pisen.
+        btn.addEventListener('click', abrirPanelHistorial);
         Object.assign(btn.style, {
             backgroundColor: '#6f42c1',
             color: '#fff',
