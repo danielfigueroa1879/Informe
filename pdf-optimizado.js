@@ -1282,8 +1282,12 @@ function agregarMetadatosYNumeracion(pdf) {
             }
             
             // Guardar el PDF después de procesar todas las páginas
-            pdf.save(`Fiscalizacion_${new Date().toLocaleDateString().replace(/\//g, '-')}.pdf`);
-            
+            const _nombrePDF = `Fiscalizacion_${new Date().toLocaleDateString().replace(/\//g, '-')}.pdf`;
+            if (typeof window.archivarPDFEnHistorial === 'function') {
+                try { window.archivarPDFEnHistorial(pdf, _nombrePDF); } catch (e) { console.warn(e); }
+            }
+            pdf.save(_nombrePDF);
+
             // Ahora, después de guardar correctamente, actualizamos el indicador de éxito
             console.log("PDF generado exitosamente");
             actualizarIndicadorExito();
@@ -1340,8 +1344,12 @@ function agregarMetadatosYNumeracion(pdf) {
             }
             
             // Guardar el PDF
-            pdf.save(`Fiscalizacion_${new Date().toLocaleDateString().replace(/\//g, '-')}.pdf`);
-            
+            const _nombrePDF2 = `Fiscalizacion_${new Date().toLocaleDateString().replace(/\//g, '-')}.pdf`;
+            if (typeof window.archivarPDFEnHistorial === 'function') {
+                try { window.archivarPDFEnHistorial(pdf, _nombrePDF2); } catch (e) { console.warn(e); }
+            }
+            pdf.save(_nombrePDF2);
+
             // Actualizar indicador de éxito
             console.log("PDF generado exitosamente (sin logo)");
             actualizarIndicadorExito();
@@ -1353,7 +1361,11 @@ function agregarMetadatosYNumeracion(pdf) {
     } catch (error) {
         console.warn("Error al añadir metadatos, numeración o logo:", error);
         // En caso de error, guardar el PDF sin características especiales
-        pdf.save(`Fiscalizacion_${new Date().toLocaleDateString().replace(/\//g, '-')}.pdf`);
+        const _nombrePDF3 = `Fiscalizacion_${new Date().toLocaleDateString().replace(/\//g, '-')}.pdf`;
+        if (typeof window.archivarPDFEnHistorial === 'function') {
+            try { window.archivarPDFEnHistorial(pdf, _nombrePDF3); } catch (e) { console.warn(e); }
+        }
+        pdf.save(_nombrePDF3);
         
         // Actualizar indicador aun así
         actualizarIndicadorExito();
