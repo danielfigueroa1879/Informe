@@ -355,6 +355,196 @@
         notificar('Exportados ' + data.length + ' informes', 'ok');
     }
 
+    // ---------- Migrar historial local (IndexedDB) a la nube ----------
+    const HIST_DB_NAME = 'InformesFiscalizacion';
+    const HIST_STORE = 'informes';
+
+    function abrirHistorialDB() {
+        return new Promise(function (resolve, reject) {
+            if (!('indexedDB' in window)) {
+                reject(new Error('IndexedDB no disponible en este navegador'));
+                return;
+            }
+            const req = indexedDB.open(HIST_DB_NAME, 1);
+            req.onsuccess = function () { resolve(req.result); };
+            req.onerror = function () { reject(req.error); };
+            req.onupgradeneeded = function (ev) {
+                // Si no existe, crearla vacía para que resolve no falle
+                const db = ev.target.result;
+                if (!db.objectStoreNames.contains(HIST_STORE)) {
+                    db.createObjectStore(HIST_STORE, { keyPath: 'id', autoIncrement: true });
+                }
+            };
+        });
+    }
+
+    function listarHistorialLocal() {
+        return abrirHistorialDB().then(function (db) {
+            return new Promise(function (resolve, reject) {
+                if (!db.objectStoreNames.contains(HIST_STORE)) { resolve([]); return; }
+                const req = db.transaction(HIST_STORE, 'readonly').objectStore(HIST_STORE).getAll();
+                req.onsuccess = function () { resolve(req.result || []); };
+                req.onerror = function () { reject(req.error); };
+            });
+        });
+    }
+
+    // Extrae fotos (base64 + descripción) desde el HTML capturado
+    function extraerFotosDeHTML(html, descripcionesDelSnapshot) {
+        const fotos = [];
+        if (!html) return fotos;
+        try {
+            const cont = document.createElement('div');
+            cont.innerHTML = html;
+            const contenedores = cont.querySelectorAll('.foto-container');
+            contenedores.forEach(function (c, idx) {
+                const img = c.querySelector('img');
+                const desc = c.querySelector('.foto-descripcion');
+                fotos.push({
+                    imagen_base64: img ? img.src : null,
+                    descripcion: (descripcionesDelSnapshot && descripcionesDelSnapshot[idx])
+                        || (desc ? desc.value || '' : '')
+                });
+            });
+        } catch (e) { console.warn('No se pudieron extraer fotos:', e); }
+        return fotos;
+    }
+
+    // Convierte un registro del historial local al formato Supabase
+    function convertirRegistroLocalAFila(registro) {
+        const snap = (registro.formulario && registro.formulario.localStorage) || {};
+        const fotosHTML = (registro.formulario && registro.formulario.fotosHTML) || '';
+
+        // Reconstruir el objeto "datos" con la misma estructura del módulo
+        const datos = {
+            campos: {},
+            radios: {},
+            observaciones: [],
+            plan_accion: '',
+            fotos: []
+        };
+
+        const nombresCampoTexto = [
+            'nombre_entidad', 'direccion', 'empresa_seguridad', 'dia', 'mes', 'ano',
+            'fiscalizador', 'Nombre y cargo persona entrevistada'
+        ];
+        nombresCampoTexto.forEach(function (n) {
+            if (typeof snap[n] === 'string') datos.campos[n] = snap[n];
+        });
+
+        // Radios: item_0, item_1, ...
+        Object.keys(snap).forEach(function (k) {
+            if (/^item_\d+$/.test(k)) datos.radios[k] = snap[k];
+        });
+
+        // Observaciones: observacion_0, observacion_1, ...
+        const obsKeys = Object.keys(snap).filter(function (k) { return /^observacion_\d+$/.test(k); });
+        obsKeys.sort(function (a, b) {
+            return parseInt(a.split('_')[1], 10) - parseInt(b.split('_')[1], 10);
+        });
+        obsKeys.forEach(function (k) {
+            const idx = parseInt(k.split('_')[1], 10);
+            datos.observaciones[idx] = snap[k] || '';
+        });
+
+        // Plan de acción
+        if (typeof snap['plan_accion'] === 'string') datos.plan_accion = snap['plan_accion'];
+
+        // Descripciones de fotos (foto_desc_0, ...)
+        const descs = {};
+        Object.keys(snap).forEach(function (k) {
+            const m = k.match(/^foto_desc_(\d+)$/);
+            if (m) descs[parseInt(m[1], 10)] = snap[k] || '';
+        });
+
+        datos.fotos = extraerFotosDeHTML(fotosHTML, descs);
+
+        // Contar cumplimiento a partir de radios
+        let cumplen = 0, noCumplen = 0, noAplica = 0;
+        Object.keys(datos.radios).forEach(function (k) {
+            if (datos.radios[k] === 'cumple') cumplen++;
+            else if (datos.radios[k] === 'no-cumple') noCumplen++;
+            else if (datos.radios[k] === 'no-aplica') noAplica++;
+        });
+        const evaluados = cumplen + noCumplen;
+        const porcentaje = evaluados > 0 ? Math.round((cumplen / evaluados) * 100) : 0;
+        let estado = 'PENDIENTE DE EVALUACIÓN';
+        if (evaluados > 0) {
+            if (porcentaje >= 80) estado = 'ESTABLECIMIENTO SEGURO';
+            else if (porcentaje >= 60) estado = 'ESTABLECIMIENTO EN RIESGO';
+            else estado = 'ESTABLECIMIENTO INSEGURO';
+        }
+
+        const dia = datos.campos.dia || '';
+        const mes = datos.campos.mes || '';
+        const ano = datos.campos.ano || '';
+        const fecha = (dia || mes || ano) ? (dia + '/' + mes + '/' + ano) : '';
+
+        return {
+            nombre_entidad: datos.campos.nombre_entidad || (registro.nombre || ''),
+            direccion: datos.campos.direccion || '',
+            empresa_seguridad: datos.campos.empresa_seguridad || '',
+            fecha_fiscalizacion: fecha,
+            fiscalizador: datos.campos.fiscalizador || '',
+            entrevistado: datos.campos['Nombre y cargo persona entrevistada'] || '',
+            estado_seguridad: estado,
+            porcentaje: porcentaje,
+            items_cumplen: cumplen,
+            items_no_cumplen: noCumplen,
+            items_no_aplica: noAplica,
+            datos: datos
+        };
+    }
+
+    async function migrarHistorialLocal() {
+        const client = getClient();
+        if (!client) { notificar('Supabase no está conectado', 'err'); return; }
+
+        let registros;
+        try {
+            registros = await listarHistorialLocal();
+        } catch (err) {
+            notificar('No se pudo leer el historial local: ' + (err.message || err), 'err');
+            return;
+        }
+
+        if (!registros.length) {
+            notificar('No hay informes en el historial local para migrar', 'warn');
+            return;
+        }
+
+        if (!confirm('Se subirán ' + registros.length + ' informe(s) del historial local a la nube. ¿Continuar?')) return;
+
+        let ok = 0, fallos = 0;
+        for (let i = 0; i < registros.length; i++) {
+            actualizarIndicadorEstado('Migrando ' + (i + 1) + ' de ' + registros.length + '...');
+            try {
+                const fila = convertirRegistroLocalAFila(registros[i]);
+                // Anotar en el JSON el origen para trazabilidad
+                fila.datos._migrado = {
+                    origen: 'historial-local-indexeddb',
+                    id_local: registros[i].id,
+                    fecha_original: registros[i].fecha,
+                    nombre_original: registros[i].nombre
+                };
+                const { error } = await client.from(TABLA).insert(fila);
+                if (error) throw error;
+                ok++;
+            } catch (err) {
+                console.error('Migración: falló el informe local id', registros[i].id, err);
+                fallos++;
+            }
+        }
+
+        actualizarIndicadorEstado(informeActualId
+            ? 'Editando informe #' + informeActualId + ' (autoguardado activo)'
+            : 'Autoguardado activo — se guarda al escribir');
+
+        const msg = 'Migración completa: ' + ok + ' subidos' + (fallos ? ', ' + fallos + ' con error (ver consola)' : '');
+        notificar(msg, fallos ? 'warn' : 'ok');
+        alert(msg + '\n\nLos informes locales NO se borraron. Si todo se ve bien en Historial, puedes eliminarlos manualmente desde el botón "Historial de Informes" (verde) o dejarlos como respaldo.');
+    }
+
     // ---------- Nuevo informe (limpia el estado local) ----------
     function nuevoInforme() {
         if (!confirm('¿Iniciar un nuevo informe? Se limpiará el formulario actual (los datos ya guardados en la nube se mantienen).')) return;
@@ -490,6 +680,7 @@
         window.supabaseListar = abrirModalListado;
         window.supabaseNuevo = nuevoInforme;
         window.supabaseExportarCSV = exportarCSV;
+        window.supabaseMigrarLocal = migrarHistorialLocal;
 
         actualizarIndicadorEstado(informeActualId
             ? 'Editando informe #' + informeActualId + ' (autoguardado activo)'

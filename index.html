@@ -643,6 +643,8 @@
 .btn-nube.btn-nuevo:hover { background: #565e64; }
 .btn-nube.btn-exportar  { background: #17a2b8; }
 .btn-nube.btn-exportar:hover { background: #138496; }
+.btn-nube.btn-migrar    { background: #fd7e14; }
+.btn-nube.btn-migrar:hover { background: #e8690b; }
 
 /* ---------- Modal de listado de informes ---------- */
 #modal-informes { display: none; position: fixed; inset: 0; z-index: 9999; }
@@ -2173,6 +2175,9 @@ h1 {
                     </button>
                     <button type="button" class="btn-nube btn-exportar" onclick="supabaseExportarCSV()">
                         <i class="fas fa-file-csv"></i> Exportar todas (CSV)
+                    </button>
+                    <button type="button" class="btn-nube btn-migrar" onclick="supabaseMigrarLocal()" title="Sube todos los informes que estaban solo en este navegador a la base de datos">
+                        <i class="fas fa-cloud-arrow-up"></i> Migrar historial local → nube
                     </button>
                 </div>
             </div>
