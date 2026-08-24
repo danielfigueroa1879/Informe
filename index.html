@@ -2158,21 +2158,21 @@ h1 {
             </div>
             <div class="nube-panel no-print">
                 <div class="nube-titulo">
-                    <i class="fas fa-cloud"></i> Base de datos en la nube
-                    <span id="supabase-estado" class="nube-estado">Sin guardar en la nube</span>
+                    <i class="fas fa-cloud"></i> Fiscalizaciones en la nube
+                    <span id="supabase-estado" class="nube-estado">Autoguardado activo — se guarda solo</span>
                 </div>
                 <div class="nube-botones">
-                    <button type="button" class="btn-nube btn-guardar" onclick="supabaseGuardar()">
-                        <i class="fas fa-save"></i> Guardar en la nube
-                    </button>
                     <button type="button" class="btn-nube btn-listar" onclick="supabaseListar()">
-                        <i class="fas fa-folder-open"></i> Ver informes guardados
+                        <i class="fas fa-clock-rotate-left"></i> Historial
+                    </button>
+                    <button type="button" class="btn-nube btn-guardar" onclick="supabaseGuardar()">
+                        <i class="fas fa-save"></i> Guardar ahora
                     </button>
                     <button type="button" class="btn-nube btn-nuevo" onclick="supabaseNuevo()">
-                        <i class="fas fa-file"></i> Nuevo informe
+                        <i class="fas fa-file-circle-plus"></i> Nueva fiscalización
                     </button>
                     <button type="button" class="btn-nube btn-exportar" onclick="supabaseExportarCSV()">
-                        <i class="fas fa-file-csv"></i> Exportar todos (CSV)
+                        <i class="fas fa-file-csv"></i> Exportar todas (CSV)
                     </button>
                 </div>
             </div>
