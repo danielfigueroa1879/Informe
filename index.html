@@ -277,7 +277,7 @@
         }
         
         .check-column {
-            width: 80px; /* MODIFICADO: Aumentado de 50px a 80px para dar más espacio */
+            width: 70px;
             text-align: center;
         }
         
@@ -288,7 +288,7 @@
         
         /* AÑADIDO: Ajustar el ancho de la columna de ítems */
         tr.header-row th:first-child {
-            width: 45%; /* Ligeramente reducido para compensar el aumento en las columnas de check */
+            width: 40%;
         }
         
         input[type="radio"] {
@@ -1192,28 +1192,32 @@ h1 {
 </head>
 <script>
     function contarCumplimiento() {
-        var totalItems = document.querySelectorAll('input[type="radio"][name^="item_"]').length / 2;
+        var totalItems = document.querySelectorAll('input[type="radio"][name^="item_"]').length / 3;
         var itemsCumplen = document.querySelectorAll('input[type="radio"][value="cumple"]:checked').length;
         var itemsNoCumplen = document.querySelectorAll('input[type="radio"][value="no-cumple"]:checked').length;
-        
+        var itemsNoAplica = document.querySelectorAll('input[type="radio"][value="no-aplica"]:checked').length;
+
         document.getElementById('total-items').textContent = totalItems;
         document.getElementById('items-cumplen').textContent = itemsCumplen;
         document.getElementById('items-no-cumplen').textContent = itemsNoCumplen;
-        
+        var noAplicaSpan = document.getElementById('items-no-aplica');
+        if (noAplicaSpan) noAplicaSpan.textContent = itemsNoAplica;
+
+        // Los ítems "No Aplica" se excluyen del cálculo del porcentaje
         var porcentaje = 0;
         if (itemsCumplen + itemsNoCumplen > 0) {
             porcentaje = Math.round((itemsCumplen / (itemsCumplen + itemsNoCumplen)) * 100);
         }
-        
+
         document.getElementById('porcentaje-cumplimiento').textContent = porcentaje;
-        
+
         var resultElement = document.getElementById('resultado-evaluacion');
         resultElement.classList.remove('seguro', 'riesgo', 'inseguro');
-        
-        // Determinar el resultado de la evaluación
+
+        // Determinar el resultado de la evaluación (No Aplica no cuenta)
         var estadoSeguridad = "PENDIENTE DE EVALUACIÓN";
         var recomendacionTexto = "Complete la evaluación para generar un análisis de vulnerabilidades.";
-        
+
         if (itemsCumplen + itemsNoCumplen > 0) {
             if (porcentaje >= 80) {
                 estadoSeguridad = "ESTABLECIMIENTO SEGURO";
@@ -1229,15 +1233,15 @@ h1 {
                 recomendacionTexto = "El establecimiento presenta graves deficiencias de seguridad que lo hacen vulnerable. Se requiere intervención urgente y un plan integral de mejora.";
             }
         }
-        
+
         resultElement.textContent = estadoSeguridad;
         document.getElementById('recomendacion').textContent = recomendacionTexto;
-        
+
         // Generar resumen automático
-        generarResumenAutomatico(itemsCumplen, itemsNoCumplen, porcentaje, estadoSeguridad);
+        generarResumenAutomatico(itemsCumplen, itemsNoCumplen, itemsNoAplica, porcentaje, estadoSeguridad);
     }
     
-    function generarResumenAutomatico(itemsCumplen, itemsNoCumplen, porcentaje, estadoSeguridad) {
+    function generarResumenAutomatico(itemsCumplen, itemsNoCumplen, itemsNoAplica, porcentaje, estadoSeguridad) {
         var resumenElement = document.getElementById('resumen-automatico');
         
         // Obtener la entidad y fecha
@@ -1270,7 +1274,8 @@ h1 {
                 <p><strong>Fecha de Evaluación:</strong> ${fechaDia}/${fechaMes}/${fechaAno}</p>
                 <p><strong>Entidad Evaluada:</strong> ${nombreEntidad}</p>
                 <p><strong>Resultado:</strong> ${estadoSeguridad}</p>
-                <p><strong>Cumplimiento General:</strong> ${porcentaje}% (${itemsCumplen} de ${itemsCumplen + itemsNoCumplen} ítems)</p>
+                <p><strong>Cumplimiento General:</strong> ${porcentaje}% (${itemsCumplen} de ${itemsCumplen + itemsNoCumplen} ítems evaluados)</p>
+                <p><strong>Ítems No Aplican:</strong> ${itemsNoAplica} (excluidos del cálculo)</p>
             </div>
         `;
         
@@ -1448,15 +1453,22 @@ h1 {
             var div = checkboxes[i];
             var td = div.parentNode;
             var row = td.parentNode;
-            var itemNumber = Math.floor(i/2);
-            var isCumple = td.cellIndex === 1;
-            
+            var itemNumber = Math.floor(i/3);
+            var valor;
+            if (td.cellIndex === 1) {
+                valor = 'cumple';
+            } else if (td.cellIndex === 2) {
+                valor = 'no-cumple';
+            } else {
+                valor = 'no-aplica';
+            }
+
             var radio = document.createElement('input');
             radio.type = 'radio';
             radio.name = 'item_' + itemNumber;
-            radio.value = isCumple ? 'cumple' : 'no-cumple';
+            radio.value = valor;
             radio.onclick = function() { contarCumplimiento(); };
-            
+
             div.parentNode.replaceChild(radio, div);
         }
 
@@ -1560,13 +1572,15 @@ h1 {
             <h3>A. Directiva de Funcionamiento</h3>
             <table>
                 <tr class="header-row">
-                    <th width="45%">Ítem a Fiscalizar</th>
-                    <th class="check-column" width="80px">Cumple</th>
-                    <th class="check-column" width="80px">No Cumple</th>
+                    <th width="40%">Ítem a Fiscalizar</th>
+                    <th class="check-column" width="70px">Cumple</th>
+                    <th class="check-column" width="70px">No Cumple</th>
+                    <th class="check-column" width="70px">No Aplica</th>
                     <th class="observaciones">Observaciones</th>
                 </tr>
                 <tr>
                     <td>Directiva de funcionamiento aprobada por OS-10 (Autoridad Fiscalizadora, durante período de transición — Art. tercero transitorio, Ley N° 21.659 / Decreto 209)</td>
+                    <td class="check-column"><div class="check-box"></div></td>
                     <td class="check-column"><div class="check-box"></div></td>
                     <td class="check-column"><div class="check-box"></div></td>
                     <td class="observaciones"></td>
@@ -1575,10 +1589,12 @@ h1 {
                     <td>Vigencia del instrumento: 4 años sin vigilancia privada o 2 años con vigilancia privada (Art. 17, Ley N° 21.659). Directiva de funcionamiento: 3 años desde aprobación SPD (Decreto 209)</td>
                     <td class="check-column"><div class="check-box"></div></td>
                     <td class="check-column"><div class="check-box"></div></td>
+                    <td class="check-column"><div class="check-box"></div></td>
                     <td class="observaciones"></td>
                 </tr>
                 <tr>
                     <td>Contiene seguro de vida (mínimo 132 UF), contrato trabajo y responsabilidad civil (Art. 88, Decreto 209 / Art. 43, Ley N° 21.659)</td>
+                    <td class="check-column"><div class="check-box"></div></td>
                     <td class="check-column"><div class="check-box"></div></td>
                     <td class="check-column"><div class="check-box"></div></td>
                     <td class="observaciones"></td>
@@ -1588,13 +1604,15 @@ h1 {
             <h3>B. Empresa de Seguridad y Personal</h3>
             <table>
                 <tr class="header-row">
-                    <th width="45%">Ítem a Fiscalizar</th>
-                    <th class="check-column" width="80px">Cumple</th>
-                    <th class="check-column" width="80px">No Cumple</th>
+                    <th width="40%">Ítem a Fiscalizar</th>
+                    <th class="check-column" width="70px">Cumple</th>
+                    <th class="check-column" width="70px">No Cumple</th>
+                    <th class="check-column" width="70px">No Aplica</th>
                     <th class="observaciones">Observaciones</th>
                 </tr>
                 <tr>
                     <td>Autorización vigente de la empresa de seguridad privada emitida por OS-10 (Autoridad Fiscalizadora, durante período de transición — Art. tercero transitorio, Ley N° 21.659)</td>
+                    <td class="check-column"><div class="check-box"></div></td>
                     <td class="check-column"><div class="check-box"></div></td>
                     <td class="check-column"><div class="check-box"></div></td>
                     <td class="observaciones"></td>
@@ -1603,10 +1621,12 @@ h1 {
                     <td>Contrato de prestación de servicios vigente entre la entidad y la empresa de seguridad privada (Art. 20, Ley N° 21.659).</td>
                     <td class="check-column"><div class="check-box"></div></td>
                     <td class="check-column"><div class="check-box"></div></td>
+                    <td class="check-column"><div class="check-box"></div></td>
                     <td class="observaciones"></td>
                 </tr>
                 <tr>
                     <td>Nómina actualizada de guardias de seguridad que prestan servicios en la instalación (registrada ante OS-10 como Autoridad Fiscalizadora durante período de transición).</td>
+                    <td class="check-column"><div class="check-box"></div></td>
                     <td class="check-column"><div class="check-box"></div></td>
                     <td class="check-column"><div class="check-box"></div></td>
                     <td class="observaciones"></td>
@@ -1620,13 +1640,15 @@ h1 {
             <h3>A. Guardias de Seguridad</h3>
             <table>
                 <tr class="header-row">
-                    <th width="45%">Ítem a Fiscalizar</th>
-                    <th class="check-column" width="80px">Cumple</th>
-                    <th class="check-column" width="80px">No Cumple</th>
+                    <th width="40%">Ítem a Fiscalizar</th>
+                    <th class="check-column" width="70px">Cumple</th>
+                    <th class="check-column" width="70px">No Cumple</th>
+                    <th class="check-column" width="70px">No Aplica</th>
                     <th class="observaciones">Observaciones</th>
                 </tr>
                 <tr>
                     <td>Credencial vigente emitida por OS-10 (Autoridad Fiscalizadora, durante período de transición — Art. tercero transitorio, Ley N° 21.659 / Art. 91, Decreto 209)</td>
+                    <td class="check-column"><div class="check-box"></div></td>
                     <td class="check-column"><div class="check-box"></div></td>
                     <td class="check-column"><div class="check-box"></div></td>
                     <td class="observaciones"></td>
@@ -1635,16 +1657,19 @@ h1 {
                     <td>Relación nominal actualizada con turno y área asignada.</td>
                     <td class="check-column"><div class="check-box"></div></td>
                     <td class="check-column"><div class="check-box"></div></td>
+                    <td class="check-column"><div class="check-box"></div></td>
                     <td class="observaciones"></td>
                 </tr>
                 <tr>
                     <td>Certificados de cursos vigentes: Formación (curso único habilitante, mín. 90 hrs.), Perfeccionamiento o Especialización cada 4 años (Art. 89, Decreto 209)</td>
                     <td class="check-column"><div class="check-box"></div></td>
                     <td class="check-column"><div class="check-box"></div></td>
+                    <td class="check-column"><div class="check-box"></div></td>
                     <td class="observaciones"></td>
                 </tr>
                 <tr>
                     <td>SERVICIOS DE 12 HORAS (F-35-B o RES. AcuerdoMarco Dirección del Trabajo).</td>
+                    <td class="check-column"><div class="check-box"></div></td>
                     <td class="check-column"><div class="check-box"></div></td>
                     <td class="check-column"><div class="check-box"></div></td>
                     <td class="observaciones"></td>
@@ -1654,13 +1679,15 @@ h1 {
             <h3>B. Dotación y Turnos</h3>
                                              <table>
                 <tr class="header-row">
-                    <th width="45%">Ítem a Fiscalizar</th>
-                    <th class="check-column" width="80px">Cumple</th>
-                    <th class="check-column" width="80px">No Cumple</th>
+                    <th width="40%">Ítem a Fiscalizar</th>
+                    <th class="check-column" width="70px">Cumple</th>
+                    <th class="check-column" width="70px">No Cumple</th>
+                    <th class="check-column" width="70px">No Aplica</th>
                     <th class="observaciones">Observaciones</th>
                 </tr>
                 <tr>
                     <td>Cantidad de guardias coincide con lo exigido en directiva de funcionamiento.</td>
+                    <td class="check-column"><div class="check-box"></div></td>
                     <td class="check-column"><div class="check-box"></div></td>
                     <td class="check-column"><div class="check-box"></div></td>
                     <td class="observaciones"></td>
@@ -1669,10 +1696,12 @@ h1 {
                     <td>Distribución adecuada según áreas críticas del hospital.</td>
                     <td class="check-column"><div class="check-box"></div></td>
                     <td class="check-column"><div class="check-box"></div></td>
+                    <td class="check-column"><div class="check-box"></div></td>
                     <td class="observaciones"></td>
                 </tr>
                 <tr>
                     <td>Cumplimiento de dotación mínima en turnos nocturnos.</td>
+                    <td class="check-column"><div class="check-box"></div></td>
                     <td class="check-column"><div class="check-box"></div></td>
                     <td class="check-column"><div class="check-box"></div></td>
                     <td class="observaciones"></td>
@@ -1681,10 +1710,12 @@ h1 {
                     <td>Existencia de plan de contingencia ante ausencia de personal.</td>
                     <td class="check-column"><div class="check-box"></div></td>
                     <td class="check-column"><div class="check-box"></div></td>
+                    <td class="check-column"><div class="check-box"></div></td>
                     <td class="observaciones"></td>
                 </tr>
                 <tr>
                     <td>Libro de novedades actualizado con registro de incidentes.</td>
+                    <td class="check-column"><div class="check-box"></div></td>
                     <td class="check-column"><div class="check-box"></div></td>
                     <td class="check-column"><div class="check-box"></div></td>
                     <td class="observaciones"></td>
@@ -1698,13 +1729,15 @@ h1 {
             <h3>A. Uniformes</h3>
             <table>
                 <tr class="header-row">
-                    <th width="45%">Ítem a Fiscalizar</th>
-                    <th class="check-column" width="80px">Cumple</th>
-                    <th class="check-column" width="80px">No Cumple</th>
+                    <th width="40%">Ítem a Fiscalizar</th>
+                    <th class="check-column" width="70px">Cumple</th>
+                    <th class="check-column" width="70px">No Cumple</th>
+                    <th class="check-column" width="70px">No Aplica</th>
                     <th class="observaciones">Observaciones</th>
                 </tr>
                 <tr>
                     <td>Uniforme según Art. 90 del Decreto 209 o autorización especial emitida por la SPD (Art. 90 inc. final, Decreto 209)</td>
+                    <td class="check-column"><div class="check-box"></div></td>
                     <td class="check-column"><div class="check-box"></div></td>
                     <td class="check-column"><div class="check-box"></div></td>
                     <td class="observaciones"></td>
@@ -1713,10 +1746,12 @@ h1 {
                     <td>Camisa color negro, manga corta o larga según temporada.</td>
                     <td class="check-column"><div class="check-box"></div></td>
                     <td class="check-column"><div class="check-box"></div></td>
+                    <td class="check-column"><div class="check-box"></div></td>
                     <td class="observaciones"></td>
                 </tr>
                 <tr>
                     <td>Pantalón color negro.</td>
+                    <td class="check-column"><div class="check-box"></div></td>
                     <td class="check-column"><div class="check-box"></div></td>
                     <td class="check-column"><div class="check-box"></div></td>
                     <td class="observaciones"></td>
@@ -1725,10 +1760,12 @@ h1 {
                     <td>Calzado y calcetines negros.</td>
                     <td class="check-column"><div class="check-box"></div></td>
                     <td class="check-column"><div class="check-box"></div></td>
+                    <td class="check-column"><div class="check-box"></div></td>
                     <td class="observaciones"></td>
                 </tr>
                 <tr>
                     <td>Chaleco alta visibilidad color rojo con bandas retrorreflectantes plateadas.</td>
+                    <td class="check-column"><div class="check-box"></div></td>
                     <td class="check-column"><div class="check-box"></div></td>
                     <td class="check-column"><div class="check-box"></div></td>
                     <td class="observaciones"></td>
@@ -1737,10 +1774,12 @@ h1 {
                     <td>Leyenda "SEGURIDAD PRIVADA" en letras blancas en parte delantera superior derecha y parte trasera superior (Art. 90 N° 6 letra b), Decreto 209)</td>
                     <td class="check-column"><div class="check-box"></div></td>
                     <td class="check-column"><div class="check-box"></div></td>
+                    <td class="check-column"><div class="check-box"></div></td>
                     <td class="observaciones"></td>
                 </tr>
                 <tr>
                     <td>Chaquetón impermeable para turnos nocturnos según características reglamentarias</td>
+                    <td class="check-column"><div class="check-box"></div></td>
                     <td class="check-column"><div class="check-box"></div></td>
                     <td class="check-column"><div class="check-box"></div></td>
                     <td class="observaciones"></td>
@@ -1750,13 +1789,15 @@ h1 {
             <h3>B. Implementos de Seguridad</h3>
             <table>
                 <tr class="header-row">
-                    <th width="45%">Ítem a Fiscalizar</th>
-                    <th class="check-column" width="80px">Cumple</th>
-                    <th class="check-column" width="80px">No Cumple</th>
+                    <th width="40%">Ítem a Fiscalizar</th>
+                    <th class="check-column" width="70px">Cumple</th>
+                    <th class="check-column" width="70px">No Cumple</th>
+                    <th class="check-column" width="70px">No Aplica</th>
                     <th class="observaciones">Observaciones</th>
                 </tr>
                 <tr>
                     <td>Elementos defensivos y de protección (Decreto 209, Art 93.)</td>
+                    <td class="check-column"><div class="check-box"></div></td>
                     <td class="check-column"><div class="check-box"></div></td>
                     <td class="check-column"><div class="check-box"></div></td>
                     <td class="observaciones"></td>
@@ -1765,10 +1806,12 @@ h1 {
                     <td>Cumplimiento de normativa sobre elementos prohibidos.</td>
                     <td class="check-column"><div class="check-box"></div></td>
                     <td class="check-column"><div class="check-box"></div></td>
+                    <td class="check-column"><div class="check-box"></div></td>
                     <td class="observaciones"></td>
                 </tr>
                 <tr>
                     <td>Equipos de comunicación operativos y con alcance en todas las áreas.</td>
+                    <td class="check-column"><div class="check-box"></div></td>
                     <td class="check-column"><div class="check-box"></div></td>
                     <td class="check-column"><div class="check-box"></div></td>
                     <td class="observaciones"></td>
@@ -1782,13 +1825,15 @@ h1 {
             <h3>A. Circuito Cerrado de Televisión (CCTV)</h3>
             <table>
                 <tr class="header-row">
-                    <th width="45%">Ítem a Fiscalizar</th>
-                    <th class="check-column" width="80px">Cumple</th>
-                    <th class="check-column" width="80px">No Cumple</th>
+                    <th width="40%">Ítem a Fiscalizar</th>
+                    <th class="check-column" width="70px">Cumple</th>
+                    <th class="check-column" width="70px">No Cumple</th>
+                    <th class="check-column" width="70px">No Aplica</th>
                     <th class="observaciones">Observaciones</th>
                 </tr>
                 <tr>
                     <td>Sistema operativo las 24 horas</td>
+                    <td class="check-column"><div class="check-box"></div></td>
                     <td class="check-column"><div class="check-box"></div></td>
                     <td class="check-column"><div class="check-box"></div></td>
                     <td class="observaciones"></td>
@@ -1797,10 +1842,12 @@ h1 {
                     <td>Cámaras en áreas críticas: accesos, urgencias, farmacia, estacionamientos.</td>
                     <td class="check-column"><div class="check-box"></div></td>
                     <td class="check-column"><div class="check-box"></div></td>
+                    <td class="check-column"><div class="check-box"></div></td>
                     <td class="observaciones"></td>
                 </tr>
                 <tr>
                     <td>Grabación digital con almacenamiento mínimo de 60 días.</td>
+                    <td class="check-column"><div class="check-box"></div></td>
                     <td class="check-column"><div class="check-box"></div></td>
                     <td class="check-column"><div class="check-box"></div></td>
                     <td class="observaciones"></td>
@@ -1809,10 +1856,12 @@ h1 {
                     <td>Sala de monitoreo con Operador CCTV (Art. 111, Decreto 209 / Decreto 32 Exento 2024 durante transición)</td>
                     <td class="check-column"><div class="check-box"></div></td>
                     <td class="check-column"><div class="check-box"></div></td>
+                    <td class="check-column"><div class="check-box"></div></td>
                     <td class="observaciones"></td>
                 </tr>
                 <tr>
                     <td>Protocolo de acción ante detección de incidentes.</td>
+                    <td class="check-column"><div class="check-box"></div></td>
                     <td class="check-column"><div class="check-box"></div></td>
                     <td class="check-column"><div class="check-box"></div></td>
                     <td class="observaciones"></td>
@@ -1827,13 +1876,15 @@ h1 {
 <h3>A. Infraestructura y Accesos</h3>
 <table>
     <tr class="header-row">
-        <th width="45%">Ítem a Fiscalizar</th>
-        <th class="check-column" width="80px">Cumple</th>
-        <th class="check-column" width="80px">No Cumple</th>
+        <th width="40%">Ítem a Fiscalizar</th>
+        <th class="check-column" width="70px">Cumple</th>
+        <th class="check-column" width="70px">No Cumple</th>
+        <th class="check-column" width="70px">No Aplica</th>
         <th class="observaciones">Observaciones</th>
     </tr>
     <tr>
         <td>Múltiples sectores y pasillos de conexiones que no permiten desplazarse fácilmente entre áreas.</td>
+        <td class="check-column"><div class="check-box"></div></td>
         <td class="check-column"><div class="check-box"></div></td>
         <td class="check-column"><div class="check-box"></div></td>
         <td class="observaciones"></td>
@@ -1842,16 +1893,19 @@ h1 {
         <td>Control de acceso de personas es realizado por personal de seguridad.</td>
         <td class="check-column"><div class="check-box"></div></td>
         <td class="check-column"><div class="check-box"></div></td>
+        <td class="check-column"><div class="check-box"></div></td>
         <td class="observaciones"></td>
     </tr>
     <tr>
         <td>Aglomeración en salas de espera que dificulta la gestión ante emergencias, existe protocolo de acción para evitarlo.</td>
         <td class="check-column"><div class="check-box"></div></td>
         <td class="check-column"><div class="check-box"></div></td>
+        <td class="check-column"><div class="check-box"></div></td>
         <td class="observaciones"></td>
     </tr>
     <tr>
         <td>La iluminación nocturna es suficiente en sectores vulnerables.</td>
+        <td class="check-column"><div class="check-box"></div></td>
         <td class="check-column"><div class="check-box"></div></td>
         <td class="check-column"><div class="check-box"></div></td>
         <td class="observaciones"></td>
@@ -1861,13 +1915,15 @@ h1 {
 <h3>B. Seguridad y Control</h3>
 <table>
     <tr class="header-row">
-        <th width="45%">Ítem a Fiscalizar</th>
-        <th class="check-column" width="80px">Cumple</th>
-        <th class="check-column" width="80px">No Cumple</th>
+        <th width="40%">Ítem a Fiscalizar</th>
+        <th class="check-column" width="70px">Cumple</th>
+        <th class="check-column" width="70px">No Cumple</th>
+        <th class="check-column" width="70px">No Aplica</th>
         <th class="observaciones">Observaciones</th>
     </tr>
     <tr>
         <td>Portón vehicular con horario controlado (cerrado de 20:00 a 07:00)</td>
+        <td class="check-column"><div class="check-box"></div></td>
         <td class="check-column"><div class="check-box"></div></td>
         <td class="check-column"><div class="check-box"></div></td>
         <td class="observaciones"></td>
@@ -1876,16 +1932,19 @@ h1 {
         <td>Sistema para control de asistencia del personal.</td>
         <td class="check-column"><div class="check-box"></div></td>
         <td class="check-column"><div class="check-box"></div></td>
+        <td class="check-column"><div class="check-box"></div></td>
         <td class="observaciones"></td>
     </tr>
     <tr>
         <td>Existen detectores de metales o sistemas de registro personal.</td>
         <td class="check-column"><div class="check-box"></div></td>
         <td class="check-column"><div class="check-box"></div></td>
+        <td class="check-column"><div class="check-box"></div></td>
         <td class="observaciones"></td>
     </tr>
     <tr>
         <td>La instalación posee un cierre perimetral adecuado.</td>
+        <td class="check-column"><div class="check-box"></div></td>
         <td class="check-column"><div class="check-box"></div></td>
         <td class="check-column"><div class="check-box"></div></td>
         <td class="observaciones"></td>
@@ -1903,6 +1962,7 @@ h1 {
                         <p>Total de ítems evaluados: <span id="total-items">0</span></p>
                         <p>Ítems que cumplen: <span id="items-cumplen">0</span></p>
                         <p>Ítems que no cumplen: <span id="items-no-cumplen">0</span></p>
+                        <p>Ítems que no aplican: <span id="items-no-aplica">0</span></p>
                         <p>Porcentaje de cumplimiento: <span id="porcentaje-cumplimiento">0</span>%</p>
                     </div>
                     <div id="resultado-evaluacion" class="result">PENDIENTE DE EVALUACIÓN</div>
@@ -2331,19 +2391,21 @@ document.addEventListener('DOMContentLoaded', function() {
             radio.addEventListener('change', function() {
                 // Quitar clases previas
                 const fila = this.closest('tr');
-                fila.classList.remove('fila-cumple', 'fila-no-cumple');
-                
+                fila.classList.remove('fila-cumple', 'fila-no-cumple', 'fila-no-aplica');
+
                 // Añadir clase según selección
                 if (this.checked) {
                     if (this.value === 'cumple') {
                         fila.classList.add('fila-cumple');
-                    } else {
+                    } else if (this.value === 'no-cumple') {
                         fila.classList.add('fila-no-cumple');
+                    } else if (this.value === 'no-aplica') {
+                        fila.classList.add('fila-no-aplica');
                     }
                 }
             });
         });
-        
+
         // Estilos inline para las filas marcadas
         const style = document.createElement('style');
         style.innerHTML = `
@@ -2352,6 +2414,9 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             .fila-no-cumple {
                 background-color: rgba(242, 222, 222, 0.5) !important;
+            }
+            .fila-no-aplica {
+                background-color: rgba(220, 220, 220, 0.5) !important;
             }
             .nav-seguro i {
                 color: #28a745 !important;
