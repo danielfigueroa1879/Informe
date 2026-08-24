@@ -590,6 +590,120 @@
             margin-bottom: 5px;
         }
 
+/* ---------- Panel de nube (Supabase) ---------- */
+.nube-panel {
+    margin: 25px 0;
+    padding: 18px 20px;
+    background: #eef4fb;
+    border: 1px solid #c9dcee;
+    border-radius: 10px;
+}
+.nube-titulo {
+    font-weight: 600;
+    color: #003366;
+    font-size: 1.05rem;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+.nube-estado {
+    margin-left: auto;
+    font-weight: 400;
+    color: #555;
+    font-size: 0.9rem;
+    font-style: italic;
+}
+.nube-botones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+.btn-nube {
+    padding: 10px 16px;
+    background: #003366;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 500;
+    margin: 0;
+    transition: background 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+.btn-nube:hover { background: #004c99; }
+.btn-nube.btn-guardar   { background: #28a745; }
+.btn-nube.btn-guardar:hover { background: #218838; }
+.btn-nube.btn-nuevo     { background: #6c757d; }
+.btn-nube.btn-nuevo:hover { background: #565e64; }
+.btn-nube.btn-exportar  { background: #17a2b8; }
+.btn-nube.btn-exportar:hover { background: #138496; }
+
+/* ---------- Modal de listado de informes ---------- */
+#modal-informes { display: none; position: fixed; inset: 0; z-index: 9999; }
+#modal-informes .mi-backdrop {
+    position: absolute; inset: 0;
+    background: rgba(0,0,0,0.55);
+}
+#modal-informes .mi-caja {
+    position: relative;
+    max-width: 1000px;
+    margin: 40px auto;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+    font-family: 'Poppins', sans-serif;
+}
+#modal-informes .mi-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid #e0e0e0;
+    display: flex; align-items: center; justify-content: space-between;
+}
+#modal-informes .mi-header h3 { margin: 0; color: #003366; }
+#modal-informes .mi-cerrar {
+    background: transparent; border: none; font-size: 2rem;
+    cursor: pointer; color: #555; padding: 0 8px; margin: 0;
+}
+#modal-informes .mi-toolbar {
+    padding: 12px 20px; display: flex; gap: 10px; align-items: center;
+    border-bottom: 1px solid #f0f0f0;
+}
+#modal-informes .mi-toolbar input {
+    flex: 1; padding: 8px 12px; border: 1px solid #ccc;
+    border-radius: 6px; font-family: 'Poppins', sans-serif; font-size: 0.95rem;
+}
+#modal-informes .mi-toolbar button {
+    padding: 8px 14px; font-size: 0.9rem; margin: 0;
+    background: #003366; color: #fff; border: none; border-radius: 6px; cursor: pointer;
+}
+#modal-informes .mi-lista {
+    overflow-y: auto; padding: 12px 20px 20px; flex: 1;
+}
+#modal-informes .mi-tabla {
+    width: 100%; border-collapse: collapse; font-size: 0.9rem;
+}
+#modal-informes .mi-tabla th,
+#modal-informes .mi-tabla td {
+    padding: 8px 10px; border-bottom: 1px solid #eee; text-align: left;
+}
+#modal-informes .mi-tabla th {
+    background: #003366; color: #fff; font-weight: 500;
+}
+#modal-informes .mi-btn {
+    padding: 5px 10px; margin: 0 3px 0 0; font-size: 0.8rem;
+    border-radius: 4px; border: none; cursor: pointer; color: #fff;
+}
+#modal-informes .mi-btn-cargar { background: #28a745; }
+#modal-informes .mi-btn-borrar { background: #dc3545; }
+
 /* Estilos de impresión para resumen automático */
 @media print {
     /* Ocultar botones de acción al imprimir o generar PDF */
@@ -1541,6 +1655,8 @@ h1 {
    
 </script>
 <script src="autoguardado.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="supabase-storage.js"></script>
 <body>
   <div class="container">
        <div class="logoo-container">
@@ -2039,6 +2155,26 @@ h1 {
                            font-weight:500; cursor:pointer;">
                     ＋ Agregar Fotografía
                 </button>
+            </div>
+            <div class="nube-panel no-print">
+                <div class="nube-titulo">
+                    <i class="fas fa-cloud"></i> Base de datos en la nube
+                    <span id="supabase-estado" class="nube-estado">Sin guardar en la nube</span>
+                </div>
+                <div class="nube-botones">
+                    <button type="button" class="btn-nube btn-guardar" onclick="supabaseGuardar()">
+                        <i class="fas fa-save"></i> Guardar en la nube
+                    </button>
+                    <button type="button" class="btn-nube btn-listar" onclick="supabaseListar()">
+                        <i class="fas fa-folder-open"></i> Ver informes guardados
+                    </button>
+                    <button type="button" class="btn-nube btn-nuevo" onclick="supabaseNuevo()">
+                        <i class="fas fa-file"></i> Nuevo informe
+                    </button>
+                    <button type="button" class="btn-nube btn-exportar" onclick="supabaseExportarCSV()">
+                        <i class="fas fa-file-csv"></i> Exportar todos (CSV)
+                    </button>
+                </div>
             </div>
             <div class="botones no-print">
     <button type="button" onclick="imprimirFormulario()">Imprimir Formulario</button>
