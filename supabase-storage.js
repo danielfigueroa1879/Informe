@@ -234,12 +234,25 @@
         }
     }
 
-    // ---------- Autoguardado con debounce ----------
+    // ---------- ¿El formulario tiene contenido mínimo? ----------
+    function tieneContenidoMinimo() {
+        const nombre = ($('input[name="nombre_entidad"]') || {}).value || '';
+        const direccion = ($('input[name="direccion"]') || {}).value || '';
+        const empresa = ($('input[name="empresa_seguridad"]') || {}).value || '';
+        const algunRadio = document.querySelector('input[type="radio"][name^="item_"]:checked');
+        return !!(nombre.trim() || direccion.trim() || empresa.trim() || algunRadio);
+    }
+
+    // ---------- Autoguardado con debounce (automático desde el inicio) ----------
     function programarAutoguardado() {
-        // Solo autoguardamos si ya se guardó al menos una vez explícitamente
-        if (!informeActualId) return;
+        // Si ya hay un informe en la nube, actualizamos.
+        // Si no hay, creamos uno la primera vez que haya contenido mínimo.
+        if (!informeActualId && !tieneContenidoMinimo()) return;
         if (autosaveTimer) clearTimeout(autosaveTimer);
-        autosaveTimer = setTimeout(function () { guardarInforme(true); }, 2500);
+        actualizarIndicadorEstado(informeActualId
+            ? 'Escribiendo... (se guardará en 2 s)'
+            : 'Creando informe en la nube en 2 s...');
+        autosaveTimer = setTimeout(function () { guardarInforme(true); }, 2000);
     }
 
     // ---------- Listar informes ----------
@@ -380,7 +393,7 @@
                 '<div class="mi-backdrop"></div>' +
                 '<div class="mi-caja">' +
                 '  <div class="mi-header">' +
-                '    <h3>Informes guardados</h3>' +
+                '    <h3><i class="fas fa-clock-rotate-left"></i> Historial de fiscalizaciones</h3>' +
                 '    <button type="button" class="mi-cerrar" aria-label="Cerrar">&times;</button>' +
                 '  </div>' +
                 '  <div class="mi-toolbar">' +
@@ -478,7 +491,9 @@
         window.supabaseNuevo = nuevoInforme;
         window.supabaseExportarCSV = exportarCSV;
 
-        actualizarIndicadorEstado(informeActualId ? 'Editando informe #' + informeActualId : 'Sin guardar en la nube');
+        actualizarIndicadorEstado(informeActualId
+            ? 'Editando informe #' + informeActualId + ' (autoguardado activo)'
+            : 'Autoguardado activo — se guarda al escribir');
     }
 
     if (document.readyState === 'loading') {
