@@ -262,7 +262,7 @@
         let q = client
             .from(TABLA)
             .select('id, created_at, updated_at, nombre_entidad, direccion, fecha_fiscalizacion, estado_seguridad, porcentaje')
-            .order('updated_at', { ascending: false })
+            .order('id', { ascending: false })
             .limit(200);
 
         if (filtro && filtro.trim()) {
