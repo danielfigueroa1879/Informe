@@ -592,12 +592,31 @@
 
 /* ---------- Panel de nube (Supabase) ---------- */
 .nube-panel {
-    margin: 25px 0;
-    padding: 18px 20px;
-    background: #eef4fb;
-    border: 1px solid #c9dcee;
-    border-radius: 10px;
+    position: relative;
+    isolation: isolate;
+    margin: 85px 0 25px;
+    padding: 22px 26px 26px;
+    background: linear-gradient(180deg, #e6f4ff 0%, #e6f4ff 30%, #cbe7fb 72%, #b5dcf7 100%);
+    border-radius: 60px;
+    filter: drop-shadow(0 4px 10px rgba(70, 140, 200, 0.25));
 }
+/* Bultos superiores para dar forma de nube */
+.nube-panel::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    left: 4%;
+    right: 4%;
+    top: -70px;
+    height: 105px;
+    background:
+        radial-gradient(circle at 12% 82px, #e6f4ff 46px, transparent 49px),
+        radial-gradient(circle at 30% 72px, #e6f4ff 62px, transparent 67px),
+        radial-gradient(circle at 50% 84px, #e6f4ff 48px, transparent 51px),
+        radial-gradient(circle at 69% 70px, #e6f4ff 64px, transparent 71px),
+        radial-gradient(circle at 88% 82px, #e6f4ff 44px, transparent 47px);
+}
+@media print { .nube-panel { filter: none; } }
 .nube-titulo {
     font-weight: 600;
     color: #003366;
