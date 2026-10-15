@@ -670,7 +670,7 @@
                 '<td>' + fecha + '</td>' +
                 '<td>' +
                 '  <button type="button" class="mi-btn mi-btn-cargar">Abrir</button>' +
-                '  <button type="button" class="mi-btn mi-btn-pdf" title="Carga este informe y descarga su PDF">PDF</button>' +
+                '  <button type="button" class="mi-btn mi-btn-pdf" title="Carga este informe y descarga su PDF">Descargar PDF</button>' +
                 '  <button type="button" class="mi-btn mi-btn-borrar">Borrar</button>' +
                 '</td>';
             tr.querySelector('.mi-btn-cargar').addEventListener('click', function () {
