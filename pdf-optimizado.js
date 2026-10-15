@@ -1602,10 +1602,12 @@ function instalarBotonPDFCorregido() {
     console.log("Instalando botón de PDF corregido...");
     
     // Buscar todos los botones relacionados con PDF
+    // Se excluyen los botones del modal de historial: tienen su propia acción
     const botonesExistentes = Array.from(document.querySelectorAll('button')).filter(btn => 
+        !btn.closest('#modal-informes') && (
         btn.textContent.includes('PDF') || 
         btn.id?.includes('pdf') ||
-        btn.onclick?.toString().includes('PDF')
+        btn.onclick?.toString().includes('PDF'))
     );
     
     // Modificar cada botón encontrado
