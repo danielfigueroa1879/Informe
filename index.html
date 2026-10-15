@@ -14,7 +14,7 @@
             font-family: 'Poppins', sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f5f5f5;
+            background-color: #bfe1f9;
             font-size: 18px;
             color: #333;
             line-height: 1.6;
@@ -616,7 +616,11 @@
         radial-gradient(circle at 69% 70px, #e6f4ff 64px, transparent 71px),
         radial-gradient(circle at 88% 82px, #e6f4ff 44px, transparent 47px);
 }
-@media print { .nube-panel { filter: none; } }
+html { background-color: #bfe1f9; }
+@media print {
+    .nube-panel { filter: none; }
+    html, body { background-color: #fff; }
+}
 .nube-titulo {
     font-weight: 600;
     color: #003366;
