@@ -290,7 +290,7 @@
             .single();
         if (error) {
             notificar('Error al cargar: ' + error.message, 'err');
-            return;
+            return false;
         }
         informeActualId = data.id;
         try { localStorage.setItem(CLAVE_ID_LOCAL, String(informeActualId)); } catch (e) {}
@@ -298,6 +298,33 @@
         actualizarIndicadorEstado('Cargado informe #' + id);
         notificar('Informe #' + id + ' cargado', 'ok');
         window.scrollTo({ top: 0, behavior: 'smooth' });
+        return true;
+    }
+
+    // ---------- Descargar PDF de un informe guardado ----------
+    // Los PDF no se guardan en la nube: se carga el informe en el formulario
+    // y se genera el PDF en el navegador con la misma función del botón principal.
+    async function descargarPDFInforme(id) {
+        if (typeof window.generarPDFCorregido !== 'function') {
+            notificar('No está disponible la generación de PDF', 'err');
+            return;
+        }
+        // Guardar primero cambios pendientes del informe actual para no perderlos
+        if (autosaveTimer) {
+            clearTimeout(autosaveTimer);
+            autosaveTimer = null;
+            await guardarInforme(true);
+        }
+        const ok = await cargarInforme(id);
+        if (!ok) return;
+        // Esperar a que las fotos restauradas terminen de cargarse
+        const imgs = Array.prototype.slice.call(document.querySelectorAll('.foto-preview'));
+        await Promise.all(imgs.map(function (img) {
+            return img.complete ? null : new Promise(function (res) {
+                img.onload = img.onerror = res;
+            });
+        }));
+        setTimeout(function () { window.generarPDFCorregido(); }, 500);
     }
 
     // ---------- Borrar informe ----------
@@ -643,11 +670,16 @@
                 '<td>' + fecha + '</td>' +
                 '<td>' +
                 '  <button type="button" class="mi-btn mi-btn-cargar">Abrir</button>' +
+                '  <button type="button" class="mi-btn mi-btn-pdf" title="Carga este informe y descarga su PDF">PDF</button>' +
                 '  <button type="button" class="mi-btn mi-btn-borrar">Borrar</button>' +
                 '</td>';
             tr.querySelector('.mi-btn-cargar').addEventListener('click', function () {
                 cerrarModalListado();
                 cargarInforme(inf.id);
+            });
+            tr.querySelector('.mi-btn-pdf').addEventListener('click', function () {
+                cerrarModalListado();
+                descargarPDFInforme(inf.id);
             });
             tr.querySelector('.mi-btn-borrar').addEventListener('click', async function () {
                 if (!confirm('¿Borrar el informe #' + inf.id + ' de "' + (inf.nombre_entidad || 'sin nombre') + '"? Esta acción no se puede deshacer.')) return;
