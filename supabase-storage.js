@@ -694,6 +694,12 @@
         return resultado;
     }
 
+    // Numeración de abajo hacia arriba: la última fila es la 1.
+    function numerarFilas(tbody) {
+        const celdas = tbody.querySelectorAll('td.mi-numero');
+        celdas.forEach(function (td, idx) { td.textContent = celdas.length - idx; });
+    }
+
     async function refrescarLista(filtro) {
         const contenedor = document.querySelector('#modal-informes .mi-lista');
         if (!contenedor) return;
@@ -710,7 +716,7 @@
         tabla.className = 'mi-tabla';
         tabla.innerHTML =
             '<thead><tr>' +
-            '<th>ID</th><th>Entidad</th><th>Fecha</th><th>Estado</th><th>%</th><th>Actualizado</th><th>Acciones</th>' +
+            '<th>N°</th><th>Entidad</th><th>Fecha</th><th>Estado</th><th>%</th><th>Actualizado</th><th>Acciones</th>' +
             '</tr></thead><tbody></tbody>';
         const tbody = tabla.querySelector('tbody');
         informes.forEach(function (inf) {
@@ -723,7 +729,7 @@
             }
             claveAnterior = k;
             tr.innerHTML =
-                '<td>' + inf.id + '</td>' +
+                '<td class="mi-numero" title="ID en la nube: ' + inf.id + '"></td>' +
                 '<td>' + (inf.nombre_entidad || '<i>(sin nombre)</i>') + '</td>' +
                 '<td>' + (inf.fecha_fiscalizacion || '') + '</td>' +
                 '<td>' + (inf.estado_seguridad || '') + '</td>' +
@@ -747,11 +753,13 @@
                 const ok = await borrarInforme(inf.id);
                 if (ok) {
                     tr.remove();
+                    numerarFilas(tbody);
                     notificar('Informe #' + inf.id + ' borrado', 'ok');
                 }
             });
             tbody.appendChild(tr);
         });
+        numerarFilas(tbody);
         contenedor.innerHTML = '';
         const totalRepetidos = informes.filter(function (inf) {
             const k = claveRepetido(inf);
