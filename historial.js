@@ -218,6 +218,7 @@
             '.historial-lista tr:hover{background:#f9fafb;}',
             '.historial-lista tr.historial-repetido td{background:#fde2e4;color:#b00020;font-weight:600;}',
             '.historial-lista tr.historial-repetido td:first-child{border-left:4px solid #dc3545;}',
+            '.historial-lista tr.historial-repetido-inicio td{border-top:3px solid #dc3545;}',
             '.historial-aviso-repetidos{margin:0 0 10px;padding:8px 12px;border-radius:6px;background:#fde2e4;color:#b00020;font-weight:600;font-size:.9rem;}',
             '.historial-vacio{text-align:center;color:#6b7280;padding:30px 10px;}',
             '.historial-acciones{display:flex;gap:6px;flex-wrap:wrap;}',
@@ -305,13 +306,32 @@
             });
             let totalRepetidos = 0;
 
-            const filas = items.map(function (r) {
+            // Juntar los repetidos: cada grupo queda en la posición de su informe más reciente
+            const grupos = {};
+            items.forEach(function (r) {
+                const k = claveRepetido(r);
+                if (k) (grupos[k] = grupos[k] || []).push(r);
+            });
+            const vistos = {};
+            const ordenados = [];
+            items.forEach(function (r) {
+                const k = claveRepetido(r);
+                if (!k) { ordenados.push(r); return; }
+                if (vistos[k]) return;
+                vistos[k] = true;
+                grupos[k].forEach(function (x) { ordenados.push(x); });
+            });
+            let claveAnterior = null;
+
+            const filas = ordenados.map(function (r) {
                 const k = claveRepetido(r);
                 const repetido = k && conteo[k] > 1;
+                const inicio = repetido && k !== claveAnterior;
+                claveAnterior = k;
                 if (repetido) totalRepetidos++;
                 return '' +
                     '<tr data-id="' + r.id + '"' +
-                        (repetido ? ' class="historial-repetido" title="Repetido: hay ' + conteo[k] + ' informes de esta entidad con la misma fecha"' : '') + '>' +
+                        (repetido ? ' class="historial-repetido' + (inicio ? ' historial-repetido-inicio' : '') + '" title="Repetido: hay ' + conteo[k] + ' informes de esta entidad con la misma fecha"' : '') + '>' +
                         '<td>' + formatearFecha(r.fecha) + '</td>' +
                         '<td>' + escapeHTML(r.nombre || r.filename || 'Informe') + '</td>' +
                         '<td>' + formatearTamanio(r.tamanio) + '</td>' +

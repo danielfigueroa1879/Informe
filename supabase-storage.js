@@ -674,16 +674,38 @@
         return conteo;
     }
 
+    // Reordena la lista para que los repetidos queden juntos, uno debajo del otro.
+    // Cada grupo aparece en la posición de su informe más reciente.
+    function agruparRepetidos(informes) {
+        const grupos = {};
+        informes.forEach(function (inf) {
+            const k = claveRepetido(inf);
+            if (k) (grupos[k] = grupos[k] || []).push(inf);
+        });
+        const vistos = {};
+        const resultado = [];
+        informes.forEach(function (inf) {
+            const k = claveRepetido(inf);
+            if (!k) { resultado.push(inf); return; }
+            if (vistos[k]) return;
+            vistos[k] = true;
+            grupos[k].forEach(function (x) { resultado.push(x); });
+        });
+        return resultado;
+    }
+
     async function refrescarLista(filtro) {
         const contenedor = document.querySelector('#modal-informes .mi-lista');
         if (!contenedor) return;
         contenedor.innerHTML = '<p>Cargando...</p>';
-        const informes = await listarInformes(filtro);
+        let informes = await listarInformes(filtro);
         if (!informes.length) {
             contenedor.innerHTML = '<p>No hay informes guardados.</p>';
             return;
         }
         const conteo = contarRepetidos(informes);
+        informes = agruparRepetidos(informes);
+        let claveAnterior = null;
         const tabla = document.createElement('table');
         tabla.className = 'mi-tabla';
         tabla.innerHTML =
@@ -696,9 +718,10 @@
             const fecha = new Date(inf.updated_at).toLocaleString('es-CL');
             const k = claveRepetido(inf);
             if (k && conteo[k] > 1) {
-                tr.className = 'mi-repetido';
+                tr.className = 'mi-repetido' + (k !== claveAnterior ? ' mi-repetido-inicio' : '');
                 tr.title = 'Repetido: hay ' + conteo[k] + ' informes de esta entidad con la misma fecha';
             }
+            claveAnterior = k;
             tr.innerHTML =
                 '<td>' + inf.id + '</td>' +
                 '<td>' + (inf.nombre_entidad || '<i>(sin nombre)</i>') + '</td>' +
