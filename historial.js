@@ -229,7 +229,7 @@
             '.historial-btn:hover{filter:brightness(1.08);}',
             '.historial-toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:#003366;color:#fff;padding:10px 18px;border-radius:6px;font-family:"Poppins",sans-serif;font-size:.9rem;box-shadow:0 4px 14px rgba(0,0,0,.25);z-index:10001;opacity:0;transition:opacity .25s ease;}',
             '.historial-toast.visible{opacity:1;}',
-            '@media (max-width:600px){.historial-lista th:nth-child(3),.historial-lista td:nth-child(3){display:none;}}'
+            '@media (max-width:600px){.historial-lista th:nth-child(4),.historial-lista td:nth-child(4){display:none;}}'
         ].join('\n');
         document.head.appendChild(s);
     }
@@ -332,6 +332,7 @@
                 return '' +
                     '<tr data-id="' + r.id + '"' +
                         (repetido ? ' class="historial-repetido' + (inicio ? ' historial-repetido-inicio' : '') + '" title="Repetido: hay ' + conteo[k] + ' informes de esta entidad con la misma fecha"' : '') + '>' +
+                        '<td class="historial-numero"></td>' +
                         '<td>' + formatearFecha(r.fecha) + '</td>' +
                         '<td>' + escapeHTML(r.nombre || r.filename || 'Informe') + '</td>' +
                         '<td>' + formatearTamanio(r.tamanio) + '</td>' +
@@ -348,9 +349,11 @@
             body.innerHTML =
                 (totalRepetidos ? '<p class="historial-aviso-repetidos">⚠ ' + totalRepetidos + ' informe(s) repetido(s) marcados en rojo (misma entidad y fecha).</p>' : '') +
                 '<table class="historial-lista">' +
-                    '<thead><tr><th>Fecha</th><th>Nombre</th><th>Tamaño</th><th>Acciones</th></tr></thead>' +
+                    '<thead><tr><th>N°</th><th>Fecha</th><th>Nombre</th><th>Tamaño</th><th>Acciones</th></tr></thead>' +
                     '<tbody>' + filas + '</tbody>' +
                 '</table>';
+
+            numerarFilas(body);
 
             body.querySelectorAll('button[data-accion]').forEach(function (btn) {
                 btn.addEventListener('click', function () {
@@ -386,6 +389,12 @@
         return entidad + '|' + fecha;
     }
 
+    // Numeración de abajo hacia arriba: la última fila es la 1.
+    function numerarFilas(contenedor) {
+        const celdas = contenedor.querySelectorAll('td.historial-numero');
+        celdas.forEach(function (td, idx) { td.textContent = celdas.length - idx; });
+    }
+
     function accionDescargar(id) {
         obtenerRegistro(id).then(function (r) {
             if (!r) return;
@@ -405,7 +414,9 @@
     function accionEliminar(id, tr) {
         if (!confirm('¿Eliminar este informe del historial? No se puede deshacer.')) return;
         eliminarRegistro(id).then(function () {
+            const tabla = tr && tr.closest('table');
             if (tr && tr.parentNode) tr.parentNode.removeChild(tr);
+            if (tabla) numerarFilas(tabla);
             mostrarToast('Informe eliminado');
         }).catch(function (err) { console.error(err); });
     }
