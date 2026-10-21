@@ -207,7 +207,7 @@
         s.id = 'historial-estilos';
         s.textContent = [
             '.historial-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:10000;display:flex;align-items:center;justify-content:center;font-family:"Poppins",sans-serif;}',
-            '.historial-modal{background:#fff;border-radius:10px;box-shadow:0 10px 40px rgba(0,0,0,.3);width:98vw;max-width:1900px;max-height:94vh;display:flex;flex-direction:column;overflow:hidden;}',
+            '.historial-modal{background:#fff;border-radius:10px;box-shadow:0 10px 40px rgba(0,0,0,.3);width:92vw;max-width:1400px;max-height:94vh;display:flex;flex-direction:column;overflow:hidden;}',
             '.historial-header{background:#003366;color:#fff;padding:10px 18px;display:flex;align-items:center;justify-content:space-between;}',
             '.historial-header h3{margin:0;font-size:1.15rem;font-weight:600;}',
             '.historial-cerrar{background:transparent;border:none;color:#fff;font-size:1.6rem;cursor:pointer;line-height:1;padding:0 4px;}',
