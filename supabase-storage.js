@@ -653,10 +653,12 @@
     }
 
     function normalizarFecha(f) {
-        return normalizarTexto(f)
+        const partes = normalizarTexto(f)
             .split(/[\/\-.\s]+/)
-            .map(function (p) { return /^\d+$/.test(p) ? String(parseInt(p, 10)) : p; })
-            .join('/');
+            .map(function (p) { return /^\d+$/.test(p) ? String(parseInt(p, 10)) : p; });
+        // Año de 2 dígitos ("26") → "2026"
+        if (partes.length === 3 && /^\d{1,2}$/.test(partes[2])) partes[2] = String(2000 + parseInt(partes[2], 10));
+        return partes.join('/');
     }
 
     function claveRepetido(inf) {

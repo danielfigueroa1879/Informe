@@ -229,6 +229,16 @@
             '.historial-btn:hover{filter:brightness(1.08);}',
             '.historial-toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:#003366;color:#fff;padding:10px 18px;border-radius:6px;font-family:"Poppins",sans-serif;font-size:.9rem;box-shadow:0 4px 14px rgba(0,0,0,.25);z-index:10001;opacity:0;transition:opacity .25s ease;}',
             '.historial-toast.visible{opacity:1;}',
+            '#historial-overlay .historial-header h3{color:#fff !important;margin:0 !important;font-size:1.1rem !important;}',
+            '#historial-overlay table.historial-lista{table-layout:auto !important;display:table !important;margin:0 !important;box-shadow:none !important;font-size:.85rem !important;}',
+            '#historial-overlay table.historial-lista th,#historial-overlay table.historial-lista td{padding:4px 8px !important;font-size:.85rem !important;line-height:1.3 !important;vertical-align:middle !important;border:none !important;border-bottom:1px solid #e5e7eb !important;text-align:left !important;}',
+            '#historial-overlay table.historial-lista th{background:#f3f4f6 !important;color:#003366 !important;}',
+            '#historial-overlay table.historial-lista td.historial-numero,#historial-overlay table.historial-lista th:first-child{width:40px;text-align:center !important;}',
+            '#historial-overlay table.historial-lista td:nth-child(2),#historial-overlay table.historial-lista td:nth-child(4){white-space:nowrap;width:1%;}',
+            '#historial-overlay table.historial-lista td:last-child{white-space:nowrap;width:1%;}',
+            '#historial-overlay table.historial-lista tr.historial-repetido td{background:#fde2e4 !important;color:#b00020 !important;font-weight:600;}',
+            '#historial-overlay table.historial-lista tr.historial-repetido td:first-child{border-left:4px solid #dc3545 !important;}',
+            '#historial-overlay table.historial-lista tr.historial-repetido-inicio td{border-top:3px solid #dc3545 !important;}',
             '@media (max-width:600px){.historial-lista th:nth-child(4),.historial-lista td:nth-child(4){display:none;}}'
         ].join('\n');
         document.head.appendChild(s);
@@ -378,15 +388,20 @@
             .toLowerCase().replace(/\s+/g, ' ').trim();
     }
 
+    // Se usa el nombre guardado al generar el PDF ("Entidad — fecha"), que se lee
+    // directo del formulario; el snapshot de localStorage puede estar desfasado.
     function claveRepetido(r) {
-        const snap = (r.formulario && r.formulario.localStorage) || {};
-        const entidad = normalizarTexto(snap.nombre_entidad);
-        if (!entidad) return null;
-        const fecha = ['dia', 'mes', 'ano'].map(function (c) {
-            const v = normalizarTexto(snap[c]);
-            return /^\d+$/.test(v) ? String(parseInt(v, 10)) : v;
-        }).join('/');
-        return entidad + '|' + fecha;
+        const nombre = normalizarTexto(r.nombre);
+        if (!nombre || nombre.indexOf('sin nombre') === 0) return null;
+        const partes = nombre.split(/[\s\/\-.—]+/).filter(Boolean).map(function (p) {
+            return /^\d+$/.test(p) ? String(parseInt(p, 10)) : p;
+        });
+        // Año de 2 dígitos al final ("26") → "2026"
+        const ult = partes.length - 1;
+        if (ult >= 0 && /^\d{1,2}$/.test(partes[ult]) && /^\d+$/.test(partes[ult - 1] || '')) {
+            partes[ult] = String(2000 + parseInt(partes[ult], 10));
+        }
+        return partes.join(' ');
     }
 
     // Numeración de abajo hacia arriba: la última fila es la 1.
