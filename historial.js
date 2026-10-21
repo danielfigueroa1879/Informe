@@ -216,6 +216,9 @@
             '.historial-lista th,.historial-lista td{padding:9px 8px;border-bottom:1px solid #e5e7eb;text-align:left;vertical-align:middle;}',
             '.historial-lista th{background:#f3f4f6;color:#003366;font-weight:600;font-size:.85rem;}',
             '.historial-lista tr:hover{background:#f9fafb;}',
+            '.historial-lista tr.historial-repetido td{background:#fde2e4;color:#b00020;font-weight:600;}',
+            '.historial-lista tr.historial-repetido td:first-child{border-left:4px solid #dc3545;}',
+            '.historial-aviso-repetidos{margin:0 0 10px;padding:8px 12px;border-radius:6px;background:#fde2e4;color:#b00020;font-weight:600;font-size:.9rem;}',
             '.historial-vacio{text-align:center;color:#6b7280;padding:30px 10px;}',
             '.historial-acciones{display:flex;gap:6px;flex-wrap:wrap;}',
             '.historial-btn{border:none;border-radius:5px;padding:6px 10px;font-size:.8rem;cursor:pointer;font-family:inherit;font-weight:500;}',
@@ -295,9 +298,20 @@
                 return;
             }
 
+            const conteo = {};
+            items.forEach(function (r) {
+                const k = claveRepetido(r);
+                if (k) conteo[k] = (conteo[k] || 0) + 1;
+            });
+            let totalRepetidos = 0;
+
             const filas = items.map(function (r) {
+                const k = claveRepetido(r);
+                const repetido = k && conteo[k] > 1;
+                if (repetido) totalRepetidos++;
                 return '' +
-                    '<tr data-id="' + r.id + '">' +
+                    '<tr data-id="' + r.id + '"' +
+                        (repetido ? ' class="historial-repetido" title="Repetido: hay ' + conteo[k] + ' informes de esta entidad con la misma fecha"' : '') + '>' +
                         '<td>' + formatearFecha(r.fecha) + '</td>' +
                         '<td>' + escapeHTML(r.nombre || r.filename || 'Informe') + '</td>' +
                         '<td>' + formatearTamanio(r.tamanio) + '</td>' +
@@ -312,6 +326,7 @@
             }).join('');
 
             body.innerHTML =
+                (totalRepetidos ? '<p class="historial-aviso-repetidos">⚠ ' + totalRepetidos + ' informe(s) repetido(s) marcados en rojo (misma entidad y fecha).</p>' : '') +
                 '<table class="historial-lista">' +
                     '<thead><tr><th>Fecha</th><th>Nombre</th><th>Tamaño</th><th>Acciones</th></tr></thead>' +
                     '<tbody>' + filas + '</tbody>' +
@@ -331,6 +346,24 @@
             console.error('[historial] Error al listar:', err);
             body.innerHTML = '<p class="historial-vacio">No se pudo cargar el historial: ' + escapeHTML(err.message || String(err)) + '</p>';
         });
+    }
+
+    // Repetido = misma entidad + misma fecha del formulario (normalizadas).
+    function normalizarTexto(t) {
+        return String(t || '')
+            .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+            .toLowerCase().replace(/\s+/g, ' ').trim();
+    }
+
+    function claveRepetido(r) {
+        const snap = (r.formulario && r.formulario.localStorage) || {};
+        const entidad = normalizarTexto(snap.nombre_entidad);
+        if (!entidad) return null;
+        const fecha = ['dia', 'mes', 'ano'].map(function (c) {
+            const v = normalizarTexto(snap[c]);
+            return /^\d+$/.test(v) ? String(parseInt(v, 10)) : v;
+        }).join('/');
+        return entidad + '|' + fecha;
     }
 
     function accionDescargar(id) {

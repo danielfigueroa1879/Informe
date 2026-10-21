@@ -642,6 +642,38 @@
         if (modal) modal.style.display = 'none';
     }
 
+    // ---------- Detección de repetidos ----------
+    // Dos informes se consideran repetidos si tienen la misma entidad y la misma
+    // fecha de fiscalización (sin importar mayúsculas, tildes, espacios o ceros a la
+    // izquierda). Sirve para detectar el mismo informe subido desde distintos computadores.
+    function normalizarTexto(t) {
+        return String(t || '')
+            .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+            .toLowerCase().replace(/\s+/g, ' ').trim();
+    }
+
+    function normalizarFecha(f) {
+        return normalizarTexto(f)
+            .split(/[\/\-.\s]+/)
+            .map(function (p) { return /^\d+$/.test(p) ? String(parseInt(p, 10)) : p; })
+            .join('/');
+    }
+
+    function claveRepetido(inf) {
+        const entidad = normalizarTexto(inf.nombre_entidad);
+        if (!entidad) return null;
+        return entidad + '|' + normalizarFecha(inf.fecha_fiscalizacion);
+    }
+
+    function contarRepetidos(informes) {
+        const conteo = {};
+        informes.forEach(function (inf) {
+            const k = claveRepetido(inf);
+            if (k) conteo[k] = (conteo[k] || 0) + 1;
+        });
+        return conteo;
+    }
+
     async function refrescarLista(filtro) {
         const contenedor = document.querySelector('#modal-informes .mi-lista');
         if (!contenedor) return;
@@ -651,6 +683,7 @@
             contenedor.innerHTML = '<p>No hay informes guardados.</p>';
             return;
         }
+        const conteo = contarRepetidos(informes);
         const tabla = document.createElement('table');
         tabla.className = 'mi-tabla';
         tabla.innerHTML =
@@ -661,6 +694,11 @@
         informes.forEach(function (inf) {
             const tr = document.createElement('tr');
             const fecha = new Date(inf.updated_at).toLocaleString('es-CL');
+            const k = claveRepetido(inf);
+            if (k && conteo[k] > 1) {
+                tr.className = 'mi-repetido';
+                tr.title = 'Repetido: hay ' + conteo[k] + ' informes de esta entidad con la misma fecha';
+            }
             tr.innerHTML =
                 '<td>' + inf.id + '</td>' +
                 '<td>' + (inf.nombre_entidad || '<i>(sin nombre)</i>') + '</td>' +
@@ -692,6 +730,16 @@
             tbody.appendChild(tr);
         });
         contenedor.innerHTML = '';
+        const totalRepetidos = informes.filter(function (inf) {
+            const k = claveRepetido(inf);
+            return k && conteo[k] > 1;
+        }).length;
+        if (totalRepetidos) {
+            const aviso = document.createElement('p');
+            aviso.className = 'mi-aviso-repetidos';
+            aviso.textContent = '⚠ ' + totalRepetidos + ' informe(s) repetido(s) marcados en rojo (misma entidad y fecha).';
+            contenedor.appendChild(aviso);
+        }
         contenedor.appendChild(tabla);
     }
 
