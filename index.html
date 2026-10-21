@@ -732,6 +732,14 @@ html { background-color: #bfe1f9; }
 #modal-informes .mi-btn-cargar { background: #28a745; }
 #modal-informes .mi-btn-pdf    { background: #003366; }
 #modal-informes .mi-btn-borrar { background: #dc3545; }
+#modal-informes .mi-tabla tr.mi-repetido td {
+    background: #fde2e4; color: #b00020; font-weight: 600;
+}
+#modal-informes .mi-tabla tr.mi-repetido td:first-child { border-left: 4px solid #dc3545; }
+#modal-informes .mi-aviso-repetidos {
+    margin: 0 0 10px; padding: 8px 12px; border-radius: 6px;
+    background: #fde2e4; color: #b00020; font-weight: 600; font-size: 0.9rem;
+}
 
 /* Estilos de impresión para resumen automático */
 @media print {
@@ -1685,7 +1693,7 @@ h1 {
 </script>
 <script src="autoguardado.js?v=20261015c"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-<script src="supabase-storage.js?v=20261015c"></script>
+<script src="supabase-storage.js?v=20261021a"></script>
 <body>
   <div class="container">
        <div class="logoo-container">
@@ -2484,7 +2492,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                                                                                                  
                                                                 
 </script>
-<script src="historial.js?v=20261015c"></script>
+<script src="historial.js?v=20261021a"></script>
 <script src="pdf-optimizado.js?v=20261015c"></script>
                                <!-- Navegación móvil fija -->
 <div class="mobile-nav no-print">
